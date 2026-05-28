@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Helper/">
+    <Project Path="Helper/HiAuRo.Helper/HiAuRo.Helper.csproj" />
+  </Folder>
+  <Project Path="KairoHiAuRoACR.csproj" />
+</Solution>
