@@ -81,6 +81,13 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 - 副本特化、停手、保留、强制爆发、转火和药水窗口不要硬编码进基础循环。
 - 需要覆盖高优先级插入时，使用官方 `CanUseHighPrioritySlotCheck` 这类 Rotation 钩子。
 
+当前差距：
+
+- MCH 只有基础 SlotResolver / EventHandler / UI，尚未接 `TargetResolvers`。
+- MCH 尚未实现 `IOpener`，因此没有倒计时 `InitCountDown` 预拉动作。
+- 副本时间线、事实轴、辅助轴策略尚未接入 Kairo 职业逻辑。
+- 面板已要求游戏内可见文案中文化，但新增职业仍需要逐项验证。
+
 ## 4. SlotMode
 
 每个 Resolver 必须选对模式：
@@ -158,6 +165,7 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 约定：
 
+- Game-visible UI labels should be Chinese by default; 游戏内可见的 Tab、QT、Hotkey、tooltip 文案默认使用中文。
 - 持续策略用 QT。
 - 一次性命令用 Hotkey。
 - QT id 必须带职业前缀，避免多个职业共用一个 DLL 后冲突。

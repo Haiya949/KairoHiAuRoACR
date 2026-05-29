@@ -21,7 +21,7 @@ function Read-File {
         return ""
     }
 
-    return Get-Content -LiteralPath $fullPath -Raw
+    return Get-Content -LiteralPath $fullPath -Raw -Encoding utf8
 }
 
 function Assert-Contains {
@@ -119,7 +119,8 @@ Assert-InOrder "Jobs/Machinist/MachinistRotationEntry.cs" @(
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddBuiltinQt\(BuiltinQt\.Burst,\s*true\)" "MCH UI must expose Burst"
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddBuiltinQt\(BuiltinQt\.Hold,\s*false\)" "MCH UI must expose Hold"
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "RegisterControls\(IAcrUiBuilder\s+builder\)" "MCH UI must implement the current IRotationUI builder signature"
-Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""MCH""\)" "MCH UI tab must use the current HiAuRo runtime AddTab signature"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*""\)" "MCH UI tab must use a Chinese in-game label with the current AddTab signature"
+Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""MCH""\)" "MCH UI tab must not expose an English-only job label"
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""mch"",\s*""MCH""\)" "MCH UI tab must not use the old two-argument SDK AddTab signature"
 Assert-InOrder "Jobs/Machinist/MachinistRotationUi.cs" @(
     "QTKey.Stop",
@@ -129,10 +130,19 @@ Assert-InOrder "Jobs/Machinist/MachinistRotationUi.cs" @(
     "QTKey.HighEndMode",
     "QTKey.Aoe"
 ) "MCH UI must expose only implemented continuous QT toggles"
-Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddQtHotkey\(""Potion"",\s*new\s+HotkeyResolver_Potion" "Potion must remain a hotkey, not a QT toggle"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string Stop = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH Stop QT must use a Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string DumpResources = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH DumpResources QT must use a Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string ForceBurst = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH ForceBurst QT must use a Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string ForbidBurst = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH ForbidBurst QT must use a Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string HighEndMode = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH HighEndMode QT must use a Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string Aoe = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH AOE QT must use a Chinese visible label"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddQtHotkey\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"",\s*new\s+HotkeyResolver_Potion" "Potion must remain a Chinese-labeled hotkey, not a QT toggle"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddQtHotkey\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"",\s*new\s+HotkeyResolver_LB" "Limit Break must remain a Chinese-labeled hotkey"
+Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "Stop all MCH actions|Spend resources immediately|Treat the current window as burst|Hold burst resources|Use two-minute burst planning|Enable AOE GCD choices|AddQtHotkey\(""(Potion|Sprint|Limit Break|Tactician|Dismantle|Second Wind|Arm's Length|Head Graze|Leg Graze|Foot Graze)""" "MCH in-game UI labels and tooltips must be Chinese"
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "QTKey\.(UsePotion|RangedSafety|CastLog|PrepullReassemble)" "MCH UI must not expose unimplemented QT toggles"
 Assert-NotContains "Jobs/Machinist/QTKey.cs" "(UsePotion|RangedSafety|CastLog|PrepullReassemble)" "MCH QT catalog must not keep unimplemented keys"
 Assert-NotContains "Jobs/Machinist/MachinistSettings.cs" "(PrepullReassemble|CountdownPullActionQueue)" "MCH settings must not keep unused prepull controls"
+Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "visible UI labels.*Chinese" "Kairo author guide compliance must document Chinese visible UI labels"
 
 Assert-Contains "Jobs/Machinist/Data/MachinistActionId.cs" "public const uint FullMetalField = 36982;" "MCH action catalog must include Dawntrail actions"
 Assert-Contains "Jobs/Machinist/Data/MachinistStatusId.cs" "public const ushort Overheated = 2688;" "MCH status catalog must include Overheated"

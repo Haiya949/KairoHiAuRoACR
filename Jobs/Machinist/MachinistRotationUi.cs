@@ -9,23 +9,23 @@ public sealed class MachinistRotationUi : IRotationUI
         builder.AddMainControl();
         builder.AddBuiltinQt(BuiltinQt.Burst, true);
         builder.AddBuiltinQt(BuiltinQt.Hold, false);
-        builder.AddTab("MCH");
-        builder.AddQtToggle(QTKey.Stop, false, "Stop all MCH actions");
-        builder.AddQtToggle(QTKey.DumpResources, false, "Spend resources immediately");
-        builder.AddQtToggle(QTKey.ForceBurst, false, "Treat the current window as burst");
-        builder.AddQtToggle(QTKey.ForbidBurst, false, "Hold burst resources");
-        builder.AddQtToggle(QTKey.HighEndMode, true, "Use two-minute burst planning");
-        builder.AddQtToggle(QTKey.Aoe, true, "Enable AOE GCD choices");
+        builder.AddTab("机工士");
+        builder.AddQtToggle(QTKey.Stop, false, "停止所有机工士动作");
+        builder.AddQtToggle(QTKey.DumpResources, false, "立即倾泻热量和电量资源");
+        builder.AddQtToggle(QTKey.ForceBurst, false, "将当前窗口视为爆发期");
+        builder.AddQtToggle(QTKey.ForbidBurst, false, "保留爆发资源");
+        builder.AddQtToggle(QTKey.HighEndMode, true, "启用两分钟爆发规划");
+        builder.AddQtToggle(QTKey.Aoe, true, "启用群攻 GCD 选择");
 
-        builder.AddQtHotkey("Potion", new HotkeyResolver_Potion());
-        builder.AddQtHotkey("Sprint", new HotkeyResolver_NormalSpell(MachinistActionId.Sprint, "Sprint", SpellTargetType.Self));
-        builder.AddQtHotkey("Limit Break", new HotkeyResolver_LB());
-        builder.AddQtHotkey("Tactician", new HotkeyResolver_NormalSpell(MachinistActionId.Tactician, "Tactician", SpellTargetType.Self));
-        builder.AddQtHotkey("Dismantle", new HotkeyResolver_NormalSpell(MachinistActionId.Dismantle, "Dismantle"));
-        builder.AddQtHotkey("Second Wind", new HotkeyResolver_NormalSpell(MachinistActionId.SecondWind, "Second Wind", SpellTargetType.Self));
-        builder.AddQtHotkey("Arm's Length", new HotkeyResolver_NormalSpell(MachinistActionId.ArmsLength, "Arm's Length", SpellTargetType.Self));
-        builder.AddQtHotkey("Head Graze", new HotkeyResolver_NormalSpell(MachinistActionId.HeadGraze, "Head Graze"));
-        builder.AddQtHotkey("Leg Graze", new HotkeyResolver_NormalSpell(MachinistActionId.LegGraze, "Leg Graze"));
-        builder.AddQtHotkey("Foot Graze", new HotkeyResolver_NormalSpell(MachinistActionId.FootGraze, "Foot Graze"));
+        builder.AddQtHotkey("爆发药", new HotkeyResolver_Potion());
+        builder.AddQtHotkey("冲刺", new HotkeyResolver_NormalSpell(MachinistActionId.Sprint, "冲刺", SpellTargetType.Self));
+        builder.AddQtHotkey("极限技", new HotkeyResolver_LB());
+        builder.AddQtHotkey("策动", new HotkeyResolver_NormalSpell(MachinistActionId.Tactician, "策动", SpellTargetType.Self));
+        builder.AddQtHotkey("武装解除", new HotkeyResolver_NormalSpell(MachinistActionId.Dismantle, "武装解除"));
+        builder.AddQtHotkey("内丹", new HotkeyResolver_NormalSpell(MachinistActionId.SecondWind, "内丹", SpellTargetType.Self));
+        builder.AddQtHotkey("亲疏自行", new HotkeyResolver_NormalSpell(MachinistActionId.ArmsLength, "亲疏自行", SpellTargetType.Self));
+        builder.AddQtHotkey("伤头", new HotkeyResolver_NormalSpell(MachinistActionId.HeadGraze, "伤头"));
+        builder.AddQtHotkey("伤腿", new HotkeyResolver_NormalSpell(MachinistActionId.LegGraze, "伤腿"));
+        builder.AddQtHotkey("伤足", new HotkeyResolver_NormalSpell(MachinistActionId.FootGraze, "伤足"));
     }
 }

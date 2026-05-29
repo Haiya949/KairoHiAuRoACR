@@ -2,10 +2,10 @@ namespace KairoHiAuRoACR.Jobs.Machinist;
 
 public static class QTKey
 {
-    public const string Stop = "MCH_Stop";
-    public const string DumpResources = "MCH_DumpResources";
-    public const string ForceBurst = "MCH_ForceBurst";
-    public const string ForbidBurst = "MCH_ForbidBurst";
-    public const string HighEndMode = "MCH_HighEndMode";
-    public const string Aoe = "MCH_Aoe";
+    public const string Stop = "机工 停手";
+    public const string DumpResources = "机工 泄资源";
+    public const string ForceBurst = "机工 强制爆发";
+    public const string ForbidBurst = "机工 保留爆发";
+    public const string HighEndMode = "机工 高难模式";
+    public const string Aoe = "机工 群攻";
 }

@@ -166,13 +166,14 @@ Resolver 只做两件事：
 builder.AddMainControl();
 builder.AddBuiltinQt(BuiltinQt.Burst, true);
 builder.AddBuiltinQt(BuiltinQt.Hold, false);
-builder.AddTab("mch", "MCH");
-builder.AddQtToggle("MCH_MinimalLoop", true, "基础循环");
+builder.AddTab("机工士");
+builder.AddQtToggle("机工 基础循环", true, "启用机工士基础循环");
 ```
 
 约定：
 
-- QT id 加职业前缀，例如 `MCH_MinimalLoop`，避免多职业冲突。
+- 游戏内可见的 Tab、QT、Hotkey、tooltip 文案默认使用中文。
+- HiAuRo 当前会从 QT label 生成内部 id，因此 QT label 要带职业前缀，例如 `机工 基础循环`，避免多职业冲突。
 - 持续开关用 QT。
 - 一次性动作以后再接 Hotkey。
 - 需要持久化的职业配置放进 `<JobName>Settings`。
