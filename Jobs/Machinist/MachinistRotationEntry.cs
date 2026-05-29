@@ -33,6 +33,7 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
         return new Rotation
         {
             SlotResolvers = _slotResolvers,
+            Opener = new MachinistOpener(),
             EventHandler = new MachinistRotationEventHandler(),
             TargetResolvers = [new MachinistTargetResolver(Settings)],
             AcrType = AcrType.PvE,

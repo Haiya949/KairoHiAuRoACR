@@ -84,7 +84,7 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 当前差距：
 
 - MCH 已接运行时读取 settings 的基础最近敌人 `TargetResolver`，但还没有副本级目标优先级。
-- MCH 尚未实现 `IOpener`，因此没有倒计时 `InitCountDown` 预拉动作。
+- MCH 已接 HiAuRo 原生 `IOpener` 起手，并按当前 `CountDownHandler` 整数秒接口使用 4s prepull Reassemble。
 - HiAuRo 正常 ACR 循环只在 `CombatContext.State.InCombat` 后执行；倒计时结束本身不会启动普通循环。
 - 副本时间线、事实轴、辅助轴策略尚未接入 Kairo 职业逻辑。
 - 面板已要求游戏内可见文案中文化，但新增职业仍需要逐项验证。

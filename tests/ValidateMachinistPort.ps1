@@ -77,6 +77,7 @@ $requiredFiles = @(
     "Jobs/Machinist/Data/MachinistActionId.cs",
     "Jobs/Machinist/Data/MachinistStatusId.cs",
     "Jobs/Machinist/QTKey.cs",
+    "Jobs/Machinist/Opener/MachinistOpener.cs",
     "Jobs/Machinist/MachinistSpellHelper.cs",
     "Jobs/Machinist/MachinistRotationEventHandler.cs",
     "Jobs/Machinist/Resolvers/GCD/MachinistAoeGcdResolver.cs",
@@ -102,6 +103,27 @@ Assert-Contains "scripts/build.ps1" '\$LASTEXITCODE' "Build script must stop whe
 Assert-NotContains "GlobalUsings.cs" "global\s+using\s+IUiBuilder" "Global usings must not keep the old IUiBuilder alias for ACR UI"
 
 Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "EventHandler\s*=\s*new\s+MachinistRotationEventHandler" "Rotation must register the MCH event handler"
+Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "Opener\s*=\s*new\s+MachinistOpener\(\)" "Rotation must register the HiAuRo-native MCH opener"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "class\s+MachinistOpener\s*:\s*IOpener" "MCH opener must implement HiAuRo IOpener"
+Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "AEAssist|Kairo\.Machinist|UseActionManager|UseAction\(" "MCH opener must use only HiAuRo-native Slot/Spell APIs"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "InitCountDown\(CountDownHandler\s+handler\)" "MCH opener must register countdown actions through HiAuRo CountDownHandler"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "handler\.AddAction\(4,\s*MachinistActionId\.Reassemble,\s*SpellTargetType\.Self\)" "MCH opener must use the approved 4s prepull Reassemble countdown action"
+Assert-InOrder "Jobs/Machinist/Opener/MachinistOpener.cs" @(
+    "MachinistActionId.Drill",
+    "MachinistActionId.AirAnchor",
+    "MachinistActionId.ChainSaw",
+    "MachinistActionId.Excavator",
+    "MachinistActionId.Drill",
+    "MachinistActionId.FullMetalField"
+) "MCH opener GCD order must follow the old Kairo standard opener"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddTargetAbility\(slot,\s*MachinistActionId\.Checkmate\)" "MCH opener must weave Checkmate in the fixed opener"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddTargetAbility\(slot,\s*MachinistActionId\.DoubleCheck" "MCH opener must weave Double Check in the fixed opener"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddSelfAbility\(slot,\s*MachinistActionId\.BarrelStabilizer\)" "MCH opener must weave Barrel Stabilizer after Air Anchor"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddSelfAbility\(slot,\s*MachinistActionId\.AutomatonQueen\)" "MCH opener must weave Queen after Excavator"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddSelfAbility\(slot,\s*MachinistActionId\.Reassemble" "MCH opener must weave the second Reassemble before second Drill"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddTargetAbility\(slot,\s*MachinistActionId\.Wildfire" "MCH opener must weave Wildfire after second Drill"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "AddSelfAbility\(slot,\s*MachinistActionId\.Hypercharge" "MCH opener must weave Hypercharge after Full Metal Field"
+Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "4s prepull Reassemble" "Docs must record the HiAuRo-only 4s prepull Reassemble decision"
 Assert-InOrder "Jobs/Machinist/MachinistRotationEntry.cs" @(
     "MachinistQueenOverdriveResolver",
     "MachinistWildfireResolver",
