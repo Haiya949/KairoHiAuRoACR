@@ -4,12 +4,12 @@ namespace KairoHiAuRoACR.Jobs.Machinist;
 
 public sealed class MachinistRotationUi : IRotationUI
 {
-    public void RegisterControls(IUiBuilder builder)
+    public void RegisterControls(IAcrUiBuilder builder)
     {
         builder.AddMainControl();
         builder.AddBuiltinQt(BuiltinQt.Burst, true);
         builder.AddBuiltinQt(BuiltinQt.Hold, false);
-        builder.AddTab("mch", "MCH");
+        builder.AddTab("MCH");
         builder.AddQtToggle(QTKey.Stop, false, "Stop all MCH actions");
         builder.AddQtToggle(QTKey.DumpResources, false, "Spend resources immediately");
         builder.AddQtToggle(QTKey.ForceBurst, false, "Treat the current window as burst");

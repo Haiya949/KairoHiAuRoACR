@@ -137,7 +137,7 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
 注意：
 
 - `AuthorName` 必须是 `Kairo`。
-- `UseCustomUi` 默认 false，优先使用 HiAuRo 的 `IUiBuilder`。
+- `UseCustomUi` 默认 false，职业 UI 使用 HiAuRo 的 `IAcrUiBuilder`。
 - `TargetJobs` 和 `Rotation.TargetJob` 必须一致。
 - `Build()` 只组装 Rotation，不做大量运行时计算。
 - 一个职业不要注册多个入口。

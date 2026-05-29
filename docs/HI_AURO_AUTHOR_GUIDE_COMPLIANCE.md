@@ -148,7 +148,7 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 ## 8. UI / QT / Hotkey
 
-默认使用 `IUiBuilder`：
+默认使用 `IAcrUiBuilder`：
 
 - `builder.AddMainControl()`
 - `builder.AddBuiltinQt(BuiltinQt.Burst, true)`

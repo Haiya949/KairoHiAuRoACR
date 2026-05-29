@@ -72,6 +72,8 @@ function Assert-InOrder {
 }
 
 $requiredFiles = @(
+    "NuGet.Config",
+    "scripts/build.ps1",
     "Jobs/Machinist/Data/MachinistActionId.cs",
     "Jobs/Machinist/Data/MachinistStatusId.cs",
     "Jobs/Machinist/QTKey.cs",
@@ -94,6 +96,11 @@ foreach ($file in $requiredFiles) {
     Assert-File $file
 }
 
+Assert-Contains "NuGet.Config" "E:\\ff14\\HiAuRo\\local-nuget-feed\\" "Kairo ACR must restore HiAuRo.Sdk from the local runtime feed first"
+Assert-Contains "KairoHiAuRoACR.csproj" "PackageReference\s+Include=""HiAuRo\.Sdk""\s+Version=""0\.1\.\*""" "Kairo ACR must track the local HiAuRo.Sdk 0.1.* package"
+Assert-Contains "scripts/build.ps1" '\$LASTEXITCODE' "Build script must stop when dotnet build fails instead of deploying stale output"
+Assert-NotContains "GlobalUsings.cs" "global\s+using\s+IUiBuilder" "Global usings must not keep the old IUiBuilder alias for ACR UI"
+
 Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "EventHandler\s*=\s*new\s+MachinistRotationEventHandler" "Rotation must register the MCH event handler"
 Assert-InOrder "Jobs/Machinist/MachinistRotationEntry.cs" @(
     "MachinistQueenOverdriveResolver",
@@ -111,6 +118,9 @@ Assert-InOrder "Jobs/Machinist/MachinistRotationEntry.cs" @(
 
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddBuiltinQt\(BuiltinQt\.Burst,\s*true\)" "MCH UI must expose Burst"
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddBuiltinQt\(BuiltinQt\.Hold,\s*false\)" "MCH UI must expose Hold"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "RegisterControls\(IAcrUiBuilder\s+builder\)" "MCH UI must implement the current IRotationUI builder signature"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""MCH""\)" "MCH UI tab must use the current HiAuRo runtime AddTab signature"
+Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""mch"",\s*""MCH""\)" "MCH UI tab must not use the old two-argument SDK AddTab signature"
 Assert-InOrder "Jobs/Machinist/MachinistRotationUi.cs" @(
     "QTKey.Stop",
     "QTKey.DumpResources",

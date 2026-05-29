@@ -43,7 +43,7 @@ docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md
 | 技能优先级 | `Rotation.SlotResolvers` 顺序 |
 | GCD Resolver | `ISlotResolver` + `SlotMode.Gcd` |
 | 能力技 Resolver | `ISlotResolver` + `SlotMode.OffGcd` |
-| QT 开关 | `IRotationUI` + `IUiBuilder` |
+| QT 开关 | `IRotationUI` + `IAcrUiBuilder` |
 | 设置 | `AcrSettings` + `ISettingsProvider<T>` |
 | 职业量谱 | `HiAuRo.Helper.<Job>Helper` |
 | 连击变化 | `ComboHelper` / `GetActionChange()` |
