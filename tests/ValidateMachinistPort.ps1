@@ -162,8 +162,14 @@ Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "HelperRuntime\.HasStat
 Assert-NotContains "Jobs/Machinist/MachinistSettings.cs" "LongFightBurstPlanMs" "MCH settings must not keep hidden long-fight burst planning"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "_settings\.IsHighEndMode" "Two-minute burst planning must use the persistent combat mode setting"
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "LongFightBurstPlanMs|_currentBattleTimeMs\s*>=\s*_settings\.LongFightBurstPlanMs|QTKey\.HighEndMode" "Two-minute burst planning must not use hidden timers or low-frequency QT"
-Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "TargetResolvers\s*=\s*BuildTargetResolvers\(\)" "Rotation must wire target selection from settings"
-Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "TargetSelectionNearestEnemy" "MCH target selection must support nearest enemy mode"
+Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "TargetResolvers\s*=\s*\[new\s+MachinistTargetResolver\(Settings\)\]" "Rotation must wire a settings-backed target resolver"
+Assert-File "Jobs/Machinist/MachinistTargetResolver.cs"
+Assert-Contains "Jobs/Machinist/MachinistTargetResolver.cs" "TargetSelectionNearestEnemy" "MCH target selection must support nearest enemy mode"
+Assert-Contains "Jobs/Machinist/MachinistTargetResolver.cs" "TargetResolver_" "MCH nearest enemy mode must use HiAuRo's built-in target resolver"
+Assert-Contains "Jobs/Machinist/MachinistTargetResolver.cs" "ResolveTarget\(out\s+agent\)" "MCH target resolver must delegate to the selected resolver at runtime"
+Assert-NotContains "Jobs/Machinist/MachinistRotationEntry.cs" "BuildTargetResolvers" "Target selection must not be frozen at Rotation Build time"
+Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "CombatContext\.State\.InCombat" "Docs must state that normal ACR loop starts only after InCombat"
+Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "IOpener" "Docs must state that countdown pull actions belong to Opener"
 Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
     "public static Spell? GetHyperchargeOffGcd()",
     "if (GetHeat() < 50 || !hypercharge.IsReadyWithCanCast())",
