@@ -50,15 +50,16 @@ Jobs/Bard/
 - `BuiltinQt.Hold`
 - 一个职业 Tab
 
-职业自定义 QT id 必须带职业前缀：
+职业自定义 QT 只放战斗中常切的短标签：
 
 ```text
-BRD_UseSong
-MCH_MinimalLoop
-WAR_Defense
+泄资源
+强制爆发
+保留爆发
+AOE
 ```
 
-不要使用只有中文含义、没有职业前缀的 id，后续多职业会冲突。
+不要把低频配置塞进 QT，例如高难 / 日随模式、目标选择策略。这类配置放职业 settings 面板，并用 `<JobName>Settings` 持久化。
 
 ## 4. 写 Resolver
 

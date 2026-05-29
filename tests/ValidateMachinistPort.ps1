@@ -123,19 +123,24 @@ Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""[^""]*\p{IsCJ
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""MCH""\)" "MCH UI tab must not expose an English-only job label"
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "AddTab\(""mch"",\s*""MCH""\)" "MCH UI tab must not use the old two-argument SDK AddTab signature"
 Assert-InOrder "Jobs/Machinist/MachinistRotationUi.cs" @(
-    "QTKey.Stop",
     "QTKey.DumpResources",
     "QTKey.ForceBurst",
     "QTKey.ForbidBurst",
-    "QTKey.HighEndMode",
     "QTKey.Aoe"
-) "MCH UI must expose only implemented continuous QT toggles"
-Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string Stop = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH Stop QT must use a Chinese visible label"
-Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string DumpResources = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH DumpResources QT must use a Chinese visible label"
-Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string ForceBurst = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH ForceBurst QT must use a Chinese visible label"
-Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string ForbidBurst = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH ForbidBurst QT must use a Chinese visible label"
-Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string HighEndMode = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH HighEndMode QT must use a Chinese visible label"
-Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string Aoe = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH AOE QT must use a Chinese visible label"
+) "MCH UI must expose only combat-time continuous QT toggles"
+Assert-NotContains "Jobs/Machinist/QTKey.cs" "public const string Stop" "MCH must use the built-in Hold QT for the visible Stop toggle"
+Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "QTKey\.Stop" "MCH UI must not duplicate the built-in Hold/Stop QT"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string DumpResources = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH DumpResources QT must use a short Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string ForceBurst = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH ForceBurst QT must use a short Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string ForbidBurst = ""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"";" "MCH ForbidBurst QT must use a short Chinese visible label"
+Assert-Contains "Jobs/Machinist/QTKey.cs" "public const string Aoe = ""AOE"";" "MCH AOE QT must use a short visible label"
+Assert-NotContains "Jobs/Machinist/QTKey.cs" "HighEndMode|MCH_|机工 " "Low-frequency mode selection must not be a QT and QT labels must not carry job prefixes"
+Assert-Contains "Jobs/Machinist/MachinistSettings.cs" "public\s+string\s+CombatMode\s*=\s*CombatModeDaily;" "MCH combat mode must be a persistent setting"
+Assert-Contains "Jobs/Machinist/MachinistSettings.cs" "public\s+string\s+TargetSelection\s*=\s*TargetSelectionManual;" "MCH target selection must be a persistent setting"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddDropdown\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"",\s*MachinistSettings\.CombatModeOptions,\s*ref\s+_settings\.CombatMode" "MCH combat mode must be configured in the main settings UI"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddDropdown\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"",\s*MachinistSettings\.TargetSelectionOptions,\s*ref\s+_settings\.TargetSelection" "MCH target selection must be configured in the main settings UI"
+Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "QTKey\.HighEndMode|机工 " "Low-frequency mode selection must not appear as a QT"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "return\s+QTHelper\.IsEnabled\(BuiltinQt\.Hold\);" "Stop policy must use the built-in Hold QT"
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddQtHotkey\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"",\s*new\s+HotkeyResolver_Potion" "Potion must remain a Chinese-labeled hotkey, not a QT toggle"
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddQtHotkey\(""[^""]*\p{IsCJKUnifiedIdeographs}[^""]*"",\s*new\s+HotkeyResolver_LB" "Limit Break must remain a Chinese-labeled hotkey"
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "Stop all MCH actions|Spend resources immediately|Treat the current window as burst|Hold burst resources|Use two-minute burst planning|Enable AOE GCD choices|AddQtHotkey\(""(Potion|Sprint|Limit Break|Tactician|Dismantle|Second Wind|Arm's Length|Head Graze|Leg Graze|Foot Graze)""" "MCH in-game UI labels and tooltips must be Chinese"
@@ -155,7 +160,10 @@ Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "GetWildfireOffGcd" "MC
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "GetHyperchargeOffGcd" "MCH helper must expose Hypercharge policy"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "HelperRuntime\.HasStatus\(MachinistStatusId\.Overheated\)" "MCH helper must not rely on stale Helper MCH Hypercharge status constants"
 Assert-NotContains "Jobs/Machinist/MachinistSettings.cs" "LongFightBurstPlanMs" "MCH settings must not keep hidden long-fight burst planning"
-Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "LongFightBurstPlanMs|_currentBattleTimeMs\s*>=\s*_settings\.LongFightBurstPlanMs" "HighEndMode must be the only two-minute burst planning switch"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "_settings\.IsHighEndMode" "Two-minute burst planning must use the persistent combat mode setting"
+Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "LongFightBurstPlanMs|_currentBattleTimeMs\s*>=\s*_settings\.LongFightBurstPlanMs|QTKey\.HighEndMode" "Two-minute burst planning must not use hidden timers or low-frequency QT"
+Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "TargetResolvers\s*=\s*BuildTargetResolvers\(\)" "Rotation must wire target selection from settings"
+Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "TargetSelectionNearestEnemy" "MCH target selection must support nearest enemy mode"
 Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
     "public static Spell? GetHyperchargeOffGcd()",
     "if (GetHeat() < 50 || !hypercharge.IsReadyWithCanCast())",

@@ -83,7 +83,7 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 当前差距：
 
-- MCH 只有基础 SlotResolver / EventHandler / UI，尚未接 `TargetResolvers`。
+- MCH 已接 `TargetResolvers` 的基础最近敌人模式，但还没有副本级目标优先级。
 - MCH 尚未实现 `IOpener`，因此没有倒计时 `InitCountDown` 预拉动作。
 - 副本时间线、事实轴、辅助轴策略尚未接入 Kairo 职业逻辑。
 - 面板已要求游戏内可见文案中文化，但新增职业仍需要逐项验证。
@@ -161,14 +161,13 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 - `builder.AddBuiltinQt(BuiltinQt.Burst, true)`
 - `builder.AddBuiltinQt(BuiltinQt.Hold, false)`
 - 职业 Tab
-- 职业前缀 QT id
 
 约定：
 
 - Game-visible UI labels should be Chinese by default; 游戏内可见的 Tab、QT、Hotkey、tooltip 文案默认使用中文。
-- 持续策略用 QT。
+- 战斗中常切的持续策略用 QT，标签保持短而清楚，例如 `泄资源`、`强制爆发`、`保留爆发`、`AOE`。
+- 低频配置放 settings 面板，例如 `战斗模式`、`目标选择`。
 - 一次性命令用 Hotkey。
-- QT id 必须带职业前缀，避免多个职业共用一个 DLL 后冲突。
 
 ## 9. 验证要求
 

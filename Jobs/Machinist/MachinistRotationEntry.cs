@@ -1,5 +1,6 @@
 using KairoHiAuRoACR.Jobs.Machinist.Resolvers.GCD;
 using KairoHiAuRoACR.Jobs.Machinist.Resolvers.OffGCD;
+using HiAuRo.ACR.TargetResolvers;
 using HiAuRoJob = HiAuRo.ACR.Jobs;
 
 namespace KairoHiAuRoACR.Jobs.Machinist;
@@ -34,6 +35,7 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
         {
             SlotResolvers = _slotResolvers,
             EventHandler = new MachinistRotationEventHandler(),
+            TargetResolvers = BuildTargetResolvers(),
             AcrType = AcrType.PvE,
             MinLevel = 1,
             MaxLevel = 100,
@@ -42,7 +44,7 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
         };
     }
 
-    public IRotationUI? GetRotationUI() => new MachinistRotationUi();
+    public IRotationUI? GetRotationUI() => new MachinistRotationUi(Settings);
 
     public void OnDrawSetting()
     {
@@ -61,5 +63,13 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
     public void OnExitRotation()
     {
         MachinistSpellHelper.Reset();
+    }
+
+    private List<ITargetResolver> BuildTargetResolvers()
+    {
+        if (Settings.TargetSelection == MachinistSettings.TargetSelectionNearestEnemy)
+            return [new TargetResolver_最近敌人()];
+
+        return [];
     }
 }

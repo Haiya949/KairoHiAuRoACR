@@ -91,7 +91,7 @@ public static class MachinistSpellHelper
 
     public static bool ShouldStopActions()
     {
-        return QTHelper.IsEnabled(BuiltinQt.Hold) || QTHelper.IsEnabled(QTKey.Stop);
+        return QTHelper.IsEnabled(BuiltinQt.Hold);
     }
 
     public static bool IsOverheated()
@@ -436,7 +436,7 @@ public static class MachinistSpellHelper
 
     private static bool ShouldUseTwoMinuteBurstPlan()
     {
-        return QTHelper.IsEnabled(QTKey.HighEndMode);
+        return _settings.IsHighEndMode;
     }
 
     private static bool IsInTwoMinuteBurstWindow()
