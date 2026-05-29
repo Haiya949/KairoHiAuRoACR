@@ -8,8 +8,17 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
 {
     private readonly List<SlotResolverData> _slotResolvers =
     [
-        new() { Resolver = new MachinistBurstAbilityResolver(), Mode = SlotMode.OffGcd },
-        new() { Resolver = new MachinistSingleTargetGcdResolver(), Mode = SlotMode.Gcd },
+        new() { Resolver = new MachinistQueenOverdriveResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistWildfireResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistBarrelStabilizerResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistHyperchargeResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistQueenResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistReassembleResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistGaussRoundResolver(), Mode = SlotMode.OffGcd },
+        new() { Resolver = new MachinistAoeGcdResolver(), Mode = SlotMode.Gcd },
+        new() { Resolver = new MachinistOverheatedGcdResolver(), Mode = SlotMode.Gcd },
+        new() { Resolver = new MachinistStrongGcdResolver(), Mode = SlotMode.Gcd },
+        new() { Resolver = new MachinistBaseGcdResolver(), Mode = SlotMode.Gcd },
     ];
 
     public string AuthorName { get; } = "Kairo";
@@ -19,14 +28,17 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
 
     public Rotation? Build(string settingFolder)
     {
+        MachinistSpellHelper.Configure(Settings);
+
         return new Rotation
         {
             SlotResolvers = _slotResolvers,
+            EventHandler = new MachinistRotationEventHandler(),
             AcrType = AcrType.PvE,
             MinLevel = 1,
             MaxLevel = 100,
             TargetJob = HiAuRoJob.MCH,
-            Description = "Kairo HiAuRo MCH framework"
+            Description = "Kairo HiAuRo MCH rotation"
         };
     }
 
@@ -42,9 +54,12 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
 
     public void OnEnterRotation()
     {
+        MachinistSpellHelper.Configure(Settings);
+        MachinistSpellHelper.Reset();
     }
 
     public void OnExitRotation()
     {
+        MachinistSpellHelper.Reset();
     }
 }
