@@ -11,15 +11,11 @@ public sealed class MachinistRotationUi : IRotationUI
         builder.AddBuiltinQt(BuiltinQt.Hold, false);
         builder.AddTab("mch", "MCH");
         builder.AddQtToggle(QTKey.Stop, false, "Stop all MCH actions");
-        builder.AddQtToggle(QTKey.UsePotion, false, "Enable potion hotkey policy");
         builder.AddQtToggle(QTKey.DumpResources, false, "Spend resources immediately");
         builder.AddQtToggle(QTKey.ForceBurst, false, "Treat the current window as burst");
         builder.AddQtToggle(QTKey.ForbidBurst, false, "Hold burst resources");
         builder.AddQtToggle(QTKey.HighEndMode, true, "Use two-minute burst planning");
         builder.AddQtToggle(QTKey.Aoe, true, "Enable AOE GCD choices");
-        builder.AddQtToggle(QTKey.RangedSafety, true, "Reserved ranged safety toggle");
-        builder.AddQtToggle(QTKey.CastLog, false, "Reserved cast log toggle");
-        builder.AddQtToggle(QTKey.PrepullReassemble, true, "Reserved prepull Reassemble toggle");
 
         builder.AddQtHotkey("Potion", new HotkeyResolver_Potion());
         builder.AddQtHotkey("Sprint", new HotkeyResolver_NormalSpell(MachinistActionId.Sprint, "Sprint", SpellTargetType.Self));

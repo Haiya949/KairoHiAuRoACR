@@ -37,6 +37,19 @@ function Assert-Contains {
     }
 }
 
+function Assert-NotContains {
+    param(
+        [string]$Path,
+        [string]$Pattern,
+        [string]$Message
+    )
+
+    $text = Read-File $Path
+    if ($text -match $Pattern) {
+        $failures.Add("$Message ($Path)")
+    }
+}
+
 function Assert-InOrder {
     param(
         [string]$Path,
@@ -100,16 +113,16 @@ Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddBuiltinQt\(BuiltinQt
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddBuiltinQt\(BuiltinQt\.Hold,\s*false\)" "MCH UI must expose Hold"
 Assert-InOrder "Jobs/Machinist/MachinistRotationUi.cs" @(
     "QTKey.Stop",
-    "QTKey.UsePotion",
     "QTKey.DumpResources",
     "QTKey.ForceBurst",
     "QTKey.ForbidBurst",
     "QTKey.HighEndMode",
-    "QTKey.Aoe",
-    "QTKey.RangedSafety",
-    "QTKey.CastLog",
-    "QTKey.PrepullReassemble"
-) "MCH UI must expose the expected QT toggles"
+    "QTKey.Aoe"
+) "MCH UI must expose only implemented continuous QT toggles"
+Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" "AddQtHotkey\(""Potion"",\s*new\s+HotkeyResolver_Potion" "Potion must remain a hotkey, not a QT toggle"
+Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "QTKey\.(UsePotion|RangedSafety|CastLog|PrepullReassemble)" "MCH UI must not expose unimplemented QT toggles"
+Assert-NotContains "Jobs/Machinist/QTKey.cs" "(UsePotion|RangedSafety|CastLog|PrepullReassemble)" "MCH QT catalog must not keep unimplemented keys"
+Assert-NotContains "Jobs/Machinist/MachinistSettings.cs" "(PrepullReassemble|CountdownPullActionQueue)" "MCH settings must not keep unused prepull controls"
 
 Assert-Contains "Jobs/Machinist/Data/MachinistActionId.cs" "public const uint FullMetalField = 36982;" "MCH action catalog must include Dawntrail actions"
 Assert-Contains "Jobs/Machinist/Data/MachinistStatusId.cs" "public const ushort Overheated = 2688;" "MCH status catalog must include Overheated"
