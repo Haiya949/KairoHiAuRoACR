@@ -134,6 +134,21 @@ Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "GetBaseComboGcd" "MCH 
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "GetWildfireOffGcd" "MCH helper must expose Wildfire policy"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "GetHyperchargeOffGcd" "MCH helper must expose Hypercharge policy"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "HelperRuntime\.HasStatus\(MachinistStatusId\.Overheated\)" "MCH helper must not rely on stale Helper MCH Hypercharge status constants"
+Assert-NotContains "Jobs/Machinist/MachinistSettings.cs" "LongFightBurstPlanMs" "MCH settings must not keep hidden long-fight burst planning"
+Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "LongFightBurstPlanMs|_currentBattleTimeMs\s*>=\s*_settings\.LongFightBurstPlanMs" "HighEndMode must be the only two-minute burst planning switch"
+Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
+    "public static Spell? GetHyperchargeOffGcd()",
+    "if (GetHeat() < 50 || !hypercharge.IsReadyWithCanCast())",
+    "if (IsForbidBurstActive())",
+    "var shouldUseActiveWildfireHypercharge = HasActiveWildfirePackage();",
+    "var shouldSpendHeatForBudget = ShouldSpendHeatByBudget();"
+) "Hypercharge budget and dump paths must respect ForbidBurst first"
+Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
+    "public static Spell? GetQueenOffGcd()",
+    "if (IsForbidBurstActive())",
+    "var shouldSpendBatteryForOvercap"
+) "Battery overcap paths must respect ForbidBurst first"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "LevelAtLeast\(80\)\s*\?\s*MachinistActionId\.QueenOverdrive\s*:\s*MachinistActionId\.RookOverdrive" "MCH robot overdrive must choose RookOverdrive below level 80"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist port validation failed:"

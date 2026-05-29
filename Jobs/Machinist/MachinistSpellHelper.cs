@@ -215,6 +215,9 @@ public static class MachinistSpellHelper
         if (GetHeat() < 50 || !hypercharge.IsReadyWithCanCast())
             return null;
 
+        if (IsForbidBurstActive())
+            return null;
+
         var shouldUseActiveWildfireHypercharge = HasActiveWildfirePackage();
         var shouldSpendHeatForBudget = ShouldSpendHeatByBudget();
 
@@ -250,6 +253,9 @@ public static class MachinistSpellHelper
         if (GetBattery() < _settings.BatteryBurstSpendThreshold)
             return null;
 
+        if (IsForbidBurstActive())
+            return null;
+
         var shouldSpendBatteryForOvercap = GetBattery() >= _settings.BatteryOvercapSpendThreshold;
         var minWeaveMs = shouldSpendBatteryForOvercap ? 650 : 800;
         if (!CanWeave(minWeaveMs))
@@ -266,7 +272,8 @@ public static class MachinistSpellHelper
         if (!IsRobotActive() || !ShouldUseDumpResources() || !CanWeave())
             return null;
 
-        var spell = SelfAbility(MachinistActionId.QueenOverdrive);
+        var actionId = LevelAtLeast(80) ? MachinistActionId.QueenOverdrive : MachinistActionId.RookOverdrive;
+        var spell = SelfAbility(actionId);
         return spell.IsReadyWithCanCast() ? spell : null;
     }
 
@@ -429,8 +436,7 @@ public static class MachinistSpellHelper
 
     private static bool ShouldUseTwoMinuteBurstPlan()
     {
-        return QTHelper.IsEnabled(QTKey.HighEndMode)
-            || _currentBattleTimeMs >= _settings.LongFightBurstPlanMs;
+        return QTHelper.IsEnabled(QTKey.HighEndMode);
     }
 
     private static bool IsInTwoMinuteBurstWindow()

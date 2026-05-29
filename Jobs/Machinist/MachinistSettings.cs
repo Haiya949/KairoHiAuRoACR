@@ -7,7 +7,6 @@ public sealed class MachinistSettings : AcrSettings
     public int BurstWindowTailMs { get; set; } = 18_000;
     public int StrongGcdLookaheadMs { get; set; } = 6_000;
     public int HyperchargeToolCooldownLookaheadMs { get; set; } = 8_000;
-    public int LongFightBurstPlanMs { get; set; } = 30_000;
     public int BatteryBurstSpendThreshold { get; set; } = 50;
     public int BatteryOvercapSpendThreshold { get; set; } = 90;
     public int HeatOvercapThreshold { get; set; } = 90;
