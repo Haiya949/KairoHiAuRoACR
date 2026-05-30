@@ -29,13 +29,20 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
     public Rotation? Build(string settingFolder)
     {
         MachinistSpellHelper.Configure(Settings);
+        var targetResolver = new MachinistTargetResolver();
 
         return new Rotation
         {
             SlotResolvers = _slotResolvers,
             Opener = new MachinistOpener(),
             EventHandler = new MachinistRotationEventHandler(),
-            TargetResolvers = [new MachinistTargetResolver(Settings)],
+            TriggerActions =
+            [
+                new TriggerAction_TimelineVariable(),
+                new TriggerAction_Hotkey(),
+                new TriggerAction_Potion(),
+            ],
+            TargetResolvers = [targetResolver],
             AcrType = AcrType.PvE,
             MinLevel = 1,
             MaxLevel = 100,
@@ -58,10 +65,12 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
     {
         MachinistSpellHelper.Configure(Settings);
         MachinistSpellHelper.Reset();
+        MachinistTimelineState.ResetAll();
     }
 
     public void OnExitRotation()
     {
         MachinistSpellHelper.Reset();
+        MachinistTimelineState.ResetAll();
     }
 }

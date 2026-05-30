@@ -1,123 +1,232 @@
+using ActionId = HiAuRo.Helper.MCHHelper.EN.Skills;
+
 using HiAuRo.Runtime;
-using KairoHiAuRoACR.Jobs.Machinist.Data;
 
 namespace KairoHiAuRoACR.Jobs.Machinist;
 
 public sealed class MachinistOpener : IOpener
 {
-    private static readonly uint[] StandardGcdOrder =
+    private const int OpenerSlotMaxDurationMs = 3_500;
+
+    private static readonly (Func<bool> IsAvailable, Action<Slot> Build)[] StandardOpenerSteps =
     [
-        MachinistActionId.Drill,
-        MachinistActionId.AirAnchor,
-        MachinistActionId.ChainSaw,
-        MachinistActionId.Excavator,
-        MachinistActionId.Drill,
-        MachinistActionId.FullMetalField,
+        (static () => IsFirstOpenerSlotAvailable(), BuildFirstOpenerSlot),
+        (static () => IsSecondOpenerSlotAvailable(), BuildSecondOpenerSlot),
+        (static () => IsGcdUnlocked(ActionId.ChainSaw), BuildChainSawSlot),
+        (static () => IsGcdUnlocked(ActionId.Excavator), BuildExcavatorSlot),
+        (static () => IsSecondDrillOpenerSlotAvailable(), BuildSecondDrillSlot),
+        (static () => IsFullMetalFieldOpenerSlotAvailable(), BuildFullMetalFieldSlot),
     ];
+
+    private List<Action<Slot>>? _activeSequence;
 
     public uint Level => 58;
 
-    public List<Action<Slot>> Sequence { get; } = [];
-
-    public MachinistOpener()
-    {
-        Sequence.Add(BuildFirstDrillSlot);
-        Sequence.Add(BuildAirAnchorSlot);
-        Sequence.Add(BuildChainSawSlot);
-        Sequence.Add(BuildExcavatorSlot);
-        Sequence.Add(BuildSecondDrillSlot);
-        Sequence.Add(BuildFullMetalFieldSlot);
-    }
+    public List<Action<Slot>> Sequence => _activeSequence ??= BuildSequence();
 
     public int StartCheck()
     {
-        if (MachinistSpellHelper.ShouldStopActions())
-            return -100;
-
-        if (global::HiAuRo.Data.Target.Current is null)
-            return -1;
-
-        return StandardGcdOrder.Any(IsActionReadyForOpener) ? 0 : -2;
+        _activeSequence = BuildSequence();
+        return CanStart() && _activeSequence.Count > 0 ? 0 : -1;
     }
 
-    public int StopCheck(int index)
-    {
-        if (MachinistSpellHelper.ShouldStopActions())
-            return 0;
-
-        if (global::HiAuRo.Data.Target.Current is null)
-            return 0;
-
-        return -1;
-    }
+    public int StopCheck(int index) => -1;
 
     public void InitCountDown(CountDownHandler handler)
     {
-        handler.AddAction(4, MachinistActionId.Reassemble, SpellTargetType.Self);
+        handler.AddAction(4_000, ActionId.Reassemble, SpellTargetType.Self);
+    }
+
+    private static List<Action<Slot>> BuildSequence()
+    {
+        return StandardOpenerSteps
+            .Where(step => step.IsAvailable())
+            .Select(step => step.Build)
+            .ToList();
+    }
+
+    private static bool IsFirstOpenerSlotAvailable()
+    {
+        return IsAirAnchorFirstOpenerActive()
+            ? IsGcdUnlocked(ActionId.AirAnchor)
+            : IsGcdUnlocked(ActionId.Drill);
+    }
+
+    private static bool IsSecondOpenerSlotAvailable()
+    {
+        return IsAirAnchorFirstOpenerActive()
+            ? IsGcdUnlocked(ActionId.Drill)
+            : IsGcdUnlocked(ActionId.AirAnchor);
+    }
+
+    private static bool IsSecondDrillOpenerSlotAvailable()
+    {
+        return IsGcdUnlocked(ActionId.AirAnchor)
+            && IsGcdUnlocked(ActionId.ChainSaw)
+            && IsGcdUnlocked(ActionId.Excavator)
+            && IsGcdUnlocked(ActionId.Drill);
+    }
+
+    private static bool IsFullMetalFieldOpenerSlotAvailable()
+    {
+        return IsSecondDrillOpenerSlotAvailable()
+            && IsGcdUnlocked(ActionId.FullMetalField);
+    }
+
+    private static void BuildFirstOpenerSlot(Slot slot)
+    {
+        if (IsAirAnchorFirstOpenerActive())
+        {
+            BuildAirAnchorSlot(slot);
+            return;
+        }
+
+        BuildFirstDrillSlot(slot);
+    }
+
+    private static void BuildSecondOpenerSlot(Slot slot)
+    {
+        if (IsAirAnchorFirstOpenerActive())
+        {
+            BuildFirstDrillSlot(slot);
+            return;
+        }
+
+        BuildAirAnchorSlot(slot);
     }
 
     private static void BuildFirstDrillSlot(Slot slot)
     {
-        AddTargetGcd(slot, MachinistActionId.Drill);
-        AddTargetAbility(slot, MachinistActionId.Checkmate);
-        AddTargetAbility(slot, MachinistActionId.DoubleCheck);
+        PrepareOpenerSlot(slot);
+        AddGcdIfUnlocked(slot, ActionId.Drill);
+        AddTargetAbilityIfReady(slot, ActionId.Checkmate);
+        AddTargetAbilityIfReady(slot, ActionId.DoubleCheck);
     }
 
     private static void BuildAirAnchorSlot(Slot slot)
     {
-        AddTargetGcd(slot, MachinistActionId.AirAnchor);
-        AddSelfAbility(slot, MachinistActionId.BarrelStabilizer);
+        PrepareOpenerSlot(slot);
+        AddGcdIfUnlocked(slot, ActionId.AirAnchor);
+        AddSelfAbilityIfReady(slot, ActionId.BarrelStabilizer);
     }
 
     private static void BuildChainSawSlot(Slot slot)
     {
-        AddTargetGcd(slot, MachinistActionId.ChainSaw);
+        PrepareOpenerSlot(slot);
+        AddGcdIfUnlocked(slot, ActionId.ChainSaw);
     }
 
     private static void BuildExcavatorSlot(Slot slot)
     {
-        AddTargetGcd(slot, MachinistActionId.Excavator);
-        AddSelfAbility(slot, MachinistActionId.AutomatonQueen);
-        AddSelfAbility(slot, MachinistActionId.Reassemble);
+        PrepareOpenerSlot(slot);
+        AddGcdIfUnlocked(slot, ActionId.Excavator);
+        AddTargetAbilityWithoutReadinessGate(slot, LevelAtLeast(80) ? ActionId.AutomatonQueen : ActionId.RookAutoturret);
+        AddSelfAbilityIfReady(slot, ActionId.Reassemble);
     }
 
     private static void BuildSecondDrillSlot(Slot slot)
     {
-        AddTargetGcd(slot, MachinistActionId.Drill);
-        AddTargetAbility(slot, MachinistActionId.Checkmate);
-        AddTargetAbility(slot, MachinistActionId.Wildfire);
+        PrepareOpenerSlot(slot);
+        AddGcdIfUnlocked(slot, ActionId.Drill);
+        AddTargetAbilityIfReady(slot, ActionId.Checkmate);
+        AddTargetAbilityIfReady(slot, ActionId.Wildfire);
     }
 
     private static void BuildFullMetalFieldSlot(Slot slot)
     {
-        AddTargetGcd(slot, MachinistActionId.FullMetalField);
-        AddTargetAbility(slot, MachinistActionId.DoubleCheck);
-        AddSelfAbility(slot, MachinistActionId.Hypercharge);
+        PrepareOpenerSlot(slot);
+        AddGcdIfUnlocked(slot, ActionId.FullMetalField);
+        AddTargetAbilityIfReady(slot, ActionId.DoubleCheck);
+        AddSelfAbilityWithoutReadinessGate(slot, ActionId.Hypercharge);
     }
 
-    private static void AddTargetGcd(Slot slot, uint actionId)
+    private static bool CanStart()
     {
-        AddIfReady(slot, new Spell(actionId, SpellTargetType.Target));
+        return !MachinistSpellHelper.ShouldStopActions()
+            && IsGcdUnlocked(ActionId.Drill)
+            && (!IsAirAnchorFirstOpenerActive() || IsGcdUnlocked(ActionId.AirAnchor));
     }
 
-    private static void AddTargetAbility(Slot slot, uint actionId)
+    private static void PrepareOpenerSlot(Slot slot)
     {
-        AddIfReady(slot, new Spell(actionId, SpellTargetType.Target) { Type = SpellType.Ability });
+        slot.MaxDuration = OpenerSlotMaxDurationMs;
     }
 
-    private static void AddSelfAbility(Slot slot, uint actionId)
+    private static void AddGcdIfUnlocked(Slot slot, uint actionId)
     {
-        AddIfReady(slot, new Spell(actionId, SpellTargetType.Self) { Type = SpellType.Ability });
+        AddGcdIfReady(slot, actionId, IsGcdUnlocked(actionId));
     }
 
-    private static void AddIfReady(Slot slot, Spell spell)
+    private static void AddGcdIfReady(Slot slot, uint actionId, bool isReady)
+    {
+        if (!isReady)
+            return;
+
+        slot.Add(TargetSpell(actionId));
+    }
+
+    private static void AddTargetAbilityIfReady(Slot slot, uint actionId)
+    {
+        AddAbilityIfReady(slot, TargetAbility(actionId));
+    }
+
+    private static void AddSelfAbilityIfReady(Slot slot, uint actionId)
+    {
+        AddAbilityIfReady(slot, SelfAbility(actionId));
+    }
+
+    private static void AddTargetAbilityWithoutReadinessGate(Slot slot, uint actionId)
+    {
+        slot.Add(TargetAbility(actionId));
+    }
+
+    private static void AddSelfAbilityWithoutReadinessGate(Slot slot, uint actionId)
+    {
+        slot.Add(SelfAbility(actionId));
+    }
+
+    private static void AddAbilityIfReady(Slot slot, Spell spell)
     {
         if (spell.IsReadyWithCanCast())
             slot.Add(spell);
     }
 
-    private static bool IsActionReadyForOpener(uint actionId)
+    private static Spell TargetSpell(uint actionId)
     {
-        return new Spell(actionId, SpellTargetType.Target).IsReadyWithCanCast();
+        return new Spell(actionId, SpellTargetType.Target);
+    }
+
+    private static Spell TargetAbility(uint actionId)
+    {
+        return new Spell(actionId, SpellTargetType.Target) { Type = SpellType.Ability };
+    }
+
+    private static Spell SelfAbility(uint actionId)
+    {
+        return new Spell(actionId, SpellTargetType.Self) { Type = SpellType.Ability };
+    }
+
+    private static bool IsGcdUnlocked(uint actionId)
+    {
+        return actionId switch
+        {
+            ActionId.Drill => LevelAtLeast(58),
+            ActionId.AirAnchor => LevelAtLeast(76),
+            ActionId.ChainSaw => LevelAtLeast(90),
+            ActionId.Excavator => LevelAtLeast(96),
+            ActionId.FullMetalField => LevelAtLeast(100),
+            _ => true,
+        };
+    }
+
+    private static bool IsAirAnchorFirstOpenerActive()
+    {
+        return MachinistTimelineState.IsActive(MachinistTimelineVariable.OpenerAirAnchorFirst);
+    }
+
+    private static bool LevelAtLeast(int level)
+    {
+        var currentLevel = HelperRuntime.GetCurrentLevel();
+        return currentLevel <= 0 || currentLevel >= level;
     }
 }

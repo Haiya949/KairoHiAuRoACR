@@ -9,6 +9,9 @@ public sealed class MachinistStrongGcdResolver : ISlotResolver
         if (MachinistSpellHelper.ShouldStopActions())
             return -100;
 
+        if (MachinistSpellHelper.ShouldHoldGcdForWildfireBurstPackage())
+            return -3;
+
         _spell = MachinistSpellHelper.GetStrongGcd();
         return _spell is not null ? 0 : -1;
     }
@@ -16,6 +19,6 @@ public sealed class MachinistStrongGcdResolver : ISlotResolver
     public void Build(Slot slot)
     {
         if (_spell is not null)
-            slot.Add(_spell);
+            MachinistSpellHelper.AddIssuedSpell(slot, _spell);
     }
 }

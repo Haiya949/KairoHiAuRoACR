@@ -1,0 +1,202 @@
+{
+  "Guid": "kairo-mch-hiauro-timeline-template",
+  "ConfigVersion": 1,
+  "Name": "Kairo MCH HiAuRo timeline authoring template",
+  "TerritoryTypeId": 0,
+  "Note": "Copy this template, replace Delay nodes with boss anchors where possible, and keep actions on KairoMCH* trigger discriminators.",
+  "Author": "Kairo",
+  "TargetAcrAuthor": "Kairo",
+  "TargetJob": 31,
+  "ExposedVars": [
+    "mch_force_burst",
+    "mch_forbid_burst",
+    "mch_hold_all_burst",
+    "mch_release_delayed_burst",
+    "mch_dump_resources",
+    "mch_hold_wildfire",
+    "mch_dump_wildfire",
+    "mch_hold_barrel",
+    "mch_dump_barrel",
+    "mch_hold_checkmate_doublecheck",
+    "mch_dump_checkmate_doublecheck",
+    "mch_hold_battery",
+    "mch_dump_battery",
+    "mch_hold_heat",
+    "mch_dump_heat",
+    "mch_hold_strong_gcd",
+    "mch_dump_strong_gcd",
+    "mch_hold_reassemble_drill",
+    "mch_dump_reassemble_drill",
+    "mch_opener_air_anchor_first"
+  ],
+  "ExposedVarDesc": "Kairo MCH timeline variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
+  "TreeRoot": {
+    "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
+    "DisplayName": "Root",
+    "Id": 1,
+    "Enable": true,
+    "Remark": "Kairo MCH HiAuRo timeline template",
+    "Tag": "Kairo-MCH",
+    "IgnoreNodeResult": true,
+    "Childs": [
+      {
+        "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+        "DisplayName": "机工时间轴模板",
+        "Id": 2,
+        "Enable": true,
+        "Remark": "每条分支可替换为副本机制锚点",
+        "Tag": "Kairo-MCH",
+        "AnyReturn": false,
+        "Childs": [
+          {
+            "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+            "DisplayName": "延迟两分钟爆发示例",
+            "Id": 3,
+            "Enable": true,
+            "Remark": "机制前留资源，机制后释放并重锚 120s 周期",
+            "Tag": "Kairo-MCH",
+            "IgnoreNodeResult": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeDelayNode, HiAuRo",
+                "DisplayName": "机制前开始留资源",
+                "Id": 4,
+                "Enable": true,
+                "Remark": "示例 Delay；实战轴优先替换成 Boss 锚点",
+                "Tag": "Kairo-MCH",
+                "Delay": 95.0
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                "DisplayName": "开始延迟爆发留资源",
+                "Id": 5,
+                "Enable": true,
+                "Remark": "打开总留资源和各细分 hold",
+                "Tag": "Kairo-MCH",
+                "TriggerActions": [
+                  {
+                    "$type": "KairoMCHTimelineVariable",
+                    "Action": "StartDelayedBurstHold",
+                    "Value": true,
+                    "Remark": "开始延迟爆发留资源"
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeDelayNode, HiAuRo",
+                "DisplayName": "释放前准备",
+                "Id": 6,
+                "Enable": true,
+                "Remark": "示例 Delay；实战轴优先替换成 Boss 锚点",
+                "Tag": "Kairo-MCH",
+                "Delay": 30.0
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                "DisplayName": "请求爆发药并释放爆发",
+                "Id": 7,
+                "Enable": true,
+                "Remark": "爆发药请求走已注册 hotkey，释放动作会重锚 120s 周期",
+                "Tag": "Kairo-MCH",
+                "TriggerActions": [
+                  {
+                    "$type": "KairoMCHPotion",
+                    "Remark": "请求一次爆发药"
+                  },
+                  {
+                    "$type": "KairoMCHHotkey",
+                    "Key": "Potion",
+                    "Remark": "兼容通用热键动作写法"
+                  },
+                  {
+                    "$type": "KairoMCHTimelineVariable",
+                    "Action": "ReleaseDelayedBurstPackage",
+                    "Value": true,
+                    "Remark": "释放延迟爆发资源"
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeDelayNode, HiAuRo",
+                "DisplayName": "爆发窗口结束",
+                "Id": 8,
+                "Enable": true,
+                "Remark": "避免释放标记污染后续轴",
+                "Tag": "Kairo-MCH",
+                "Delay": 28.0
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                "DisplayName": "还原延迟爆发变量",
+                "Id": 9,
+                "Enable": true,
+                "Remark": "关闭强制、禁止、总留和细分 hold/dump",
+                "Tag": "Kairo-MCH",
+                "TriggerActions": [
+                  {
+                    "$type": "KairoMCHTimelineVariable",
+                    "Action": "ResetDelayedBurstPackage",
+                    "Value": true,
+                    "Remark": "还原延迟爆发变量"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+            "DisplayName": "单项泄资源示例",
+            "Id": 10,
+            "Enable": false,
+            "Remark": "用于展示单变量动作写法，默认关闭",
+            "Tag": "Kairo-MCH",
+            "IgnoreNodeResult": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                "DisplayName": "打开热量释放",
+                "Id": 11,
+                "Enable": true,
+                "Remark": "只释放热量，不影响电量和强 GCD",
+                "Tag": "Kairo-MCH",
+                "TriggerActions": [
+                  {
+                    "$type": "KairoMCHTimelineVariable",
+                    "Action": "DumpHeat",
+                    "Value": true,
+                    "Remark": "打开 mch_dump_heat"
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeDelayNode, HiAuRo",
+                "DisplayName": "短窗口后关闭",
+                "Id": 12,
+                "Enable": true,
+                "Remark": "示例 Delay",
+                "Tag": "Kairo-MCH",
+                "Delay": 8.0
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                "DisplayName": "关闭热量释放",
+                "Id": 13,
+                "Enable": true,
+                "Remark": "避免状态残留",
+                "Tag": "Kairo-MCH",
+                "TriggerActions": [
+                  {
+                    "$type": "KairoMCHTimelineVariable",
+                    "Action": "DumpHeat",
+                    "Value": false,
+                    "Remark": "关闭 mch_dump_heat"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

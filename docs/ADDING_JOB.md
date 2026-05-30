@@ -59,7 +59,7 @@ Jobs/Bard/
 AOE
 ```
 
-不要把低频配置塞进 QT，例如高难 / 日随模式、目标选择策略。这类配置放职业 settings 面板，并用 `<JobName>Settings` 持久化。
+不要把低频配置塞进 QT，例如高难 / 日随模式。这类配置放职业 settings 面板，并用 `<JobName>Settings` 持久化。目标选择不要做成 ACR 面板选项；在 `Rotation.TargetResolvers` 注册 resolver，交给 HiAuRo Runtime 统一执行。
 
 ## 4. 写 Resolver
 

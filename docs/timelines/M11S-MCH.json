@@ -1,0 +1,1307 @@
+{
+  "Guid": "kairo-mch-hiauro-m11s",
+  "ConfigVersion": 1,
+  "Name": "M11S-MCH",
+  "TerritoryTypeId": 1325,
+  "Note": "M11S Machinist HiAuRo timeline by Kairo. This concrete axis keeps the old M11S strategy while using only HiAuRo-native execution nodes and KairoMCH trigger discriminators. The fight is treated as a normal dummy rotation except the six-minute Majestic Meteor phase: heat is briefly held around 46148 Explosion, then released on 46150 Fire Breath so the six-minute package does not double-Hypercharge through tower and knockback downtime. This axis does not use ReleaseDelayedBurstPackage and does not re-anchor the 120s cycle. Potion plan defaults to 0 / 5 / 10 through KairoMCHPotion requests. Progression fallback can be 0 / 6 / 10:30 by moving the middle potion manually after the three meteor explosions and two GCDs. The five-minute potion reserves Reassemble from 278s, holds strong GCD at 298s so the 5:00 Drill cannot go naked before potion, releases Reassemble plus strong GCD at 302s, and clears at 312s. Mitigation is boss-spell gated with Tactician and Dismantle; Dismantle selects boss DataId 3913 before TriggerActionHighPrioritySlot.",
+  "Author": "Kairo",
+  "TargetAcrAuthor": "Kairo",
+  "TargetJob": 31,
+  "ExposedVars": [
+    "mch_force_burst",
+    "mch_forbid_burst",
+    "mch_hold_all_burst",
+    "mch_release_delayed_burst",
+    "mch_dump_resources",
+    "mch_hold_wildfire",
+    "mch_dump_wildfire",
+    "mch_hold_barrel",
+    "mch_dump_barrel",
+    "mch_hold_checkmate_doublecheck",
+    "mch_dump_checkmate_doublecheck",
+    "mch_hold_battery",
+    "mch_dump_battery",
+    "mch_hold_heat",
+    "mch_dump_heat",
+    "mch_hold_strong_gcd",
+    "mch_dump_strong_gcd",
+    "mch_hold_reassemble_drill",
+    "mch_dump_reassemble_drill",
+    "mch_opener_air_anchor_first"
+  ],
+  "ExposedVarDesc": "Kairo MCH M11S timeline variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
+  "TreeRoot": {
+    "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
+    "DisplayName": "Root",
+    "Id": 1,
+    "Enable": true,
+    "Remark": "M11S-MCH",
+    "Tag": "Kairo-MCH-M11S",
+    "IgnoreNodeResult": true,
+    "Childs": [
+      {
+        "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+        "DisplayName": "M11S MCH parallel axis",
+        "Id": 2,
+        "Enable": true,
+        "Remark": "M11S MCH control branches",
+        "Tag": "Kairo-MCH-M11S",
+        "AnyReturn": false,
+        "Childs": [
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Potion plan",
+            "Id": 10,
+            "Enable": true,
+            "Remark": "M11S potion plan",
+            "Tag": "Kairo-MCH-M11S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Potion 00:06",
+                "Id": 11,
+                "Enable": true,
+                "Remark": "opener potion",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "6s gate",
+                    "Id": 12,
+                    "Enable": true,
+                    "Remark": "opener potion gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 6000,
+                        "Remark": "opener potion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Request potion",
+                    "Id": 13,
+                    "Enable": true,
+                    "Remark": "opener potion",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHPotion",
+                        "Remark": "opener potion"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Potion 05:00",
+                "Id": 14,
+                "Enable": true,
+                "Remark": "five-minute potion",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "300s gate",
+                    "Id": 15,
+                    "Enable": true,
+                    "Remark": "five-minute potion gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 300000,
+                        "Remark": "five-minute potion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Request potion",
+                    "Id": 16,
+                    "Enable": true,
+                    "Remark": "five-minute potion",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHPotion",
+                        "Remark": "five-minute potion"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Potion 10:12",
+                "Id": 17,
+                "Enable": true,
+                "Remark": "ten-minute potion",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "612s gate",
+                    "Id": 18,
+                    "Enable": true,
+                    "Remark": "ten-minute potion gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 612000,
+                        "Remark": "ten-minute potion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Request potion",
+                    "Id": 19,
+                    "Enable": true,
+                    "Remark": "ten-minute potion",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHPotion",
+                        "Remark": "ten-minute potion"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Five-minute Reassemble",
+            "Id": 100,
+            "Enable": true,
+            "Remark": "M11S 5m potion reassemble control",
+            "Tag": "Kairo-MCH-M11S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Hold Reassemble at 278s",
+                "Id": 101,
+                "Enable": true,
+                "Remark": "278s hold Reassemble",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "278s gate",
+                    "Id": 102,
+                    "Enable": true,
+                    "Remark": "278s Reassemble gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 278000,
+                        "Remark": "hold Reassemble for five-minute potion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold Reassemble",
+                    "Id": 103,
+                    "Enable": true,
+                    "Remark": "278s hold Reassemble",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldReassembleDrill",
+                        "Value": true,
+                        "Remark": "reserve Reassemble for five-minute potion"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Hold strong GCD at 298s",
+                "Id": 104,
+                "Enable": true,
+                "Remark": "298s hold strong GCD",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "298s gate",
+                    "Id": 105,
+                    "Enable": true,
+                    "Remark": "298s strong GCD gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 298000,
+                        "Remark": "hold strong GCD before five-minute potion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold strong GCD",
+                    "Id": 106,
+                    "Enable": true,
+                    "Remark": "298s hold strong GCD",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldStrongGcd",
+                        "Value": true,
+                        "Remark": "prevent naked Drill before five-minute potion"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Release five-minute tool",
+                "Id": 107,
+                "Enable": true,
+                "Remark": "302s release Reassemble tool",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "302s gate",
+                    "Id": 108,
+                    "Enable": true,
+                    "Remark": "302s release gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 302000,
+                        "Remark": "release after five-minute potion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Release holds",
+                    "Id": 109,
+                    "Enable": true,
+                    "Remark": "302s release holds",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldStrongGcd",
+                        "Value": false,
+                        "Remark": "release strong GCD hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldReassembleDrill",
+                        "Value": false,
+                        "Remark": "release Reassemble hold"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dump tool",
+                    "Id": 110,
+                    "Enable": true,
+                    "Remark": "302s dump tool",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpStrongGcd",
+                        "Value": true,
+                        "Remark": "dump strong GCD after five-minute potion"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpReassembleDrill",
+                        "Value": true,
+                        "Remark": "dump Reassemble target after five-minute potion"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Clear five-minute tool",
+                "Id": 111,
+                "Enable": true,
+                "Remark": "312s clear Reassemble tool",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "312s gate",
+                    "Id": 112,
+                    "Enable": true,
+                    "Remark": "312s clear gate",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 312000,
+                        "Remark": "clear five-minute potion variables"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Clear holds",
+                    "Id": 113,
+                    "Enable": true,
+                    "Remark": "312s clear holds",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldStrongGcd",
+                        "Value": false,
+                        "Remark": "clear strong GCD hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldReassembleDrill",
+                        "Value": false,
+                        "Remark": "clear Reassemble hold"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Clear dumps",
+                    "Id": 114,
+                    "Enable": true,
+                    "Remark": "312s clear dumps",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpStrongGcd",
+                        "Value": false,
+                        "Remark": "clear strong GCD dump"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpReassembleDrill",
+                        "Value": false,
+                        "Remark": "clear Reassemble dump"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Meteor heat control",
+            "Id": 200,
+            "Enable": true,
+            "Remark": "M11S meteor heat control",
+            "Tag": "Kairo-MCH-M11S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Majestic Meteor start",
+                "Id": 201,
+                "Enable": true,
+                "Remark": "46144 hold Wildfire and Barrel",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46144 gate",
+                    "Id": 202,
+                    "Enable": true,
+                    "Remark": "Majestic Meteor 46144",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 372000,
+                        "Remark": "Majestic Meteor timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46144,
+                        "EnemyDataId": 0,
+                        "Remark": "Majestic Meteor"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold Wildfire and Barrel",
+                    "Id": 203,
+                    "Enable": true,
+                    "Remark": "46144 hold Wildfire and Barrel",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldWildfire",
+                        "Value": true,
+                        "Remark": "prevent Wildfire before meteor downtime"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldBarrel",
+                        "Value": true,
+                        "Remark": "prevent Barrel Stabilizer before meteor downtime"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "First Explosion",
+                "Id": 204,
+                "Enable": true,
+                "Remark": "46148 hold heat",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46148 gate",
+                    "Id": 205,
+                    "Enable": true,
+                    "Remark": "first Explosion 46148",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 382000,
+                        "Remark": "first Explosion timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46148,
+                        "EnemyDataId": 0,
+                        "Remark": "Explosion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold heat",
+                    "Id": 206,
+                    "Enable": true,
+                    "Remark": "46148 hold heat",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldHeat",
+                        "Value": true,
+                        "Remark": "avoid double Hypercharge before Fire Breath"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "First Fire Breath",
+                "Id": 207,
+                "Enable": true,
+                "Remark": "46150 release heat",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46150 gate",
+                    "Id": 208,
+                    "Enable": true,
+                    "Remark": "first Fire Breath 46150",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 396000,
+                        "Remark": "first Fire Breath timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46150,
+                        "EnemyDataId": 0,
+                        "Remark": "Fire Breath"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Release heat",
+                    "Id": 209,
+                    "Enable": true,
+                    "Remark": "46150 release heat",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldHeat",
+                        "Value": false,
+                        "Remark": "release heat hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpHeat",
+                        "Value": true,
+                        "Remark": "dump heat on Fire Breath"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Massive Meteor",
+                "Id": 210,
+                "Enable": true,
+                "Remark": "46152 release Wildfire and Barrel",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46152 gate",
+                    "Id": 211,
+                    "Enable": true,
+                    "Remark": "Massive Meteor 46152",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 442000,
+                        "Remark": "Massive Meteor timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46152,
+                        "EnemyDataId": 0,
+                        "Remark": "Massive Meteor"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Release Wildfire and Barrel",
+                    "Id": 212,
+                    "Enable": true,
+                    "Remark": "46152 release Wildfire and Barrel",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldWildfire",
+                        "Value": false,
+                        "Remark": "release Wildfire hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpWildfire",
+                        "Value": true,
+                        "Remark": "dump Wildfire after meteor downtime"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldBarrel",
+                        "Value": false,
+                        "Remark": "release Barrel hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpBarrel",
+                        "Value": true,
+                        "Remark": "dump Barrel after meteor downtime"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Meteor cleanup",
+                "Id": 213,
+                "Enable": true,
+                "Remark": "46148 cleanup meteor variables",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "cleanup 46148 gate",
+                    "Id": 214,
+                    "Enable": true,
+                    "Remark": "third Explosion 46148 cleanup",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 451000,
+                        "Remark": "third Explosion cleanup timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46148,
+                        "EnemyDataId": 0,
+                        "Remark": "Explosion cleanup"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Clear meteor variables",
+                    "Id": 215,
+                    "Enable": true,
+                    "Remark": "46148 cleanup meteor variables",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldHeat",
+                        "Value": false,
+                        "Remark": "clear heat hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpHeat",
+                        "Value": false,
+                        "Remark": "clear heat dump"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldWildfire",
+                        "Value": false,
+                        "Remark": "clear Wildfire hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpWildfire",
+                        "Value": false,
+                        "Remark": "clear Wildfire dump"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldBarrel",
+                        "Value": false,
+                        "Remark": "clear Barrel hold"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpBarrel",
+                        "Value": false,
+                        "Remark": "clear Barrel dump"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Mitigation axis",
+            "Id": 300,
+            "Enable": true,
+            "Remark": "M11S mitigation axis",
+            "Tag": "Kairo-MCH-M11S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Crown Tactician 00:10",
+                "Id": 301,
+                "Enable": true,
+                "Remark": "46086 opener Tactician",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46086 gate",
+                    "Id": 302,
+                    "Enable": true,
+                    "Remark": "Crown 46086 opener",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 10000,
+                        "Remark": "opener Crown timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46086,
+                        "EnemyDataId": 0,
+                        "Remark": "Crown of Arcadia"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 303,
+                    "Enable": true,
+                    "Remark": "opener Crown Tactician",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "opener Crown Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Dominion Tactician",
+                "Id": 304,
+                "Enable": true,
+                "Remark": "46120 Dominion Tactician",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46120 gate",
+                    "Id": 305,
+                    "Enable": true,
+                    "Remark": "Dancing Dominion 46120",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 140000,
+                        "Remark": "Dominion timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46120,
+                        "EnemyDataId": 0,
+                        "Remark": "Dancing Dominion"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 306,
+                    "Enable": true,
+                    "Remark": "Dominion Tactician",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Dominion Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Tyrant Tactician",
+                "Id": 307,
+                "Enable": true,
+                "Remark": "46122 Tyrant Tactician",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46122 gate",
+                    "Id": 308,
+                    "Enable": true,
+                    "Remark": "Brutish Swing 46122",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 242000,
+                        "Remark": "Tyrant timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46122,
+                        "EnemyDataId": 0,
+                        "Remark": "Brutish Swing"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 309,
+                    "Enable": true,
+                    "Remark": "Tyrant Tactician",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tyrant Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Triple Tyrannhilation Tactician",
+                "Id": 310,
+                "Enable": true,
+                "Remark": "46140 Triple Tyrannhilation Tactician",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46140 gate",
+                    "Id": 311,
+                    "Enable": true,
+                    "Remark": "Triple Tyrannhilation 46140",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 340000,
+                        "Remark": "Triple Tyrannhilation timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46140,
+                        "EnemyDataId": 0,
+                        "Remark": "Triple Tyrannhilation"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 312,
+                    "Enable": true,
+                    "Remark": "Triple Tyrannhilation Tactician",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Triple Tyrannhilation Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Fire Breath Dismantle 06:36",
+                "Id": 313,
+                "Enable": true,
+                "Remark": "46150 first Fire Breath Dismantle",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "first 46150 gate",
+                    "Id": 314,
+                    "Enable": true,
+                    "Remark": "first Fire Breath 46150",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 396000,
+                        "Remark": "first Fire Breath timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46150,
+                        "EnemyDataId": 0,
+                        "Remark": "Fire Breath"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 315,
+                    "Enable": true,
+                    "Remark": "first Fire Breath Dismantle",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 3913,
+                        "Nearest": true,
+                        "Remark": "select M11S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle first Fire Breath"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Fire Breath Dismantle 07:09",
+                "Id": 316,
+                "Enable": true,
+                "Remark": "46150 second Fire Breath Dismantle",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "second 46150 gate",
+                    "Id": 317,
+                    "Enable": true,
+                    "Remark": "second Fire Breath 46150",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 430000,
+                        "Remark": "second Fire Breath timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46150,
+                        "EnemyDataId": 0,
+                        "Remark": "Fire Breath"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 318,
+                    "Enable": true,
+                    "Remark": "second Fire Breath Dismantle",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 3913,
+                        "Nearest": true,
+                        "Remark": "select M11S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle second Fire Breath"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Massive Meteor Tactician",
+                "Id": 319,
+                "Enable": true,
+                "Remark": "46152 Massive Meteor Tactician",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46152 gate",
+                    "Id": 320,
+                    "Enable": true,
+                    "Remark": "Massive Meteor 46152 mitigation",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 442000,
+                        "Remark": "Massive Meteor timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46152,
+                        "EnemyDataId": 0,
+                        "Remark": "Massive Meteor"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 321,
+                    "Enable": true,
+                    "Remark": "Massive Meteor Tactician",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Massive Meteor Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Crown Tactician 08:01",
+                "Id": 322,
+                "Enable": true,
+                "Remark": "46086 eight-minute Crown Tactician",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "late 46086 gate",
+                    "Id": 323,
+                    "Enable": true,
+                    "Remark": "Crown 46086 eight-minute",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 481000,
+                        "Remark": "eight-minute Crown timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46086,
+                        "EnemyDataId": 0,
+                        "Remark": "Crown of Arcadia"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 324,
+                    "Enable": true,
+                    "Remark": "eight-minute Crown Tactician",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "eight-minute Crown Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Orbital Omen Dismantle",
+                "Id": 325,
+                "Enable": true,
+                "Remark": "46131 Orbital Omen Dismantle",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46131 gate",
+                    "Id": 326,
+                    "Enable": true,
+                    "Remark": "Orbital Omen 46131",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 510000,
+                        "Remark": "Orbital Omen timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46131,
+                        "EnemyDataId": 0,
+                        "Remark": "Orbital Omen"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 327,
+                    "Enable": true,
+                    "Remark": "Orbital Omen Dismantle",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 3913,
+                        "Nearest": true,
+                        "Remark": "select M11S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle Orbital Omen"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Meteor Stream Dismantle",
+                "Id": 328,
+                "Enable": true,
+                "Remark": "46132 Meteor Stream Dismantle",
+                "Tag": "Kairo-MCH-M11S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "46132 gate",
+                    "Id": 329,
+                    "Enable": true,
+                    "Remark": "Meteor Stream 46132",
+                    "Tag": "Kairo-MCH-M11S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 546000,
+                        "Remark": "Meteor Stream timing"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46132,
+                        "EnemyDataId": 0,
+                        "Remark": "Meteor Stream"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 330,
+                    "Enable": true,
+                    "Remark": "Meteor Stream Dismantle",
+                    "Tag": "Kairo-MCH-M11S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 3913,
+                        "Nearest": true,
+                        "Remark": "select M11S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle Meteor Stream"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

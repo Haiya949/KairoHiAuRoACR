@@ -20,8 +20,9 @@ public sealed class MachinistRotationEventHandler : IRotationEventHandler
         MachinistSpellHelper.RecordCombatActionUse(spell.Id);
     }
 
-    public void BeforeSpell(Slot slot, Spell spell)
+    public Slot? BeforeSpell(Slot slot)
     {
+        return null;
     }
 
     public void AfterSpell(Slot slot, Spell spell)

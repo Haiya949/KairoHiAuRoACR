@@ -1,4 +1,4 @@
-using KairoHiAuRoACR.Jobs.Machinist.Data;
+using ActionId = HiAuRo.Helper.MCHHelper.EN.Skills;
 
 namespace KairoHiAuRoACR.Jobs.Machinist;
 
@@ -25,18 +25,17 @@ public sealed class MachinistRotationUi : IRotationUI
 
         builder.AddGroup("运行设置");
         builder.AddDropdown("战斗模式", MachinistSettings.CombatModeOptions, ref _settings.CombatMode);
-        builder.AddDropdown("目标选择", MachinistSettings.TargetSelectionOptions, ref _settings.TargetSelection);
 
         builder.AddGroup("快捷动作");
         builder.AddQtHotkey("爆发药", new HotkeyResolver_Potion());
-        builder.AddQtHotkey("冲刺", new HotkeyResolver_NormalSpell(MachinistActionId.Sprint, "冲刺", SpellTargetType.Self));
+        builder.AddQtHotkey("冲刺", new HotkeyResolver_NormalSpell(ActionId.Sprint, "冲刺", SpellTargetType.Self));
         builder.AddQtHotkey("极限技", new HotkeyResolver_LB());
-        builder.AddQtHotkey("策动", new HotkeyResolver_NormalSpell(MachinistActionId.Tactician, "策动", SpellTargetType.Self));
-        builder.AddQtHotkey("武装解除", new HotkeyResolver_NormalSpell(MachinistActionId.Dismantle, "武装解除"));
-        builder.AddQtHotkey("内丹", new HotkeyResolver_NormalSpell(MachinistActionId.SecondWind, "内丹", SpellTargetType.Self));
-        builder.AddQtHotkey("亲疏自行", new HotkeyResolver_NormalSpell(MachinistActionId.ArmsLength, "亲疏自行", SpellTargetType.Self));
-        builder.AddQtHotkey("伤头", new HotkeyResolver_NormalSpell(MachinistActionId.HeadGraze, "伤头"));
-        builder.AddQtHotkey("伤腿", new HotkeyResolver_NormalSpell(MachinistActionId.LegGraze, "伤腿"));
-        builder.AddQtHotkey("伤足", new HotkeyResolver_NormalSpell(MachinistActionId.FootGraze, "伤足"));
+        builder.AddQtHotkey("策动", new HotkeyResolver_NormalSpell(ActionId.Tactician, "策动", SpellTargetType.Self));
+        builder.AddQtHotkey("武装解除", new HotkeyResolver_NormalSpell(ActionId.Dismantle, "武装解除"));
+        builder.AddQtHotkey("内丹", new HotkeyResolver_NormalSpell(ActionId.SecondWind, "内丹", SpellTargetType.Self));
+        builder.AddQtHotkey("亲疏自行", new HotkeyResolver_NormalSpell(ActionId.ArmsLength, "亲疏自行", SpellTargetType.Self));
+        builder.AddQtHotkey("伤头", new HotkeyResolver_NormalSpell(ActionId.HeadGraze, "伤头"));
+        builder.AddQtHotkey("伤腿", new HotkeyResolver_NormalSpell(ActionId.LegGraze, "伤腿"));
+        builder.AddQtHotkey("伤足", new HotkeyResolver_NormalSpell(ActionId.FootGraze, "伤足"));
     }
 }

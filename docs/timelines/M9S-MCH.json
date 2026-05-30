@@ -1,0 +1,1048 @@
+{
+  "Guid": "kairo-mch-hiauro-m9s",
+  "ConfigVersion": 1,
+  "Name": "M9S-MCH",
+  "TerritoryTypeId": 1321,
+  "Note": "M9S Machinist HiAuRo timeline by Kairo. This concrete axis migrates the old M9S add plan without legacy plugin fields. Potion requests are at 125s and 485s. M9S add control uses boss cast anchors and add DataId 19170: first 45875 starts short holds, first 45963 selects the rod and dumps heat/oGCD/battery, 45956 briefly holds strong GCD for the 5m tool, second 45963 selects the rod and dumps strong GCD/Reassemble, third 45963 keeps heat/oGCD/battery dumping, and the later 45875 cleanup restores normal loop. Mitigation uses boss DataId 19167 before Dismantle.",
+  "Author": "Kairo",
+  "TargetAcrAuthor": "Kairo",
+  "TargetJob": 31,
+  "ExposedVars": [
+    "mch_force_burst",
+    "mch_forbid_burst",
+    "mch_hold_all_burst",
+    "mch_release_delayed_burst",
+    "mch_dump_resources",
+    "mch_hold_wildfire",
+    "mch_dump_wildfire",
+    "mch_hold_barrel",
+    "mch_dump_barrel",
+    "mch_hold_checkmate_doublecheck",
+    "mch_dump_checkmate_doublecheck",
+    "mch_hold_battery",
+    "mch_dump_battery",
+    "mch_hold_heat",
+    "mch_dump_heat",
+    "mch_hold_strong_gcd",
+    "mch_dump_strong_gcd",
+    "mch_hold_reassemble_drill",
+    "mch_dump_reassemble_drill",
+    "mch_opener_air_anchor_first"
+  ],
+  "ExposedVarDesc": "Kairo MCH M9S timeline variables. 0 = off, 1 = on.",
+  "TreeRoot": {
+    "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
+    "DisplayName": "Root",
+    "Id": 1,
+    "Enable": true,
+    "Remark": "M9S-MCH",
+    "Tag": "Kairo-MCH-M9S",
+    "IgnoreNodeResult": true,
+    "Childs": [
+      {
+        "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+        "DisplayName": "M9S MCH parallel axis",
+        "Id": 2,
+        "Enable": true,
+        "Remark": "M9S MCH control branches",
+        "Tag": "Kairo-MCH-M9S",
+        "AnyReturn": false,
+        "Childs": [
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Potion plan",
+            "Id": 10,
+            "Enable": true,
+            "Remark": "M9S potion plan",
+            "Tag": "Kairo-MCH-M9S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Potion 02:05",
+                "Id": 11,
+                "Enable": true,
+                "Remark": "125s potion",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "125s gate",
+                    "Id": 12,
+                    "Enable": true,
+                    "Remark": "125s potion gate",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 125000,
+                        "Remark": "125s"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Potion",
+                    "Id": 13,
+                    "Enable": true,
+                    "Remark": "request potion at 125s",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHPotion",
+                        "Remark": "M9S 125s potion"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Potion 08:05",
+                "Id": 14,
+                "Enable": true,
+                "Remark": "485s potion",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "485s gate",
+                    "Id": 15,
+                    "Enable": true,
+                    "Remark": "485s potion gate",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 485000,
+                        "Remark": "485s"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Potion",
+                    "Id": 16,
+                    "Enable": true,
+                    "Remark": "request potion at 485s",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHPotion",
+                        "Remark": "M9S 485s potion"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Add control",
+            "Id": 100,
+            "Enable": true,
+            "Remark": "M9S add resource control",
+            "Tag": "Kairo-MCH-M9S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "First rod hold",
+                "Id": 101,
+                "Enable": true,
+                "Remark": "45875 first add hold",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Sadistic Screech first add gate",
+                    "Id": 102,
+                    "Enable": true,
+                    "Remark": "45875 first add hold gate",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 264000,
+                        "Remark": "after 04:24"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45875,
+                        "EnemyDataId": 0,
+                        "Remark": "Sadistic Screech"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold first rod resources",
+                    "Id": 103,
+                    "Enable": true,
+                    "Remark": "hold heat battery oGCD and Reassemble",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldReassembleDrill",
+                        "Value": true,
+                        "Remark": "hold Reassemble for add window"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldHeat",
+                        "Value": true,
+                        "Remark": "hold heat for first rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldCheckmateDoubleCheck",
+                        "Value": true,
+                        "Remark": "hold AoE oGCDs"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldBattery",
+                        "Value": true,
+                        "Remark": "hold Queen for rod"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "First rod dump",
+                "Id": 110,
+                "Enable": true,
+                "Remark": "45963 first rod dump",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "First Drop gate",
+                    "Id": 111,
+                    "Enable": true,
+                    "Remark": "45963 first rod",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 296000,
+                        "Remark": "first rod"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45963,
+                        "EnemyDataId": 0,
+                        "Remark": "Drop"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Wait first rod",
+                    "Id": 112,
+                    "Enable": true,
+                    "Remark": "wait DataId 19170",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondWaitTarget",
+                        "DataId": 19170,
+                        "Remark": "Fatal Rod"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dump first rod resources",
+                    "Id": 113,
+                    "Enable": true,
+                    "Remark": "select first rod and dump heat/oGCD/battery",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19170,
+                        "Nearest": true,
+                        "Remark": "select first rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpHeat",
+                        "Value": true,
+                        "Remark": "dump heat on first rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpCheckmateDoubleCheck",
+                        "Value": true,
+                        "Remark": "dump AoE oGCDs on first rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpBattery",
+                        "Value": true,
+                        "Remark": "dump Queen on first rod"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Second rod strong GCD hold",
+                "Id": 120,
+                "Enable": true,
+                "Remark": "45956 second rod strong GCD hold",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Necrotic Echo gate",
+                    "Id": 121,
+                    "Enable": true,
+                    "Remark": "45956 strong GCD hold",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 303000,
+                        "Remark": "after first rod"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45956,
+                        "EnemyDataId": 0,
+                        "Remark": "Necrotic Echo"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold strong GCD",
+                    "Id": 122,
+                    "Enable": true,
+                    "Remark": "hold 5m Chain Saw briefly",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldStrongGcd",
+                        "Value": true,
+                        "Remark": "hold strong GCD for second rod"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Second rod strong GCD dump",
+                "Id": 130,
+                "Enable": true,
+                "Remark": "45963 second rod dump",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Second Drop gate",
+                    "Id": 131,
+                    "Enable": true,
+                    "Remark": "45963 second rod",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 314000,
+                        "Remark": "second rod"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45963,
+                        "EnemyDataId": 0,
+                        "Remark": "Drop"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Wait second rod",
+                    "Id": 132,
+                    "Enable": true,
+                    "Remark": "wait DataId 19170",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondWaitTarget",
+                        "DataId": 19170,
+                        "Remark": "Fatal Rod"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dump second rod resources",
+                    "Id": 133,
+                    "Enable": true,
+                    "Remark": "select second rod and dump strong GCD/Reassemble",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19170,
+                        "Nearest": true,
+                        "Remark": "select second rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpStrongGcd",
+                        "Value": true,
+                        "Remark": "dump Chain Saw/Excavator"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpReassembleDrill",
+                        "Value": true,
+                        "Remark": "dump Reassemble target"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Third rod dump",
+                "Id": 140,
+                "Enable": true,
+                "Remark": "45963 third rod dump",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Third Drop gate",
+                    "Id": 141,
+                    "Enable": true,
+                    "Remark": "45963 third rod",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 332000,
+                        "Remark": "third rod"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45963,
+                        "EnemyDataId": 0,
+                        "Remark": "Drop"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Wait third rod",
+                    "Id": 142,
+                    "Enable": true,
+                    "Remark": "wait DataId 19170",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondWaitTarget",
+                        "DataId": 19170,
+                        "Remark": "Fatal Rod"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dump third rod resources",
+                    "Id": 143,
+                    "Enable": true,
+                    "Remark": "select third rod and keep dumping heat/oGCD/battery",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19170,
+                        "Nearest": true,
+                        "Remark": "select third rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpHeat",
+                        "Value": true,
+                        "Remark": "keep dumping heat on third rod"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpCheckmateDoubleCheck",
+                        "Value": true,
+                        "Remark": "keep dumping AoE oGCDs"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpBattery",
+                        "Value": true,
+                        "Remark": "keep dumping battery"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Add cleanup",
+                "Id": 150,
+                "Enable": true,
+                "Remark": "45875 add cleanup",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Add cleanup gate",
+                    "Id": 151,
+                    "Enable": true,
+                    "Remark": "45875 cleanup",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 356000,
+                        "Remark": "after third rod"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45875,
+                        "EnemyDataId": 0,
+                        "Remark": "Sadistic Screech"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Cleanup add variables",
+                    "Id": 152,
+                    "Enable": true,
+                    "Remark": "restore normal loop after adds",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19167,
+                        "Nearest": true,
+                        "Remark": "return to boss"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldStrongGcd",
+                        "Value": false,
+                        "Remark": "cleanup hold strong GCD"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpStrongGcd",
+                        "Value": false,
+                        "Remark": "cleanup dump strong GCD"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldReassembleDrill",
+                        "Value": false,
+                        "Remark": "cleanup hold Reassemble"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpReassembleDrill",
+                        "Value": false,
+                        "Remark": "cleanup dump Reassemble"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldHeat",
+                        "Value": false,
+                        "Remark": "cleanup hold heat"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpHeat",
+                        "Value": false,
+                        "Remark": "cleanup dump heat"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldCheckmateDoubleCheck",
+                        "Value": false,
+                        "Remark": "cleanup hold oGCD"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpCheckmateDoubleCheck",
+                        "Value": false,
+                        "Remark": "cleanup dump oGCD"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "HoldBattery",
+                        "Value": false,
+                        "Remark": "cleanup hold battery"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "DumpBattery",
+                        "Value": false,
+                        "Remark": "cleanup dump battery"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Mitigation",
+            "Id": 300,
+            "Enable": true,
+            "Remark": "M9S mitigation axis",
+            "Tag": "Kairo-MCH-M9S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Brutal Rain 00:42",
+                "Id": 301,
+                "Enable": true,
+                "Remark": "45917 Tactician Dismantle",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Brutal Rain gate",
+                    "Id": 302,
+                    "Enable": true,
+                    "Remark": "45917 first Brutal Rain",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 42000,
+                        "Remark": "00:42"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45917,
+                        "EnemyDataId": 0,
+                        "Remark": "Brutal Rain"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician Dismantle",
+                    "Id": 303,
+                    "Enable": true,
+                    "Remark": "first mitigation",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      },
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19167,
+                        "Nearest": true,
+                        "Remark": "select boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Sadistic Screech 02:13",
+                "Id": 310,
+                "Enable": true,
+                "Remark": "45875 Tactician",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Sadistic Screech mitigation gate",
+                    "Id": 311,
+                    "Enable": true,
+                    "Remark": "45875 second Sadistic Screech",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 133000,
+                        "Remark": "02:13"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45875,
+                        "EnemyDataId": 0,
+                        "Remark": "Sadistic Screech"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 312,
+                    "Enable": true,
+                    "Remark": "second Tactician",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Finale Fatale 02:46",
+                "Id": 320,
+                "Enable": true,
+                "Remark": "45888 Dismantle",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Finale Fatale gate",
+                    "Id": 321,
+                    "Enable": true,
+                    "Remark": "45888 Finale Fatale",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 166000,
+                        "Remark": "02:46"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45888,
+                        "EnemyDataId": 0,
+                        "Remark": "Finale Fatale"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle",
+                    "Id": 322,
+                    "Enable": true,
+                    "Remark": "Finale Fatale Dismantle",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19167,
+                        "Nearest": true,
+                        "Remark": "select boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Brutal Rain 04:12",
+                "Id": 330,
+                "Enable": true,
+                "Remark": "45917 Tactician",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Second Brutal Rain gate",
+                    "Id": 331,
+                    "Enable": true,
+                    "Remark": "45917 second Brutal Rain",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 252000,
+                        "Remark": "04:12"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45917,
+                        "EnemyDataId": 0,
+                        "Remark": "Brutal Rain"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 332,
+                    "Enable": true,
+                    "Remark": "third Tactician",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Sadistic Screech 05:51",
+                "Id": 340,
+                "Enable": true,
+                "Remark": "45875 Tactician Dismantle",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Six-minute Sadistic Screech gate",
+                    "Id": 341,
+                    "Enable": true,
+                    "Remark": "45875 six-minute mitigation",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 351000,
+                        "Remark": "05:51"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45875,
+                        "EnemyDataId": 0,
+                        "Remark": "Sadistic Screech"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician Dismantle",
+                    "Id": 342,
+                    "Enable": true,
+                    "Remark": "six-minute mitigation",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      },
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19167,
+                        "Nearest": true,
+                        "Remark": "select boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Bat Deathmatch 07:29",
+                "Id": 350,
+                "Enable": true,
+                "Remark": "45984 Tactician",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Bat Deathmatch gate",
+                    "Id": 351,
+                    "Enable": true,
+                    "Remark": "45984 Bat Deathmatch",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 449000,
+                        "Remark": "07:29"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45984,
+                        "EnemyDataId": 0,
+                        "Remark": "Bat Deathmatch"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 352,
+                    "Enable": true,
+                    "Remark": "fifth Tactician",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Brutal Rain 08:14",
+                "Id": 360,
+                "Enable": true,
+                "Remark": "45917 final Dismantle",
+                "Tag": "Kairo-MCH-M9S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Final Brutal Rain gate",
+                    "Id": 361,
+                    "Enable": true,
+                    "Remark": "45917 final Brutal Rain",
+                    "Tag": "Kairo-MCH-M9S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 494000,
+                        "Remark": "08:14"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 45917,
+                        "EnemyDataId": 0,
+                        "Remark": "Brutal Rain"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle",
+                    "Id": 362,
+                    "Enable": true,
+                    "Remark": "final Dismantle",
+                    "Tag": "Kairo-MCH-M9S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19167,
+                        "Nearest": true,
+                        "Remark": "select boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

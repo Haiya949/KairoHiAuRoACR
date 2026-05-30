@@ -30,9 +30,8 @@ $activeDlls = Get-ChildItem -LiteralPath $DeployDir -File -Filter "*.dll" |
     Where-Object { $_.Name -notlike "*.bak*" }
 
 if ($activeDlls.Count -gt 1) {
-    Write-Warning "Multiple active DLLs are present in $DeployDir. HiAuRo may scan more than Kairo.dll."
-    $activeDlls | Select-Object Name, Length, LastWriteTime | Format-Table -AutoSize
+    $activeDllList = ($activeDlls | Select-Object -ExpandProperty Name) -join ", "
+    throw "Multiple active DLLs are present in $DeployDir. HiAuRo may scan more than Kairo.dll. Active DLLs: $activeDllList"
 }
 
 Write-Host "[Kairo] Deployed: $DeployDll"
-

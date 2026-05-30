@@ -16,6 +16,6 @@ public sealed class MachinistQueenOverdriveResolver : ISlotResolver
     public void Build(Slot slot)
     {
         if (_spell is not null)
-            slot.Add(_spell);
+            MachinistSpellHelper.AddIssuedSpell(slot, _spell);
     }
 }

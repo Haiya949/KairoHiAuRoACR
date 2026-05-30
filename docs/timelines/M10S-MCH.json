@@ -1,0 +1,995 @@
+{
+  "Guid": "kairo-mch-hiauro-m10s",
+  "ConfigVersion": 1,
+  "Name": "M10S-MCH",
+  "TerritoryTypeId": 1323,
+  "Note": "M10S Machinist HiAuRo timeline by Kairo. This concrete axis keeps the old M10S strategy while using only HiAuRo-native execution nodes and KairoMCH trigger discriminators. Opener sets mch_opener_air_anchor_first so the ACR uses Air Anchor -> Drill -> Chain Saw for this fight. The water/surf delayed burst segment is boss-spell gated: 46519/46533/46534/46535/46536/44487 hold burst, 46520/46521 release the delayed burst package, and 46486 resets temporary burst variables. Mitigation is boss-spell gated with Tactician and Dismantle actions; Dismantle uses TriggerActionSelectenemy plus TriggerActionHighPrioritySlot.",
+  "Author": "Kairo",
+  "TargetAcrAuthor": "Kairo",
+  "TargetJob": 31,
+  "ExposedVars": [
+    "mch_force_burst",
+    "mch_forbid_burst",
+    "mch_hold_all_burst",
+    "mch_release_delayed_burst",
+    "mch_dump_resources",
+    "mch_hold_wildfire",
+    "mch_dump_wildfire",
+    "mch_hold_barrel",
+    "mch_dump_barrel",
+    "mch_hold_checkmate_doublecheck",
+    "mch_dump_checkmate_doublecheck",
+    "mch_hold_battery",
+    "mch_dump_battery",
+    "mch_hold_heat",
+    "mch_dump_heat",
+    "mch_hold_strong_gcd",
+    "mch_dump_strong_gcd",
+    "mch_hold_reassemble_drill",
+    "mch_dump_reassemble_drill",
+    "mch_opener_air_anchor_first"
+  ],
+  "ExposedVarDesc": "Kairo MCH M10S timeline variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
+  "TreeRoot": {
+    "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
+    "DisplayName": "Root",
+    "Id": 1,
+    "Enable": true,
+    "Remark": "M10S-MCH",
+    "Tag": "Kairo-MCH-M10S",
+    "IgnoreNodeResult": true,
+    "Childs": [
+      {
+        "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+        "DisplayName": "M10S MCH parallel axis",
+        "Id": 2,
+        "Enable": true,
+        "Remark": "M10S MCH control branches",
+        "Tag": "Kairo-MCH-M10S",
+        "AnyReturn": false,
+        "Childs": [
+          {
+            "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+            "DisplayName": "Opener variant",
+            "Id": 10,
+            "Enable": true,
+            "Remark": "M10S Air Anchor first opener",
+            "Tag": "Kairo-MCH-M10S",
+            "IgnoreNodeResult": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                "DisplayName": "Set Air Anchor first opener",
+                "Id": 11,
+                "Enable": true,
+                "Remark": "Air Anchor -> Drill -> Chain Saw",
+                "Tag": "Kairo-MCH-M10S",
+                "TriggerActions": [
+                  {
+                    "$type": "KairoMCHTimelineVariable",
+                    "Action": "OpenerAirAnchorFirst",
+                    "Value": true,
+                    "Remark": "M10S uses Air Anchor first opener"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Delayed burst",
+            "Id": 100,
+            "Enable": true,
+            "Remark": "M10S water/surf delayed burst control",
+            "Tag": "Kairo-MCH-M10S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Hold on Deep Impact",
+                "Id": 101,
+                "Enable": true,
+                "Remark": "46519 hold before water",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Deep Impact gate",
+                    "Id": 102,
+                    "Enable": true,
+                    "Remark": "Deep Impact 46519",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 310000,
+                        "Remark": "after 05:10"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46519,
+                        "EnemyDataId": 0,
+                        "Remark": "Deep Impact"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Start delayed burst hold",
+                    "Id": 103,
+                    "Enable": true,
+                    "Remark": "water hold preset",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "StartDelayedBurstHold",
+                        "Value": true,
+                        "Remark": "start holding resources before water/surf"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Hold on Xtreme Wave",
+                "Id": 110,
+                "Enable": true,
+                "Remark": "46533 surf start hold",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Xtreme Wave gate",
+                    "Id": 111,
+                    "Enable": true,
+                    "Remark": "Xtreme Wave 46533",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 340000,
+                        "Remark": "surf start window"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46533,
+                        "EnemyDataId": 0,
+                        "Remark": "Xtreme Wave"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Reinforce hold",
+                    "Id": 112,
+                    "Enable": true,
+                    "Remark": "surf start hold preset",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "StartDelayedBurstHold",
+                        "Value": true,
+                        "Remark": "keep holding through surf"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Surf backup 46534",
+                "Id": 120,
+                "Enable": true,
+                "Remark": "46534 surf backup hold",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Surf backup 46534 gate",
+                    "Id": 121,
+                    "Enable": true,
+                    "Remark": "Surf backup 46534",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 344000,
+                        "Remark": "surf backup"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46534,
+                        "EnemyDataId": 0,
+                        "Remark": "surf backup"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Reinforce hold 46534",
+                    "Id": 122,
+                    "Enable": true,
+                    "Remark": "backup hold preset",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "StartDelayedBurstHold",
+                        "Value": true,
+                        "Remark": "backup hold through surf"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Surf backup 46535",
+                "Id": 130,
+                "Enable": true,
+                "Remark": "46535 surf backup hold",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Surf backup 46535 gate",
+                    "Id": 131,
+                    "Enable": true,
+                    "Remark": "Surf backup 46535",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 350000,
+                        "Remark": "surf backup"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46535,
+                        "EnemyDataId": 0,
+                        "Remark": "surf backup"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Reinforce hold 46535",
+                    "Id": 132,
+                    "Enable": true,
+                    "Remark": "backup hold preset",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "StartDelayedBurstHold",
+                        "Value": true,
+                        "Remark": "backup hold through surf"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Surf backup 46536",
+                "Id": 140,
+                "Enable": true,
+                "Remark": "46536 surf backup hold",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Surf backup 46536 gate",
+                    "Id": 141,
+                    "Enable": true,
+                    "Remark": "Surf backup 46536",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 360000,
+                        "Remark": "surf backup"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46536,
+                        "EnemyDataId": 0,
+                        "Remark": "surf backup"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Reinforce hold 46536",
+                    "Id": 142,
+                    "Enable": true,
+                    "Remark": "backup hold preset",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "StartDelayedBurstHold",
+                        "Value": true,
+                        "Remark": "backup hold through surf"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Scathing Steam hold",
+                "Id": 150,
+                "Enable": true,
+                "Remark": "44487 water hold",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Scathing Steam gate",
+                    "Id": 151,
+                    "Enable": true,
+                    "Remark": "Scathing Steam 44487",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 382000,
+                        "Remark": "water prison finish"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 44487,
+                        "EnemyDataId": 0,
+                        "Remark": "Scathing Steam"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Hold until release",
+                    "Id": 152,
+                    "Enable": true,
+                    "Remark": "last hold before release",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "StartDelayedBurstHold",
+                        "Value": true,
+                        "Remark": "hold until post-surf double target"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Release on Divers Dare",
+                "Id": 160,
+                "Enable": true,
+                "Remark": "46520 release delayed burst",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Divers Dare release gate",
+                    "Id": 161,
+                    "Enable": true,
+                    "Remark": "Divers Dare 46520",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 396000,
+                        "Remark": "post-surf release"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46520,
+                        "EnemyDataId": 0,
+                        "Remark": "Divers Dare"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Release delayed burst",
+                    "Id": 162,
+                    "Enable": true,
+                    "Remark": "release delayed burst package",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHPotion",
+                        "Remark": "request one potion for delayed burst"
+                      },
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "ReleaseDelayedBurstPackage",
+                        "Value": true,
+                        "Remark": "release delayed burst resources"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Release backup 46521",
+                "Id": 170,
+                "Enable": true,
+                "Remark": "46521 release delayed burst backup",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Divers Dare backup gate",
+                    "Id": 171,
+                    "Enable": true,
+                    "Remark": "Divers Dare 46521",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 400000,
+                        "Remark": "post-surf release backup"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46521,
+                        "EnemyDataId": 0,
+                        "Remark": "Divers Dare backup"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Release delayed burst backup",
+                    "Id": 172,
+                    "Enable": true,
+                    "Remark": "release backup",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "ReleaseDelayedBurstPackage",
+                        "Value": true,
+                        "Remark": "backup release delayed burst resources"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Reset after burst",
+                "Id": 180,
+                "Enable": true,
+                "Remark": "46486 reset delayed burst",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Freaky Pyrotation reset gate",
+                    "Id": 181,
+                    "Enable": true,
+                    "Remark": "Freaky Pyrotation 46486",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 430000,
+                        "Remark": "delayed burst cleanup"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46486,
+                        "EnemyDataId": 0,
+                        "Remark": "Freaky Pyrotation"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Reset delayed burst vars",
+                    "Id": 182,
+                    "Enable": true,
+                    "Remark": "cleanup delayed burst state",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHTimelineVariable",
+                        "Action": "ResetDelayedBurstPackage",
+                        "Value": true,
+                        "Remark": "reset delayed burst variables"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
+            "DisplayName": "Mitigation",
+            "Id": 300,
+            "Enable": true,
+            "Remark": "M10S mitigation axis",
+            "Tag": "Kairo-MCH-M10S",
+            "AnyReturn": false,
+            "Childs": [
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Dismantle 01:04",
+                "Id": 301,
+                "Enable": true,
+                "Remark": "46530 Dismantle",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Pyrotation gate",
+                    "Id": 302,
+                    "Enable": true,
+                    "Remark": "Pyrotation 46530",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 64000,
+                        "Remark": "01:04"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46530,
+                        "EnemyDataId": 0,
+                        "Remark": "Pyrotation"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 303,
+                    "Enable": true,
+                    "Remark": "select boss and Dismantle",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19287,
+                        "Nearest": true,
+                        "Remark": "select M10S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Tactician 01:18",
+                "Id": 310,
+                "Enable": true,
+                "Remark": "46520 Tactician",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Divers Dare gate",
+                    "Id": 311,
+                    "Enable": true,
+                    "Remark": "Divers Dare 46520",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 78000,
+                        "Remark": "01:18"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46520,
+                        "EnemyDataId": 0,
+                        "Remark": "Divers Dare"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 312,
+                    "Enable": true,
+                    "Remark": "request Tactician",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Tactician 02:42",
+                "Id": 320,
+                "Enable": true,
+                "Remark": "46500 Tactician",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Xtreme Spectacular gate",
+                    "Id": 321,
+                    "Enable": true,
+                    "Remark": "Xtreme Spectacular 46500",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 162000,
+                        "Remark": "02:42"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46500,
+                        "EnemyDataId": 0,
+                        "Remark": "Xtreme Spectacular"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 322,
+                    "Enable": true,
+                    "Remark": "request Tactician",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Dismantle 03:45",
+                "Id": 330,
+                "Enable": true,
+                "Remark": "46520 Dismantle",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Divers Dare Dismantle gate",
+                    "Id": 331,
+                    "Enable": true,
+                    "Remark": "Divers Dare 46520",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 225000,
+                        "Remark": "03:45"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46520,
+                        "EnemyDataId": 0,
+                        "Remark": "Divers Dare"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 332,
+                    "Enable": true,
+                    "Remark": "select boss and Dismantle",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19287,
+                        "Nearest": true,
+                        "Remark": "select M10S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Tactician 05:10",
+                "Id": 340,
+                "Enable": true,
+                "Remark": "46519 Tactician",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Deep Impact Tactician gate",
+                    "Id": 341,
+                    "Enable": true,
+                    "Remark": "Deep Impact 46519",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 310000,
+                        "Remark": "05:10"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46519,
+                        "EnemyDataId": 0,
+                        "Remark": "Deep Impact"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 342,
+                    "Enable": true,
+                    "Remark": "request Tactician",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Dismantle 06:36",
+                "Id": 350,
+                "Enable": true,
+                "Remark": "46520 post-surf Dismantle",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Post-surf Divers Dare Dismantle gate",
+                    "Id": 351,
+                    "Enable": true,
+                    "Remark": "Divers Dare 46520",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 396000,
+                        "Remark": "06:36"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46520,
+                        "EnemyDataId": 0,
+                        "Remark": "Divers Dare"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 352,
+                    "Enable": true,
+                    "Remark": "select boss and Dismantle",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19287,
+                        "Nearest": true,
+                        "Remark": "select M10S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Tactician 07:46",
+                "Id": 360,
+                "Enable": true,
+                "Remark": "46510 Tactician",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Xtreme Firesnaking gate",
+                    "Id": 361,
+                    "Enable": true,
+                    "Remark": "Xtreme Firesnaking 46510",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 466000,
+                        "Remark": "07:46"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46510,
+                        "EnemyDataId": 0,
+                        "Remark": "Xtreme Firesnaking"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Tactician",
+                    "Id": 362,
+                    "Enable": true,
+                    "Remark": "request Tactician",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "KairoMCHHotkey",
+                        "Key": "Tactician",
+                        "Remark": "Tactician"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "HiAuRo.Execution.TreeSequence, HiAuRo",
+                "DisplayName": "Dismantle 08:44",
+                "Id": 370,
+                "Enable": true,
+                "Remark": "46520 final Dismantle",
+                "Tag": "Kairo-MCH-M10S",
+                "IgnoreNodeResult": false,
+                "Childs": [
+                  {
+                    "$type": "HiAuRo.Execution.TreeCondNode, HiAuRo",
+                    "DisplayName": "Final Divers Dare Dismantle gate",
+                    "Id": 371,
+                    "Enable": true,
+                    "Remark": "Divers Dare 46520",
+                    "Tag": "Kairo-MCH-M10S",
+                    "CondLogicType": 0,
+                    "CheckOnce": false,
+                    "ReverseResult": false,
+                    "TriggerConds": [
+                      {
+                        "$type": "TriggerCondAfterBattleStart",
+                        "TimeMs": 524000,
+                        "Remark": "08:44"
+                      },
+                      {
+                        "$type": "TriggerCondEnemyCastSpell",
+                        "SpellId": 46520,
+                        "EnemyDataId": 0,
+                        "Remark": "Divers Dare"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "HiAuRo.Execution.TreeActionNode, HiAuRo",
+                    "DisplayName": "Dismantle boss",
+                    "Id": 372,
+                    "Enable": true,
+                    "Remark": "select boss and Dismantle",
+                    "Tag": "Kairo-MCH-M10S",
+                    "TriggerActions": [
+                      {
+                        "$type": "TriggerActionSelectenemy",
+                        "TargetDataId": 19287,
+                        "Nearest": true,
+                        "Remark": "select M10S boss"
+                      },
+                      {
+                        "$type": "TriggerActionHighPrioritySlot",
+                        "SpellId": 2887,
+                        "TargetType": 1,
+                        "Remark": "Dismantle"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

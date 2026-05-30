@@ -23,7 +23,7 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 禁止：
 
-- 使用旧插件入口接口。
+- 使用非 HiAuRo 的入口接口。
 - 入口类里保存战斗过程状态作为主要决策来源。
 - 一个职业同时注册多个互相竞争的入口。
 
@@ -83,9 +83,9 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 当前差距：
 
-- MCH 已接运行时读取 settings 的基础最近敌人 `TargetResolver`，但还没有副本级目标优先级。
+- MCH 已接基础最近敌人 `TargetResolver`，由 HiAuRo Runtime 在各状态统一调度；ACR 主控不再暴露手动目标选择。
 - MCH 已接 HiAuRo 原生 `IOpener` 起手，并按当前 `CountDownHandler` 整数秒接口使用 4s prepull Reassemble。
-- HiAuRo 正常 ACR 循环只在 `CombatContext.State.InCombat` 后执行；倒计时结束本身不会启动普通循环。
+- HiAuRo Runtime v0.1.83 会在倒计时开始事件重置 `CountDownHandler` / `OpenerMgr` 并懒注册 `InitCountDown`，倒计时结束后自动启动 `OpenerMgr`；普通 ACR 循环仍只在 `CombatContext.State.InCombat` 后执行。
 - 副本时间线、事实轴、辅助轴策略尚未接入 Kairo 职业逻辑。
 - 面板已要求游戏内可见文案中文化，但新增职业仍需要逐项验证。
 
@@ -167,7 +167,7 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 - Game-visible UI labels should be Chinese by default; 游戏内可见的 Tab、QT、Hotkey、tooltip 文案默认使用中文。
 - 战斗中常切的持续策略用 QT，标签保持短而清楚，例如 `泄资源`、`强制爆发`、`保留爆发`、`AOE`。
-- 低频配置放 settings 面板，例如 `战斗模式`、`目标选择`。
+- 低频配置放 settings 面板，例如 `战斗模式`；目标选择通过 `Rotation.TargetResolvers` 交给 Runtime，不在主控里提供“手动目标/最近敌人”切换。
 - 一次性命令用 Hotkey。
 
 ## 9. 验证要求
@@ -182,7 +182,7 @@ dotnet build E:\ff14\HiAuRo\KairoHiAuRoACR\KairoHiAuRoACR.slnx -c Debug
 
 - `0 errors`。
 - 输出 DLL 是 `Kairo.dll`。
-- `ACR/Kairo/` 下没有旧测试 `.dll` 与当前 DLL 同时被扫描。
+- `ACR/Kairo/` 下没有其他测试 `.dll` 与当前 DLL 同时被扫描。
 - 游戏内 `/hi reload` 后对应职业能识别。
 
 职业逻辑变更还要检查：
@@ -192,3 +192,11 @@ dotnet build E:\ff14\HiAuRo\KairoHiAuRoACR\KairoHiAuRoACR.slnx -c Debug
 - GCD / oGCD 模式正确。
 - Helper 状态、量谱、技能 ID 有来源。
 - 基础循环不包含副本时间线特化。
+
+## 10. MCH 起手边界
+
+- `MachinistOpener` 作为 HiAuRo `IOpener` 倒计时和起手入口，`InitCountDown` 声明 4s prepull Reassemble。
+- 完整多 GCD 起手写进 `IOpener.Sequence`，由 Runtime `OpenerMgr` 在倒计时结束或进入战斗后启动。
+- 每个起手 Slot 以 GCD 开头，后接该 GCD 后的固定 oGCD；Runtime v0.1.83 按 ActionCategory/recast group 判断 GCD/oGCD，ACR 保留 `SpellType.Ability` 标记用于兼容事件记录。
+- 倒计时阶段的 production opener logic 只走 Runtime `CountDownHandler` 处理已注册动作；ACR 代码不直接读取 `Countdown.CountdownTimer`，也不在职业侧重注册或排队倒计时技能。
+- ACR 面板不保留 Runtime 倒计时/起手调试诊断；需要排查时临时加日志，问题定位后移除。
