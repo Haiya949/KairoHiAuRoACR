@@ -235,7 +235,7 @@ E:\ff14\HiAuRo\KairoHiAuRoACR\scripts\deploy.ps1
 - Daily target HP policy 只在 `日随模式` 生效：非 Boss 目标低于 12% HP 时保留计划爆发，目标低于 3% HP 时自动视为泄资源；自动泄资源 requires a live target，无目标不能被当成 0% HP；该策略 disabled in high-end mode，高难资源控制仍由 Burst/Hold QT、显式触发器或时间线变量负责。
 - AOE target policy: AOE GCDs use HiAuRo `TargetHelper.GetMostCanTargetObjects` to pick the best AOE center for Auto Crossbow, Bioblaster, Scattergun/Spread Shot; this does not replace Runtime target selection, and Runtime `TargetResolvers` still owns normal current-target selection.
 - Low-level Hot Shot fallback: 76 级前没有 Air Anchor 时，强 GCD fallback 使用 Helper 的 `ActionId.HotShot`，保持 `MinLevel = 1` 的低等级可运行边界。
-- xivanalysis Helper catalog parity: 机工和 xivanalysis 里会出现的 `VolleyFire`、`ChargedVolleyFire`、`PileBunker`、`ArmPunch`、`RollerDash`、`CrownedCollider` 以及 `Tactician`、`Hypercharged`、`ExcavatorReady`、`FullMetalMachinist` 必须保留在 `HiAuRo.Helper.MCHHelper`；职业代码需要这些 ID 时继续从 Helper 取。
+- xivanalysis Helper catalog parity: 机工实际会用到的 `PileBunker`、`ArmPunch`、`RollerDash`、`CrownedCollider` 以及 `Tactician`、`Hypercharged`、`ExcavatorReady`、`FullMetalMachinist` 必须保留在 `HiAuRo.Helper.MCHHelper`；职业代码需要这些 ID 时继续从 Helper 取。
 - 所有技能和状态 ID 继续来自 `HiAuRo.Helper.MCHHelper`；不在职业代码里恢复本地 `MachinistActionId` / `MachinistStatusId`。
 
 ## 机工时间轴变量

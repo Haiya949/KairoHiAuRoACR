@@ -16,8 +16,6 @@ $docs = Read-ProjectFile 'docs/DEVELOPMENT.md'
 $failures = [System.Collections.Generic.List[string]]::new()
 
 $requiredActions = [ordered]@{
-    VolleyFire = 2891
-    ChargedVolleyFire = 3588
     PileBunker = 16503
     ArmPunch = 16504
     RollerDash = 17206
@@ -61,7 +59,7 @@ if ($docs -notmatch 'xivanalysis Helper catalog parity') {
     $failures.Add('Development docs must record xivanalysis Helper catalog parity for migrated MCH IDs.')
 }
 
-if ($docs -notmatch 'VolleyFire' -or $docs -notmatch 'ChargedVolleyFire' -or $docs -notmatch 'CrownedCollider') {
+if ($docs -notmatch 'PileBunker' -or $docs -notmatch 'ArmPunch' -or $docs -notmatch 'CrownedCollider') {
     $failures.Add('Development docs must name the migrated MCH Helper action IDs.')
 }
 
