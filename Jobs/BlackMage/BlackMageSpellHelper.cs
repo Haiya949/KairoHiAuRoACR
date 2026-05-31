@@ -1,4 +1,3 @@
-using KairoHiAuRoACR.Jobs.BlackMage.Data;
 using OmenTools.Dalamud.Services.ObjectTable.Abstractions.ObjectKinds;
 
 namespace KairoHiAuRoACR.Jobs.BlackMage;
@@ -21,31 +20,31 @@ public static class BlackMageSpellHelper
 
     private static readonly HashSet<uint> GcdActions =
     [
-        BlackMageActionId.Fire,
-        BlackMageActionId.Blizzard,
-        BlackMageActionId.Thunder,
-        BlackMageActionId.FireII,
-        BlackMageActionId.ThunderII,
-        BlackMageActionId.FireIII,
-        BlackMageActionId.ThunderIII,
-        BlackMageActionId.BlizzardIII,
-        BlackMageActionId.Scathe,
-        BlackMageActionId.Freeze,
-        BlackMageActionId.Flare,
-        BlackMageActionId.BlizzardIV,
-        BlackMageActionId.FireIV,
-        BlackMageActionId.ThunderIV,
-        BlackMageActionId.Foul,
-        BlackMageActionId.Despair,
-        BlackMageActionId.UmbralSoul,
-        BlackMageActionId.Xenoglossy,
-        BlackMageActionId.BlizzardII,
-        BlackMageActionId.HighFireII,
-        BlackMageActionId.HighBlizzardII,
-        BlackMageActionId.Paradox,
-        BlackMageActionId.HighThunder,
-        BlackMageActionId.HighThunderII,
-        BlackMageActionId.FlareStar,
+        BLMHelper.EN.Skills.Fire,
+        BLMHelper.EN.Skills.Blizzard,
+        BLMHelper.EN.Skills.Thunder,
+        BLMHelper.EN.Skills.FireII,
+        BLMHelper.EN.Skills.ThunderII,
+        BLMHelper.EN.Skills.FireIII,
+        BLMHelper.EN.Skills.ThunderIII,
+        BLMHelper.EN.Skills.BlizzardIII,
+        BLMHelper.EN.Skills.Scathe,
+        BLMHelper.EN.Skills.Freeze,
+        BLMHelper.EN.Skills.Flare,
+        BLMHelper.EN.Skills.BlizzardIV,
+        BLMHelper.EN.Skills.FireIV,
+        BLMHelper.EN.Skills.ThunderIV,
+        BLMHelper.EN.Skills.Foul,
+        BLMHelper.EN.Skills.Despair,
+        BLMHelper.EN.Skills.UmbralSoul,
+        BLMHelper.EN.Skills.Xenoglossy,
+        BLMHelper.EN.Skills.BlizzardII,
+        BLMHelper.EN.Skills.HighFireII,
+        BLMHelper.EN.Skills.HighBlizzardII,
+        BLMHelper.EN.Skills.Paradox,
+        BLMHelper.EN.Skills.HighThunder,
+        BLMHelper.EN.Skills.HighThunderII,
+        BLMHelper.EN.Skills.FlareStar,
     ];
 
     private static BlackMageSettings _settings = new();
@@ -82,7 +81,7 @@ public static class BlackMageSpellHelper
     {
         CombatActionUseCounts[actionId] = GetCombatActionUseCount(actionId) + 1;
 
-        if (actionId == BlackMageActionId.LeyLines)
+        if (actionId == BLMHelper.EN.Skills.LeyLines)
             _lastLeyLinesUseMs = _currentBattleTimeMs;
 
         if (GcdActions.Contains(actionId))
@@ -99,29 +98,29 @@ public static class BlackMageSpellHelper
         if (ShouldStopActions() || !HasTarget() || !LevelAtLeast(100))
             return false;
 
-        if (GetCombatActionUseCount(BlackMageActionId.HighThunder) > 0 ||
-            GetCombatActionUseCount(BlackMageActionId.FireIV) > 0 ||
-            GetCombatActionUseCount(BlackMageActionId.LeyLines) > 0)
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.HighThunder) > 0 ||
+            GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) > 0 ||
+            GetCombatActionUseCount(BLMHelper.EN.Skills.LeyLines) > 0)
             return false;
 
-        return TargetSpell(BlackMageActionId.HighThunder).IsReadyWithCanCast() ||
-               TargetSpell(BlackMageActionId.FireIV).IsReadyWithCanCast();
+        return TargetSpell(BLMHelper.EN.Skills.HighThunder).IsReadyWithCanCast() ||
+               TargetSpell(BLMHelper.EN.Skills.FireIV).IsReadyWithCanCast();
     }
 
     public static Spell? GetOpeningHighThunderGcd()
     {
-        if (GetCombatActionUseCount(BlackMageActionId.HighThunder) > 0)
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.HighThunder) > 0)
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.HighThunder);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.HighThunder);
     }
 
     public static Spell? GetOpeningFireIvGcd()
     {
-        if (GetCombatActionUseCount(BlackMageActionId.FireIV) > 0)
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) > 0)
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.FireIV);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.FireIV);
     }
 
     public static Spell? GetSingleTargetGcd()
@@ -146,7 +145,15 @@ public static class BlackMageSpellHelper
         if (thunder is not null)
             return thunder;
 
-        return GetNeutralElementGcd() ?? ReadyTargetSpell(BlackMageActionId.Scathe);
+        return GetNeutralElementGcd() ?? ReadyTargetSpell(BLMHelper.EN.Skills.Scathe);
+    }
+
+    public static Spell? GetDowntimeGcd()
+    {
+        if (!ShouldUseDowntimeRecovery())
+            return null;
+
+        return ReadySelfSpell(BLMHelper.EN.Skills.UmbralSoul);
     }
 
     public static Spell? GetAoeGcd()
@@ -154,6 +161,14 @@ public static class BlackMageSpellHelper
         if (!ShouldUseAoe())
             return null;
 
+        if (ShouldUseHighEndAoeLoop())
+            return GetHighEndAoeGcd() ?? GetLegacyAoeGcd();
+
+        return GetLegacyAoeGcd();
+    }
+
+    private static Spell? GetHighEndAoeGcd()
+    {
         var thunder = GetAoeThunderGcd();
         if (thunder is not null)
             return thunder;
@@ -164,38 +179,125 @@ public static class BlackMageSpellHelper
             if (flareStar is not null)
                 return flareStar;
 
-            return ReadyTargetSpell(BlackMageActionId.Flare) ??
-                   GetPolyglotGcd(true);
+            var flare = BestAoeTargetSpell(BLMHelper.EN.Skills.Flare);
+            if (flare.IsReadyWithCanCast())
+                return flare;
+
+            return GetAoeFillerGcd();
         }
 
         if (IsUmbralIceActive())
         {
-            if ((GetUmbralHearts() < MaxElementalStacks || CurrentMp() < AoeFireEntryMpThreshold) &&
-                IsActionUsable(BlackMageActionId.Freeze))
+            if (GetUmbralHearts() < MaxElementalStacks || CurrentMp() < AoeFireEntryMpThreshold)
             {
-                var freeze = ReadyTargetSpell(BlackMageActionId.Freeze);
-                if (freeze is not null)
+                var freeze = BestAoeTargetSpell(BLMHelper.EN.Skills.Freeze);
+                if (freeze.IsReadyWithCanCast())
+                    return freeze;
+            }
+
+            return GetAoeFillerGcd();
+        }
+
+        var neutralFreeze = BestAoeTargetSpell(BLMHelper.EN.Skills.Freeze);
+        if (neutralFreeze.IsReadyWithCanCast())
+            return neutralFreeze;
+
+        return GetAoeFillerGcd();
+    }
+
+    private static Spell? GetLegacyAoeGcd()
+    {
+        var polyglot = GetPolyglotGcd(true);
+        if (polyglot is not null)
+            return polyglot;
+
+        var thunder = GetAoeThunderGcd();
+        if (thunder is not null)
+            return thunder;
+
+        if (IsAstralFireActive())
+        {
+            if (CurrentMp() <= _settings.DespairMpThreshold)
+            {
+                var flare = BestAoeTargetSpell(BLMHelper.EN.Skills.Flare);
+                if (flare.IsReadyWithCanCast())
+                    return flare;
+            }
+
+            var fire = BestAoeTargetSpell(GetAoeFireActionId());
+            if (fire.IsReadyWithCanCast())
+                return fire;
+
+            return GetAoeFillerGcd();
+        }
+
+        if (IsUmbralIceActive())
+        {
+            if (GetUmbralHearts() < MaxElementalStacks || CurrentMp() < AoeFireEntryMpThreshold)
+            {
+                var freeze = BestAoeTargetSpell(BLMHelper.EN.Skills.Freeze);
+                if (freeze.IsReadyWithCanCast())
                     return freeze;
             }
 
             if (CurrentMp() >= AoeFireEntryMpThreshold)
-                return ReadyTargetSpell(BlackMageActionId.Flare);
+            {
+                var fire = BestAoeTargetSpell(GetAoeFireActionId());
+                if (fire.IsReadyWithCanCast())
+                    return fire;
+            }
 
-            return GetPolyglotGcd(true);
+            var blizzard = BestAoeTargetSpell(GetAoeBlizzardActionId());
+            if (blizzard.IsReadyWithCanCast())
+                return blizzard;
+
+            return GetAoeFillerGcd();
         }
 
-        return ReadyTargetSpell(BlackMageActionId.Freeze) ?? GetPolyglotGcd(true);
+        if (CurrentMp() >= AoeFireEntryMpThreshold)
+        {
+            var fire = BestAoeTargetSpell(GetAoeFireActionId());
+            if (fire.IsReadyWithCanCast())
+                return fire;
+        }
+
+        var neutralBlizzard = BestAoeTargetSpell(GetAoeBlizzardActionId());
+        if (neutralBlizzard.IsReadyWithCanCast())
+            return neutralBlizzard;
+
+        return GetAoeFillerGcd();
+    }
+
+    private static Spell? GetAoeFillerGcd()
+    {
+        var thunder = GetAoeThunderGcd();
+        if (thunder is not null)
+            return thunder;
+
+        var polyglot = GetPolyglotGcd(true);
+        if (polyglot is not null)
+            return polyglot;
+
+        return IsUmbralIceActive() ? GetUmbralParadoxGcd() : null;
     }
 
     private static Spell? GetAstralFireGcd()
     {
-        var thunder = GetThunderGcd();
-        if (thunder is not null)
-            return thunder;
+        var firestarterEntry = GetFirestarterEntryGcd();
+        if (firestarterEntry is not null)
+            return firestarterEntry;
+
+        var openingPolyglot = GetOpeningPolyglotBeforeManafontGcd();
+        if (openingPolyglot is not null)
+            return openingPolyglot;
 
         var fireParadox = GetFireParadoxGcd();
         if (fireParadox is not null)
             return fireParadox;
+
+        var thunder = GetThunderGcd();
+        if (thunder is not null)
+            return thunder;
 
         var polyglot = GetPolyglotGcd(false);
         if (polyglot is not null)
@@ -205,7 +307,10 @@ public static class BlackMageSpellHelper
         if (flareStar is not null)
             return flareStar;
 
-        var fireIv = ReadyTargetSpell(BlackMageActionId.FireIV);
+        if (ShouldWaitForOpeningFlareStarBeforeFireIv())
+            return null;
+
+        var fireIv = ReadyTargetSpell(BLMHelper.EN.Skills.FireIV);
         if (fireIv is not null)
             return fireIv;
 
@@ -213,15 +318,27 @@ public static class BlackMageSpellHelper
         if (despair is not null)
             return despair;
 
-        if (ShouldSwitchToUmbralIce())
-            return ReadyTargetSpell(BlackMageActionId.BlizzardIII);
+        if (ShouldWaitForOpeningFiveSevenPackageGcd())
+            return null;
 
-        return ReadyTargetSpell(BlackMageActionId.FireIII) ??
-               ReadyTargetSpell(BlackMageActionId.Fire);
+        if (ShouldSwitchToUmbralIce())
+        {
+            if (ShouldWaitForTransposeBeforeIceTransition())
+                return null;
+
+            return ReadyTargetSpell(BLMHelper.EN.Skills.BlizzardIII);
+        }
+
+        return ReadyTargetSpell(BLMHelper.EN.Skills.FireIII) ??
+               ReadyTargetSpell(BLMHelper.EN.Skills.Fire);
     }
 
     private static Spell? GetUmbralIceGcd()
     {
+        var polyglot = GetPolyglotGcd(false);
+        if (polyglot is not null)
+            return polyglot;
+
         var recovery = GetUmbralRecoveryGcd();
         if (recovery is not null)
             return recovery;
@@ -238,30 +355,30 @@ public static class BlackMageSpellHelper
         if (fireEntry is not null)
             return fireEntry;
 
-        return ReadyTargetSpell(BlackMageActionId.BlizzardIII) ??
-               ReadySelfSpell(BlackMageActionId.UmbralSoul);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.BlizzardIII) ??
+               ReadySelfSpell(BLMHelper.EN.Skills.UmbralSoul);
     }
 
     private static Spell? GetNeutralElementGcd()
     {
         if (CurrentMp() >= 2_400)
-            return ReadyTargetSpell(BlackMageActionId.FireIII);
+            return ReadyTargetSpell(BLMHelper.EN.Skills.FireIII);
 
-        return ReadyTargetSpell(BlackMageActionId.BlizzardIII);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.BlizzardIII);
     }
 
     private static Spell? GetUmbralRecoveryGcd()
     {
         if (GetUmbralIceStacks() < MaxElementalStacks)
         {
-            var blizzardIII = ReadyTargetSpell(BlackMageActionId.BlizzardIII);
+            var blizzardIII = ReadyTargetSpell(BLMHelper.EN.Skills.BlizzardIII);
             if (blizzardIII is not null)
                 return blizzardIII;
         }
 
         if (GetUmbralHearts() < MaxElementalStacks)
         {
-            var blizzardIV = ReadyTargetSpell(BlackMageActionId.BlizzardIV);
+            var blizzardIV = ReadyTargetSpell(BLMHelper.EN.Skills.BlizzardIV);
             if (blizzardIV is not null)
                 return blizzardIV;
         }
@@ -271,7 +388,7 @@ public static class BlackMageSpellHelper
 
     private static Spell? GetUmbralParadoxGcd()
     {
-        return IsParadoxReady() ? ReadyTargetSpell(BlackMageActionId.Paradox) : null;
+        return IsParadoxReady() ? ReadyTargetSpell(BLMHelper.EN.Skills.Paradox) : null;
     }
 
     private static Spell? GetUmbralFireEntryGcd()
@@ -279,21 +396,61 @@ public static class BlackMageSpellHelper
         if (!ShouldSwitchToAstralFire())
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.FireIII);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.FireIII);
+    }
+
+    private static Spell? GetFirestarterEntryGcd()
+    {
+        return ShouldUseFirestarterToEnterAstralFire() ? ReadyTargetSpell(BLMHelper.EN.Skills.FireIII) : null;
+    }
+
+    private static bool ShouldUseFirestarterToEnterAstralFire()
+    {
+        return IsAstralFireActive() &&
+               HasFirestarter() &&
+               !IsAfterOpeningFireIvBeforeFirstIce() &&
+               GetAstralFireStacks() < MaxElementalStacks;
+    }
+
+    private static bool IsAfterOpeningFireIvBeforeFirstIce()
+    {
+        return GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) > 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.BlizzardIII) == 0;
+    }
+
+    private static Spell? GetOpeningPolyglotBeforeManafontGcd()
+    {
+        if (!ShouldUsePolyglotBeforeManafont())
+            return null;
+
+        return ReadyTargetSpell(GetSingleTargetPolyglotActionId());
     }
 
     private static Spell? GetFireParadoxGcd()
     {
-        if (!IsParadoxReady())
-            return null;
+        return ShouldUseFireParadoxInAstralFire() ? ReadyTargetSpell(BLMHelper.EN.Skills.Paradox) : null;
+    }
+
+    private static bool ShouldUseFireParadoxInAstralFire()
+    {
+        if (!IsAstralFireActive() || !IsParadoxReady())
+            return false;
+
+        if (ShouldSkipOpeningParadoxAfterManafont())
+            return false;
 
         if (GetAstralFireStacks() < MaxElementalStacks && !HasFirestarter())
-            return ReadyTargetSpell(BlackMageActionId.Paradox);
+            return true;
 
-        if (GetAstralSoulStacks() >= FireParadoxAstralSoulFloor)
-            return ReadyTargetSpell(BlackMageActionId.Paradox);
+        return GetAstralSoulStacks() >= FireParadoxAstralSoulFloor;
+    }
 
-        return null;
+    private static bool ShouldSkipOpeningParadoxAfterManafont()
+    {
+        return (GetCombatActionUseCount(BLMHelper.EN.Skills.Manafont) > 0 || _openingManafontQueued) &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) < OpeningTotalFireIVCount &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Despair) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) < OpeningFlareStarCount;
     }
 
     private static Spell? GetThunderGcd()
@@ -301,7 +458,7 @@ public static class BlackMageSpellHelper
         if (!ShouldRefreshThunder())
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.HighThunder);
+        return ReadyTargetSpell(GetSingleTargetThunderActionId());
     }
 
     private static Spell? GetAoeThunderGcd()
@@ -309,7 +466,7 @@ public static class BlackMageSpellHelper
         if (!ShouldRefreshAoeThunder())
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.HighThunderII);
+        return ReadyTargetSpell(GetAoeThunderActionId());
     }
 
     public static Spell? GetFlareStarGcd()
@@ -323,18 +480,21 @@ public static class BlackMageSpellHelper
         if (GetAstralSoulStacks() < MaxAstralSoulStacks)
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.FlareStar);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.FlareStar);
     }
 
     public static Spell? GetDespairGcd()
     {
-        if (!IsAstralFireActive() || IsForbidBurstActive())
+        if (!LevelAtLeast(72) || !IsAstralFireActive() || IsForbidBurstActive())
             return null;
 
         if (CurrentMp() > _settings.DespairMpThreshold)
             return null;
 
-        return ReadyTargetSpell(BlackMageActionId.Despair);
+        if (ShouldHoldDespairForOpeningFiveSevenPackage())
+            return null;
+
+        return ReadyTargetSpell(BLMHelper.EN.Skills.Despair);
     }
 
     private static Spell? GetPolyglotGcd(bool aoe)
@@ -345,17 +505,50 @@ public static class BlackMageSpellHelper
         if (!ShouldUseDumpResources() && ShouldHoldPolyglot() && GetPolyglotStacks() < MaxPolyglotStacks)
             return null;
 
-        var shouldDumpPolyglot = ShouldUseDumpResources() ||
-                                 ShouldUsePolyglotBeforeManafont() ||
-                                 ShouldDumpPolyglot() ||
-                                 ShouldUsePolyglotForDumpStacks() ||
-                                 ShouldUsePolyglotForBurstAnchor() ||
-                                 ShouldUseMovementTools();
-        if (!shouldDumpPolyglot)
+        if (!ShouldUsePolyglotInBurstPackage())
             return null;
 
-        var actionId = aoe ? BlackMageActionId.Foul : BlackMageActionId.Xenoglossy;
+        var actionId = aoe ? BLMHelper.EN.Skills.Foul : GetSingleTargetPolyglotActionId();
         return ReadyTargetSpell(actionId);
+    }
+
+    private static bool ShouldUsePolyglotInBurstPackage()
+    {
+        return ShouldUsePolyglotForDumpStacks() ||
+               ShouldUsePolyglotBeforeManafont() ||
+               ShouldUseMovementTools() ||
+               ShouldUseDumpResources() ||
+               ShouldDumpPolyglot() ||
+               ShouldUsePolyglotForBurstAnchor();
+    }
+
+    private static uint GetSingleTargetPolyglotActionId()
+    {
+        return LevelAtLeast(80) ? BLMHelper.EN.Skills.Xenoglossy : BLMHelper.EN.Skills.Foul;
+    }
+
+    private static uint GetSingleTargetThunderActionId()
+    {
+        return LevelAtLeast(100)
+            ? BLMHelper.EN.Skills.HighThunder
+            : HelperRuntime.GetActionChange(BLMHelper.EN.Skills.Thunder);
+    }
+
+    private static uint GetAoeThunderActionId()
+    {
+        return LevelAtLeast(100)
+            ? BLMHelper.EN.Skills.HighThunderII
+            : HelperRuntime.GetActionChange(BLMHelper.EN.Skills.ThunderII);
+    }
+
+    private static uint GetAoeFireActionId()
+    {
+        return HelperRuntime.GetActionChange(BLMHelper.EN.Skills.FireII);
+    }
+
+    private static uint GetAoeBlizzardActionId()
+    {
+        return HelperRuntime.GetActionChange(BLMHelper.EN.Skills.BlizzardII);
     }
 
     public static Spell? GetLeyLinesOffGcd()
@@ -370,7 +563,7 @@ public static class BlackMageSpellHelper
         if (!shouldUseLeyLines || HasLeyLines())
             return null;
 
-        return ReadySelfAbility(BlackMageActionId.LeyLines);
+        return ReadySelfAbility(BLMHelper.EN.Skills.LeyLines);
     }
 
     public static Spell? GetTriplecastOffGcd()
@@ -388,7 +581,7 @@ public static class BlackMageSpellHelper
         if (HasTriplecast() || HasSwiftcast())
             return null;
 
-        return ReadySelfAbility(BlackMageActionId.Triplecast);
+        return ReadySelfAbility(BLMHelper.EN.Skills.Triplecast);
     }
 
     public static Spell? GetSwiftcastOffGcd()
@@ -403,7 +596,7 @@ public static class BlackMageSpellHelper
         if (HasSwiftcast())
             return null;
 
-        return ReadySelfAbility(BlackMageActionId.Swiftcast);
+        return ReadySelfAbility(BLMHelper.EN.Skills.Swiftcast);
     }
 
     public static Spell? GetManafontOffGcd()
@@ -421,7 +614,7 @@ public static class BlackMageSpellHelper
         if (!CanUseOffGcdWindow() && !ShouldClipManafontToContinueAstralFire())
             return null;
 
-        var spell = ReadySelfAbility(BlackMageActionId.Manafont);
+        var spell = ReadySelfAbility(BLMHelper.EN.Skills.Manafont);
         if (spell is not null && shouldUseOpeningManafont)
             _openingManafontQueued = true;
 
@@ -431,13 +624,17 @@ public static class BlackMageSpellHelper
     public static Spell? GetTransposeOffGcd()
     {
         var shouldClipForIceTransition = ShouldClipTransposeForIceTransition();
+        var shouldTransposeForAoeLoop = ShouldTransposeForAoeLoop();
         if (!CanUseOffGcdWindow() && !shouldClipForIceTransition)
             return null;
 
-        if (!ShouldTransposeFromAstralFire() && !ShouldTransposeFromUmbralIce() && !shouldClipForIceTransition)
+        if (!ShouldTransposeFromAstralFire() &&
+            !ShouldTransposeFromUmbralIce() &&
+            !shouldClipForIceTransition &&
+            !shouldTransposeForAoeLoop)
             return null;
 
-        return ReadySelfAbility(BlackMageActionId.Transpose);
+        return ReadySelfAbility(BLMHelper.EN.Skills.Transpose);
     }
 
     public static Spell? GetAmplifierOffGcd()
@@ -451,7 +648,7 @@ public static class BlackMageSpellHelper
         if (!CanUseBurstResource() && !CanUseResourceForOvercap())
             return null;
 
-        return ReadySelfAbility(BlackMageActionId.Amplifier);
+        return ReadySelfAbility(BLMHelper.EN.Skills.Amplifier);
     }
 
     private static Spell? GetMovementGcd()
@@ -462,26 +659,26 @@ public static class BlackMageSpellHelper
 
         if (IsParadoxReady())
         {
-            var paradox = ReadyTargetSpell(BlackMageActionId.Paradox);
+            var paradox = ReadyTargetSpell(BLMHelper.EN.Skills.Paradox);
             if (paradox is not null)
                 return paradox;
         }
 
         if (HasFirestarter())
         {
-            var firestarter = ReadyTargetSpell(BlackMageActionId.FireIII);
+            var firestarter = ReadyTargetSpell(BLMHelper.EN.Skills.FireIII);
             if (firestarter is not null)
                 return firestarter;
         }
 
         if (HasThunderhead() && ShouldRefreshThunder())
         {
-            var thunder = ReadyTargetSpell(BlackMageActionId.HighThunder);
+            var thunder = ReadyTargetSpell(GetSingleTargetThunderActionId());
             if (thunder is not null)
                 return thunder;
         }
 
-        return ReadyTargetSpell(BlackMageActionId.Scathe);
+        return ReadyTargetSpell(BLMHelper.EN.Skills.Scathe);
     }
 
     public static bool ShouldUseManafontNow()
@@ -493,6 +690,12 @@ public static class BlackMageSpellHelper
 
         if (ShouldUseOpeningManafontBeforeDespair())
             return true;
+
+        if (!IsActionUsable(BLMHelper.EN.Skills.Manafont))
+            return false;
+
+        if (ShouldHoldManafontForBurstWindow() && !ShouldClipManafontToContinueAstralFire())
+            return false;
 
         if (CurrentMp() > _settings.ManafontMpThreshold)
             return false;
@@ -509,9 +712,20 @@ public static class BlackMageSpellHelper
         if (shouldDumpManafont)
             return true;
 
-        return _lastCombatGcdActionId is BlackMageActionId.Despair or
-                                      BlackMageActionId.Xenoglossy or
-                                      BlackMageActionId.Foul;
+        return _lastCombatGcdActionId is BLMHelper.EN.Skills.Despair or
+                                      BLMHelper.EN.Skills.Xenoglossy or
+                                      BLMHelper.EN.Skills.Foul;
+    }
+
+    private static bool ShouldHoldManafontForBurstWindow()
+    {
+        if (ShouldUseDumpResources() || ShouldDumpManafont())
+            return false;
+
+        if (!IsActionUsable(BLMHelper.EN.Skills.Manafont))
+            return false;
+
+        return !IsInTwoMinuteBurstWindow();
     }
 
     public static bool ShouldUseOpeningManafontBeforeDespair()
@@ -522,7 +736,7 @@ public static class BlackMageSpellHelper
         if (ShouldUsePolyglotBeforeManafont())
             return false;
 
-        return _lastCombatGcdActionId is BlackMageActionId.Xenoglossy or BlackMageActionId.Foul ||
+        return _lastCombatGcdActionId is BLMHelper.EN.Skills.Xenoglossy or BLMHelper.EN.Skills.Foul ||
                GetPolyglotStacks() <= 0;
     }
 
@@ -542,10 +756,13 @@ public static class BlackMageSpellHelper
 
     private static bool ShouldUsePolyglotBeforeManafont()
     {
+        if (!LevelAtLeast(80))
+            return false;
+
         if (!IsOpeningManafontCandidate() || !HasReachedOpeningManafontTail())
             return false;
 
-        if (_lastCombatGcdActionId != BlackMageActionId.FireIV)
+        if (!HasOpeningFireIvTailGcd())
             return false;
 
         if (CurrentMp() >= GetExpectedFireIVMpCost())
@@ -554,28 +771,115 @@ public static class BlackMageSpellHelper
         if (GetPolyglotStacks() <= 0)
             return false;
 
-        return !ShouldHoldManafont() && !ShouldHoldPolyglot();
+        return IsActionUsable(BLMHelper.EN.Skills.Manafont) &&
+               !ShouldHoldManafont() &&
+               !ShouldHoldPolyglot();
     }
 
     private static bool IsOpeningManafontCandidate()
     {
+        return IsOpeningFiveSevenPackageCandidate() &&
+               IsActionUsable(BLMHelper.EN.Skills.Manafont);
+    }
+
+    private static bool IsOpeningFiveSevenPackageCandidate()
+    {
         return IsAstralFireActive() &&
-               GetCombatActionUseCount(BlackMageActionId.Manafont) == 0 &&
-               GetCombatActionUseCount(BlackMageActionId.Despair) == 0 &&
-               GetCombatActionUseCount(BlackMageActionId.FireIV) < OpeningTotalFireIVCount &&
-               GetCombatActionUseCount(BlackMageActionId.FlareStar) < OpeningFlareStarCount &&
-               !_openingManafontQueued &&
-               IsActionUsable(BlackMageActionId.Manafont);
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Manafont) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Despair) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) < OpeningTotalFireIVCount &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) < OpeningFlareStarCount &&
+               !_openingManafontQueued;
     }
 
     private static bool HasReachedOpeningManafontTail()
     {
-        return GetCombatActionUseCount(BlackMageActionId.FireIV) >= OpeningManafontFireIVCount;
+        return GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) >= OpeningManafontFireIVCount ||
+               ShouldTreatLowMpOpeningTailAsReached();
+    }
+
+    private static bool HasOpeningFireIvTailGcd()
+    {
+        return _lastCombatGcdActionId == BLMHelper.EN.Skills.FireIV ||
+               ShouldTreatLowMpOpeningTailAsReached();
+    }
+
+    private static bool ShouldTreatLowMpOpeningTailAsReached()
+    {
+        return LevelAtLeast(100) &&
+               IsOpeningFiveSevenPackageCandidate() &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.BlizzardIII) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Manafont) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Despair) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) >= OpeningManafontFireIVCount - 1 &&
+               CurrentMp() < GetExpectedFireIVMpCost();
+    }
+
+    private static bool ShouldKeepOpeningFiveSevenPackageInAstralFire()
+    {
+        if (!LevelAtLeast(100) || !IsAstralFireActive())
+            return false;
+
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.BlizzardIII) > 0)
+            return false;
+
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.Despair) > 0)
+            return false;
+
+        if (IsOpeningFiveSevenPackageCandidate())
+            return HasReachedOpeningManafontTail();
+
+        if (!HasOpeningManafontStarted())
+            return false;
+
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) >= OpeningFlareStarCount)
+            return false;
+
+        return true;
+    }
+
+    private static bool HasOpeningManafontStarted()
+    {
+        return GetCombatActionUseCount(BLMHelper.EN.Skills.Manafont) > 0 ||
+               _openingManafontQueued;
+    }
+
+    private static bool ShouldHoldDespairForOpeningFiveSevenPackage()
+    {
+        return ShouldKeepOpeningFiveSevenPackageInAstralFire() &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) < OpeningFlareStarCount;
+    }
+
+    private static bool ShouldWaitForOpeningFlareStarBeforeFireIv()
+    {
+        if (!ShouldKeepOpeningFiveSevenPackageInAstralFire())
+            return false;
+
+        if (!HasOpeningManafontStarted())
+            return false;
+
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) >= OpeningFlareStarCount)
+            return false;
+
+        var plannedFireIvCount = GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) == 0
+            ? OpeningManafontFireIVCount + 1
+            : OpeningTotalFireIVCount;
+
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.FireIV) < plannedFireIvCount)
+            return false;
+
+        return GetFlareStarGcd() is null;
+    }
+
+    private static bool ShouldWaitForOpeningFiveSevenPackageGcd()
+    {
+        return ShouldKeepOpeningFiveSevenPackageInAstralFire();
     }
 
     private static bool ShouldUsePolyglotForDumpStacks()
     {
-        if (IsOpeningManafontCandidate() && !HasReachedOpeningManafontTail())
+        if (ShouldHoldOpeningPolyglotForManafontTail())
             return false;
 
         if (GetPolyglotStacks() < _settings.PolyglotDumpStacks)
@@ -595,7 +899,15 @@ public static class BlackMageSpellHelper
         if (ShouldUseDumpResources() || IsForceBurstActive())
             return true;
 
+        if (ShouldHoldOpeningPolyglotForManafontTail())
+            return false;
+
         return IsAtOrAfterTwoMinuteBurstAnchor();
+    }
+
+    private static bool ShouldHoldOpeningPolyglotForManafontTail()
+    {
+        return IsOpeningManafontCandidate() && !HasReachedOpeningManafontTail();
     }
 
     private static bool ShouldHoldPolyglotForUpcomingBurstAnchor()
@@ -636,7 +948,7 @@ public static class BlackMageSpellHelper
         if (IsParadoxReady())
             return false;
 
-        return GetUmbralHearts() >= MaxElementalStacks || !IsActionUsable(BlackMageActionId.BlizzardIV);
+        return GetUmbralHearts() >= MaxElementalStacks || !IsActionUsable(BLMHelper.EN.Skills.BlizzardIV);
     }
 
     private static bool ShouldDelayAstralFireExitForResource()
@@ -644,16 +956,47 @@ public static class BlackMageSpellHelper
         if (!IsAstralFireActive())
             return false;
 
-        if (GetAstralSoulStacks() >= MaxAstralSoulStacks)
+        if (ShouldKeepOpeningFiveSevenPackageInAstralFire())
             return true;
 
-        if (CurrentMp() > 0 && CurrentMp() <= _settings.DespairMpThreshold && !IsForbidBurstActive())
+        if (GetAstralSoulStacks() >= MaxAstralSoulStacks && GetFlareStarGcd() is not null)
+            return true;
+
+        if (ShouldReserveDespairBeforeAstralFireExit())
             return true;
 
         if (ShouldUsePolyglotBeforeManafont())
             return true;
 
         return ShouldUseManafontNow();
+    }
+
+    private static bool ShouldReserveDespairBeforeAstralFireExit()
+    {
+        if (!LevelAtLeast(72) || !IsAstralFireActive())
+            return false;
+
+        if (IsForbidBurstActive())
+            return false;
+
+        if (_lastCombatGcdActionId == BLMHelper.EN.Skills.Despair)
+            return false;
+
+        if (CurrentMp() <= 0 || CurrentMp() > _settings.DespairMpThreshold)
+            return false;
+
+        if (ShouldUseOpeningManafontBeforeDespair())
+            return false;
+
+        return !ShouldSkipOpeningDespairAfterFiveSevenOpener();
+    }
+
+    private static bool ShouldSkipOpeningDespairAfterFiveSevenOpener()
+    {
+        return GetCombatActionUseCount(BLMHelper.EN.Skills.BlizzardIII) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Manafont) > 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.Despair) == 0 &&
+               GetCombatActionUseCount(BLMHelper.EN.Skills.FlareStar) < OpeningFlareStarCount;
     }
 
     private static bool ShouldTransposeFromAstralFire()
@@ -676,10 +1019,13 @@ public static class BlackMageSpellHelper
         if (HasSwiftcast() || HasTriplecast())
             return false;
 
+        if (ShouldReserveManafontBeforeIceTransition())
+            return false;
+
         if (!ShouldPrepareInstantIceTransition())
             return false;
 
-        return IsActionUsable(BlackMageActionId.Swiftcast);
+        return IsActionUsable(BLMHelper.EN.Skills.Swiftcast);
     }
 
     private static bool ShouldUseTriplecastForIceTransition()
@@ -696,10 +1042,27 @@ public static class BlackMageSpellHelper
         if (ShouldUseSwiftcastForIceTransition() || IsSwiftcastNearlyReadyForIceTransition())
             return false;
 
+        if (ShouldReserveManafontBeforeIceTransition())
+            return false;
+
         if (!ShouldPrepareInstantIceTransition())
             return false;
 
-        return IsActionUsable(BlackMageActionId.Triplecast);
+        return IsActionUsable(BLMHelper.EN.Skills.Triplecast);
+    }
+
+    private static bool ShouldReserveManafontBeforeIceTransition()
+    {
+        if (ShouldHoldManafont())
+            return false;
+
+        if (!IsActionUsable(BLMHelper.EN.Skills.Manafont))
+            return false;
+
+        if (!ShouldUseManafontNow())
+            return false;
+
+        return ReadySelfAbility(BLMHelper.EN.Skills.Manafont) is not null;
     }
 
     private static bool IsSwiftcastNearlyReadyForIceTransition()
@@ -707,13 +1070,18 @@ public static class BlackMageSpellHelper
         return ShouldPrepareInstantIceTransition() &&
                !HasSwiftcast() &&
                !HasTriplecast() &&
-               SelfAbility(BlackMageActionId.Swiftcast).CooldownMs <= SwiftcastIceTransitionWaitMs;
+               GetSwiftcastCooldownMs() <= SwiftcastIceTransitionWaitMs;
+    }
+
+    private static float GetSwiftcastCooldownMs()
+    {
+        return SelfAbility(BLMHelper.EN.Skills.Swiftcast).CooldownMs;
     }
 
     private static bool ShouldPrepareInstantIceTransition()
     {
         return IsAstralFireActive() &&
-               IsActionUsable(BlackMageActionId.Transpose) &&
+               IsActionUsable(BLMHelper.EN.Skills.Transpose) &&
                (ShouldSwitchToUmbralIce() || ShouldTransposeFromAstralFire());
     }
 
@@ -722,20 +1090,67 @@ public static class BlackMageSpellHelper
         return ShouldPrepareInstantIceTransition() && (HasSwiftcast() || HasTriplecast());
     }
 
-    private static bool ShouldUseAoe()
+    private static bool ShouldWaitForTransposeBeforeIceTransition()
     {
-        if (!QTHelper.IsEnabled(QTKey.Aoe) || !HasTarget())
+        if (!ShouldPrepareInstantIceTransition())
             return false;
 
-        return HelperRuntime.GetEnemyCountNearTarget(5f) >= _settings.AoeEnemyCount;
+        if (GCDHelper.CanUseGCD())
+            return false;
+
+        return HasSwiftcast() ||
+               HasTriplecast() ||
+               ShouldUseSwiftcastForIceTransition() ||
+               IsSwiftcastNearlyReadyForIceTransition() ||
+               ShouldUseTriplecastForIceTransition();
+    }
+
+    private static bool ShouldUseHighEndAoeLoop()
+    {
+        return LevelAtLeast(100);
+    }
+
+    private static bool ShouldUseDowntimeRecovery()
+    {
+        return !ShouldStopActions() &&
+               !HasTarget() &&
+               IsUmbralIceActive() &&
+               IsActionUsable(BLMHelper.EN.Skills.UmbralSoul) &&
+               (CurrentMp() < _settings.UmbralIceFullMpThreshold ||
+                GetUmbralHearts() < MaxElementalStacks);
+    }
+
+    private static bool ShouldTransposeForAoeLoop()
+    {
+        if (!ShouldUseHighEndAoeLoop() || !ShouldUseAoe())
+            return false;
+
+        if (IsAstralFireActive())
+            return CurrentMp() <= 0 &&
+                   GetAstralSoulStacks() < MaxAstralSoulStacks;
+
+        if (IsUmbralIceActive())
+            return GetUmbralHearts() >= MaxElementalStacks &&
+                   CurrentMp() >= AoeFireEntryMpThreshold;
+
+        return false;
+    }
+
+    private static bool ShouldUseAoe()
+    {
+        if (!QTHelper.IsEnabled(QTKey.Aoe) || GetCurrentTarget() is null)
+            return false;
+
+        return GetEnemyCountNearTarget(5f) >= _settings.AoeEnemyCount;
     }
 
     private static bool ShouldRefreshThunder()
     {
-        if (!HasTarget() || ShouldUseDumpResources())
+        if (!HasTarget())
             return false;
 
-        return GetThunderDotTimeLeft() * 1000 <= _settings.ThunderRefreshMs;
+        return !ShouldSkipThunderForEndingTarget() &&
+               GetThunderDotTimeLeft() * 1000 <= _settings.ThunderRefreshMs;
     }
 
     private static bool ShouldRefreshAoeThunder()
@@ -743,7 +1158,24 @@ public static class BlackMageSpellHelper
         if (!ShouldUseAoe())
             return false;
 
-        return GetAoeThunderDotTimeLeft() * 1000 <= _settings.ThunderRefreshMs;
+        return !ShouldSkipThunderForEndingTarget() &&
+               GetAoeThunderDotTimeLeft() * 1000 <= _settings.ThunderRefreshMs;
+    }
+
+    private static bool ShouldSkipThunderForEndingTarget()
+    {
+        var target = GetCurrentTarget();
+        return target is null ||
+               ShouldUseDumpResources() ||
+               GetTargetHpPercent(target) <= _settings.ThunderSkipTargetHpPercent;
+    }
+
+    private static float GetTargetHpPercent(IBattleChara target)
+    {
+        if (target.MaxHp <= 0)
+            return 0f;
+
+        return (float)target.CurrentHp / target.MaxHp;
     }
 
     public static bool CanUseBurstResource()
@@ -770,29 +1202,53 @@ public static class BlackMageSpellHelper
         if (IsForceBurstActive())
             return true;
 
-        var timeToAnchor = GetTimeToNextTwoMinuteBurstAnchor();
-        return timeToAnchor <= _settings.BurstWindowTailMs ||
-               timeToAnchor >= 120_000 - _settings.BurstWindowLeadMs;
+        var elapsed = GetElapsedInTwoMinuteBurstCycle();
+        return elapsed <= _settings.BurstWindowTailMs ||
+               elapsed >= 120_000 - _settings.BurstWindowLeadMs;
     }
 
     private static bool IsAtOrAfterTwoMinuteBurstAnchor()
     {
-        return IsForceBurstActive() || GetTimeToNextTwoMinuteBurstAnchor() <= _settings.BurstWindowTailMs;
+        if (IsForceBurstActive())
+            return true;
+
+        var elapsed = GetElapsedInTwoMinuteBurstCycle();
+        return elapsed <= _settings.BurstWindowTailMs;
     }
 
     private static int GetTimeToNextTwoMinuteBurstAnchor()
     {
+        var elapsed = GetElapsedInTwoMinuteBurstCycle();
+        return elapsed == 0 ? 0 : 120_000 - elapsed;
+    }
+
+    private static int GetElapsedInTwoMinuteBurstCycle()
+    {
         var diff = _currentBattleTimeMs - _settings.FirstBurstAnchorMs;
-        var mod = ((diff % 120_000) + 120_000) % 120_000;
-        return mod == 0 ? 0 : 120_000 - mod;
+        return ((diff % 120_000) + 120_000) % 120_000;
+    }
+
+    private static int GetCurrentOrPreviousTwoMinuteBurstAnchor()
+    {
+        return _currentBattleTimeMs - GetElapsedInTwoMinuteBurstCycle();
+    }
+
+    private static int GetActiveTwoMinuteBurstWindowAnchor()
+    {
+        var elapsed = GetElapsedInTwoMinuteBurstCycle();
+        var anchor = GetCurrentOrPreviousTwoMinuteBurstAnchor();
+
+        return elapsed >= 120_000 - _settings.BurstWindowLeadMs
+            ? anchor + 120_000
+            : anchor;
     }
 
     private static bool ShouldUseOpeningLeyLines()
     {
-        if (GetCombatActionUseCount(BlackMageActionId.LeyLines) > 0)
+        if (GetCombatActionUseCount(BLMHelper.EN.Skills.LeyLines) > 0)
             return false;
 
-        if (_lastCombatGcdActionId != BlackMageActionId.FireIV)
+        if (_lastCombatGcdActionId != BLMHelper.EN.Skills.FireIV)
             return false;
 
         return _currentBattleTimeMs >= OpeningLeyLinesEarliestMs &&
@@ -804,7 +1260,11 @@ public static class BlackMageSpellHelper
         if (_lastLeyLinesUseMs is not { } lastUseMs)
             return false;
 
-        return Math.Abs(_currentBattleTimeMs - lastUseMs) < 90_000;
+        var anchor = GetActiveTwoMinuteBurstWindowAnchor();
+        var windowStart = Math.Max(0, anchor - _settings.BurstWindowLeadMs);
+        var windowEnd = anchor + _settings.BurstWindowTailMs;
+
+        return lastUseMs >= windowStart && lastUseMs <= windowEnd;
     }
 
     private static bool CanUseOffGcdWindow(int minGcdCooldownMs = 650, bool allowMovementRecovery = false)
@@ -849,26 +1309,30 @@ public static class BlackMageSpellHelper
     private static int GetEnochianTimer() => BLMHelper.通晓计时;
     private static bool IsAstralFireActive() => BLMHelper.火状态;
     private static bool IsUmbralIceActive() => BLMHelper.冰状态;
-    private static bool IsParadoxReady() => BLMHelper.悖论指示 || HelperRuntime.HasStatus(BlackMageStatusId.Paradox);
-    private static bool HasFirestarter() => HelperRuntime.HasStatus(BlackMageStatusId.Firestarter);
-    private static bool HasThunderhead() => HelperRuntime.HasStatus(BlackMageStatusId.Thunderhead);
-    private static bool HasSwiftcast() => HelperRuntime.HasStatus(BlackMageStatusId.Swiftcast);
-    private static bool HasTriplecast() => HelperRuntime.HasStatus(BlackMageStatusId.Triplecast);
-    private static bool HasLeyLines() => HelperRuntime.HasStatus(BlackMageStatusId.LeyLines) ||
-                                         HelperRuntime.HasStatus(BlackMageStatusId.CircleOfPower);
+    private static bool IsParadoxReady() => BLMHelper.悖论指示;
+    private static bool HasFirestarter() => HelperRuntime.HasStatus(BLMHelper.EN.Buffs.Firestarter);
+    private static bool HasThunderhead() => HelperRuntime.HasStatus(BLMHelper.EN.Buffs.Thunderhead);
+    private static bool HasSwiftcast() => HelperRuntime.HasStatus(BLMHelper.EN.Buffs.Swiftcast);
+    private static bool HasTriplecast() => HelperRuntime.HasStatus(BLMHelper.EN.Buffs.Triplecast);
+    private static bool HasLeyLines() => HelperRuntime.HasStatus(BLMHelper.EN.Buffs.LeyLines) ||
+                                         HelperRuntime.HasStatus(BLMHelper.EN.Buffs.CircleOfPower);
 
     private static float GetThunderDotTimeLeft()
     {
         return Math.Max(
-            HelperRuntime.GetStatusTimeLeftOnTarget(BlackMageStatusId.HighThunder),
+            HelperRuntime.GetStatusTimeLeftOnTarget(BLMHelper.EN.Buffs.HighThunder),
             Math.Max(
-                HelperRuntime.GetStatusTimeLeftOnTarget(BlackMageStatusId.ThunderIII),
-                HelperRuntime.GetStatusTimeLeftOnTarget(BlackMageStatusId.ThunderIV)));
+                HelperRuntime.GetStatusTimeLeftOnTarget(BLMHelper.EN.Buffs.ThunderIII),
+                HelperRuntime.GetStatusTimeLeftOnTarget(BLMHelper.EN.Buffs.ThunderIV)));
     }
 
     private static float GetAoeThunderDotTimeLeft()
     {
-        return HelperRuntime.GetStatusTimeLeftOnTarget(BlackMageStatusId.HighThunderII);
+        return Math.Max(
+            HelperRuntime.GetStatusTimeLeftOnTarget(BLMHelper.EN.Buffs.HighThunderII),
+            Math.Max(
+                HelperRuntime.GetStatusTimeLeftOnTarget(BLMHelper.EN.Buffs.ThunderIV),
+                HelperRuntime.GetStatusTimeLeftOnTarget(BLMHelper.EN.Buffs.ThunderIII)));
     }
 
     private static bool ShouldUseDumpResources() => QTHelper.IsEnabled(QTKey.DumpResources);
@@ -888,13 +1352,40 @@ public static class BlackMageSpellHelper
 
     private static bool HasTarget()
     {
-        return global::HiAuRo.Data.Target.Current is IBattleChara { IsDead: false, IsTargetable: true };
+        return GetCurrentTarget() is not null;
+    }
+
+    private static IBattleChara? GetCurrentTarget()
+    {
+        return global::HiAuRo.Data.Target.Current is IBattleChara target &&
+               target.CurrentHp > 0 &&
+               target.IsDead != true &&
+               target.IsTargetable
+            ? target
+            : null;
+    }
+
+    private static Spell BestAoeTargetSpell(uint actionId)
+    {
+        return new Spell(actionId, () => GetBestAoeTarget(actionId));
+    }
+
+    private static IBattleChara GetBestAoeTarget(uint actionId)
+    {
+        return TargetHelper.GetMostCanTargetObjects(actionId, _settings.AoeEnemyCount, 5f)
+            ?? GetCurrentTarget()!;
+    }
+
+    private static int GetEnemyCountNearTarget(float range)
+    {
+        var nearTarget = HelperRuntime.GetEnemyCountNearTarget(range);
+        return nearTarget > 0 ? nearTarget : HelperRuntime.GetNearbyEnemyCount(range);
     }
 
     private static bool LevelAtLeast(int level)
     {
         var currentLevel = HelperRuntime.GetCurrentLevel();
-        return currentLevel <= 0 || currentLevel >= level;
+        return currentLevel > 0 && currentLevel >= level;
     }
 
     private static bool IsActionUsable(uint actionId)

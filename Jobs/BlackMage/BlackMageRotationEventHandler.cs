@@ -13,6 +13,13 @@ public sealed class BlackMageRotationEventHandler : IRotationEventHandler
 
     public void OnNoTarget()
     {
+        var spell = BlackMageSpellHelper.GetDowntimeGcd();
+        if (spell is null)
+            return;
+
+        var slot = new Slot();
+        slot.Add(spell);
+        SlotHelper.Execute(slot);
     }
 
     public void OnSpellCastSuccess(Slot slot, Spell spell)

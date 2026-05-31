@@ -1,6 +1,7 @@
 using KairoHiAuRoACR.Jobs.BlackMage.Opener;
 using KairoHiAuRoACR.Jobs.BlackMage.Resolvers.GCD;
 using KairoHiAuRoACR.Jobs.BlackMage.Resolvers.OffGCD;
+using KairoHiAuRoACR.Jobs.BlackMage.Triggers;
 using HiAuRoJob = HiAuRo.ACR.Jobs;
 
 namespace KairoHiAuRoACR.Jobs.BlackMage;
@@ -34,6 +35,11 @@ public sealed class BlackMageRotationEntry : IRotationEntry, ISettingsProvider<B
             SlotResolvers = _slotResolvers,
             Opener = new BlackMageOpener(),
             EventHandler = new BlackMageRotationEventHandler(),
+            TriggerActions =
+            [
+                new TriggerAction_Hotkey(),
+                new TriggerAction_Potion(),
+            ],
             TargetResolvers = [targetResolver],
             AcrType = AcrType.PvE,
             MinLevel = 70,
