@@ -137,11 +137,11 @@ Assert-BodyContains $helper "private static bool CanUseResourceForOvercap\(\)" @
     "!ShouldHoldBurstForWeakTarget\(\)"
 ) "Daily weak-target hold must also govern overcap spending, while explicit dump/force bypass it"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Daily target HP policy" "Development docs must record the daily target-HP policy boundary"
-Assert-Contains "docs/DEVELOPMENT.md" "12%" "Development docs must record weak-target burst hold threshold"
-Assert-Contains "docs/DEVELOPMENT.md" "3%" "Development docs must record low-HP resource dump threshold"
-Assert-Contains "docs/DEVELOPMENT.md" "requires a live target" "Development docs must record that daily auto-dump is not active without a live target"
-Assert-Contains "docs/DEVELOPMENT.md" "disabled in high-end mode" "Development docs must state this QoL policy is not hidden high-end logic"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Daily target HP policy" "Development docs must record the daily target-HP policy boundary"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "12%" "Development docs must record weak-target burst hold threshold"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "3%" "Development docs must record low-HP resource dump threshold"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "requires a live target" "Development docs must record that daily auto-dump is not active without a live target"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "disabled in high-end mode" "Development docs must state this QoL policy is not hidden high-end logic"
 
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "Core\\.Me\\.GetCurrTarget|TargetHelper\\.GetNearbyEnemyCount|AEAssist|MachinistActionId|MachinistStatusId" "Daily target-HP policy must stay HiAuRo-native and Helper-backed"
 

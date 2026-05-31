@@ -80,7 +80,7 @@ function Assert-Order {
 }
 
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
-$docs = Read-File "docs/DEVELOPMENT.md"
+$docs = Read-File "Jobs/Machinist/docs/DEVELOPMENT.md"
 
 $gaussBody = Get-Body $helper "public static Spell\? GetGaussRoundOffGcd\(\)" "Checkmate/Double Check policy"
 Assert-NotContains $gaussBody "ShouldHoldCheckmateDoubleCheckForLoopBurst" "Checkmate/Double Check must not use a hidden loop-burst hold"

@@ -90,10 +90,10 @@ Assert-BodyContains $opener "private static void BuildSecondOpenerSlot\(Slot slo
     "BuildAirAnchorSlot\(slot\)"
 ) "Dynamic opener sequence must keep inverted second slot selection"
 
-Assert-Contains "docs/DEVELOPMENT.md" "IOpener\.Sequence" "Development docs must record the opener Sequence contract"
-Assert-Contains "docs/DEVELOPMENT.md" "dynamic Sequence snapshot" "Development docs must record why opener Sequence is snapshotted at StartCheck"
-Assert-Contains "docs/DEVELOPMENT.md" "before OpenerMgr starts" "Development docs must state the Air Anchor first variable timing"
-Assert-Contains "docs/DEVELOPMENT.md" "same Sequence snapshot" "Development docs must state Runtime opener execution uses the same Sequence snapshot"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "IOpener\.Sequence" "Development docs must record the opener Sequence contract"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "dynamic Sequence snapshot" "Development docs must record why opener Sequence is snapshotted at StartCheck"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "before OpenerMgr starts" "Development docs must state the Air Anchor first variable timing"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "same Sequence snapshot" "Development docs must state Runtime opener execution uses the same Sequence snapshot"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "before OpenerMgr starts" "Execution-axis docs must state when mch_opener_air_anchor_first is consumed"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "running opener snapshot" "Execution-axis docs must state opener variables do not mutate the running opener snapshot"
 

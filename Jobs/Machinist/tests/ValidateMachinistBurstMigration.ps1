@@ -251,7 +251,7 @@ foreach ($pattern in @(
     "one paid Hypercharge per 120s budget",
     "230 Battery"
 )) {
-    Assert-Contains "docs/DEVELOPMENT.md" $pattern "Development docs must record the migrated MCH burst policy"
+    Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" $pattern "Development docs must record the migrated MCH burst policy"
 }
 
 if ($failures.Count -gt 0) {

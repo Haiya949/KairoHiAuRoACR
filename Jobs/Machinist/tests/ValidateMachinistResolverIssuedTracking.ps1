@@ -102,9 +102,9 @@ Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "CombatActionLastUsedAt
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "if \(actionId is ActionId\.AutomatonQueen or ActionId\.RookAutoturret\)\s*_robotActiveUntilMs = actionBattleTimeMs \+ QueenActiveEstimateMs;" "Issued-action tracking must mark robot active when Queen/Rook is queued"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "if \(actionId is ActionId\.QueenOverdrive or ActionId\.RookOverdrive or ActionId\.Detonator\)\s*_robotActiveUntilMs = 0;" "Issued-action tracking must clear robot active when overdrive/detonator is queued"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Issued-action tracking" "Development docs must record resolver issued-action tracking"
-Assert-Contains "docs/DEVELOPMENT.md" "slot.Add" "Development docs must state marking happens after slot.Add"
-Assert-Contains "docs/DEVELOPMENT.md" "OnSpellCastSuccess" "Development docs must explain why success callback alone is too late"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Issued-action tracking" "Development docs must record resolver issued-action tracking"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "slot.Add" "Development docs must state marking happens after slot.Add"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "OnSpellCastSuccess" "Development docs must explain why success callback alone is too late"
 
 Assert-NotContains "Jobs/Machinist" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist" "Issued-action tracking must stay HiAuRo-native and Helper-backed"
 

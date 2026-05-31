@@ -182,11 +182,11 @@ Assert-BodyContains $helper "private static uint\? GetReassembleTargetActionId\(
     "ShouldHoldReassembleDrillForTimeline\(\)"
 ) "Reassemble target policy must honor timeline hold/dump"
 
-Assert-Contains "docs/DEVELOPMENT.md" "KairoMCHTimelineVariable" "Development docs must record the HiAuRo timeline trigger discriminator"
-Assert-Contains "docs/DEVELOPMENT.md" "mch_hold_wildfire" "Development docs must list old MCH timeline variables"
-Assert-Contains "docs/DEVELOPMENT.md" "StartDelayedBurstHold" "Development docs must describe delayed burst hold preset"
-Assert-Contains "docs/DEVELOPMENT.md" "ReleaseDelayedBurstPackage" "Development docs must describe delayed burst release preset"
-Assert-Contains "docs/DEVELOPMENT.md" "ResetDelayedBurstPackage" "Development docs must describe delayed burst reset preset"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "KairoMCHTimelineVariable" "Development docs must record the HiAuRo timeline trigger discriminator"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "mch_hold_wildfire" "Development docs must list old MCH timeline variables"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "StartDelayedBurstHold" "Development docs must describe delayed burst hold preset"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "ReleaseDelayedBurstPackage" "Development docs must describe delayed burst release preset"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "ResetDelayedBurstPackage" "Development docs must describe delayed burst reset preset"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist timeline migration validation failed:"

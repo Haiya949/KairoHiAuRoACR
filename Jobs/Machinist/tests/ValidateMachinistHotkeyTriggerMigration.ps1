@@ -61,9 +61,9 @@ Assert-Contains "Jobs/Machinist/Triggers/MachinistHotkeyIds.cs" "hk_" "MCH potio
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" 'new HotkeyResolver_Potion\(\)' "MCH UI must register the potion hotkey resolver"
 Assert-NotContains "Jobs/Machinist/QTKey.cs" "UsePotion" "MCH must not restore old UsePotion QT; potion remains a hotkey"
 
-Assert-Contains "docs/DEVELOPMENT.md" "KairoMCHHotkey" "Development docs must record the hotkey trigger discriminator"
-Assert-Contains "docs/DEVELOPMENT.md" "KairoMCHPotion" "Development docs must record the potion trigger discriminator"
-Assert-Contains "docs/DEVELOPMENT.md" "MachinistHotkeyIds.Potion" "Development docs must describe the potion hotkey id contract"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "KairoMCHHotkey" "Development docs must record the hotkey trigger discriminator"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "KairoMCHPotion" "Development docs must record the potion trigger discriminator"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "MachinistHotkeyIds.Potion" "Development docs must describe the potion hotkey id contract"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist hotkey trigger migration validation failed:"

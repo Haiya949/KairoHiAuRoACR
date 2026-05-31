@@ -98,9 +98,9 @@ Assert-BodyContains $helper "private static Spell\? GetReassembledAoeGcd\(\)" @(
     "BestAoeTargetSpell\(ActionId\.Scattergun\)"
 ) "Reassembled Scattergun must also use the best AOE target center"
 
-Assert-Contains "docs/DEVELOPMENT.md" "AOE target policy" "Development docs must record the MCH best-AOE-target policy"
-Assert-Contains "docs/DEVELOPMENT.md" "TargetHelper.GetMostCanTargetObjects" "Development docs must cite the HiAuRo-native AOE target helper"
-Assert-Contains "docs/DEVELOPMENT.md" "does not replace Runtime target selection" "Development docs must keep AOE target centering separate from Runtime target selection"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "AOE target policy" "Development docs must record the MCH best-AOE-target policy"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "TargetHelper.GetMostCanTargetObjects" "Development docs must cite the HiAuRo-native AOE target helper"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "does not replace Runtime target selection" "Development docs must keep AOE target centering separate from Runtime target selection"
 
 Assert-NotContains "Jobs/Machinist/MachinistTargetResolver.cs" "TargetResolver_最佳AOE位置|TargetResolver_最低HP敌人|TrySelectTarget|TargetManager" "MCH Runtime target resolver must remain nearest-enemy only"
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "Core\\.Me\\.GetCurrTarget|AEAssist|MachinistActionId|MachinistStatusId|DynamicTargetSpell" "AOE target policy must stay HiAuRo-native and Helper-backed"

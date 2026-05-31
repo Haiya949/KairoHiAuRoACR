@@ -86,6 +86,8 @@ foreach ($path in @(
 
 foreach ($path in @(
     "Jobs\Machinist\docs\execution_axis_variables.md",
+    "Jobs\Machinist\docs\DEVELOPMENT.md",
+    "Jobs\Machinist\docs\HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md",
     "Jobs\Machinist\docs\execution_timelines\M9S-MCH-execution.json",
     "Jobs\Machinist\docs\execution_timelines\M10S-MCH-execution.json",
     "Jobs\Machinist\docs\execution_timelines\M11S-MCH-execution.json",
@@ -95,6 +97,23 @@ foreach ($path in @(
     if (-not (Test-Path -LiteralPath (Join-Path $Root $path))) {
         $failures.Add("Missing Machinist-specific artifact: $path")
     }
+}
+
+$topLevelDevelopment = Read-File "docs\DEVELOPMENT.md"
+foreach ($pattern in @(
+    "##\s*机工",
+    "Wildfire|Queen/Rook|Hypercharge|Full Metal Field",
+    "mch_opener_air_anchor_first|mch_hold_wildfire|KairoMCHTimelineVariable",
+    "Jobs/Machinist/docs/execution_axis_variables\.md|Jobs/Machinist/docs/execution_timelines"
+)) {
+    Assert-NotContains $topLevelDevelopment $pattern "Top-level development docs must stay job-neutral"
+}
+
+foreach ($pattern in @(
+    "MCH|Machinist|机工",
+    "Reassemble|Countdown\.CountdownTimer|production opener logic"
+)) {
+    Assert-NotContains $compliance $pattern "Top-level compliance docs must stay job-neutral"
 }
 
 $notCopyHelper = (U 0x8F93,0x51FA,0x4E0D,0x590D,0x5236) + ' `HiAuRo.Helper.dll`'

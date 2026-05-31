@@ -66,7 +66,7 @@ Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "GetDismantleOffGcd|
 Assert-Contains "Jobs/Machinist/MachinistRotationUi.cs" 'AddQtHotkey\("[^"]*\p{IsCJKUnifiedIdeographs}[^"]*",\s*new\s+HotkeyResolver_NormalSpell\(ActionId\.Dismantle,\s*"[^"]*\p{IsCJKUnifiedIdeographs}[^"]*"\)\)' "UI must keep Dismantle as an explicit Chinese hotkey"
 Assert-Contains "Jobs/Machinist/Triggers/TriggerAction_Hotkey.cs" 'MachinistHotkeyAction\.Dismantle => TargetAbility\(ActionId\.Dismantle,\s*"[^"]*\p{IsCJKUnifiedIdeographs}[^"]*"\)' "Timeline hotkey trigger must support explicit Dismantle"
 Assert-Contains "Jobs/Machinist/Triggers/TriggerAction_Hotkey.cs" 'MachinistHotkeyAction\.Dismantle => "[^"]*\p{IsCJKUnifiedIdeographs}[^"]*。"' "Timeline hotkey trigger must describe explicit Dismantle in Chinese"
-Assert-Contains "docs/DEVELOPMENT.md" "Dismantle remains explicit hotkey/timeline control" "Development docs must record Dismantle as explicit-only control"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Dismantle remains explicit hotkey/timeline control" "Development docs must record Dismantle as explicit-only control"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "Dismantle" "Execution-axis authoring docs must expose Dismantle through KairoMCHHotkey"
 
 if ($failures.Count -gt 0) {

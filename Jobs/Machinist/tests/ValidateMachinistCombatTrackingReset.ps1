@@ -111,7 +111,7 @@ Assert-BodyContains $helper "private static bool ShouldResetStaleCombatTrackingO
 
 Assert-Contains $helper "ActionId\.Reassemble" "Stale opener reset must use the Helper action alias, not a local ID catalog"
 Assert-Contains $helper "if \(_acrCombatClockStartedAtTick is not null\)\s*return false;" "Active opener combat clock must prevent Reassemble stale-reset"
-Assert-Contains (Read-File "docs/DEVELOPMENT.md") "opener second Reassemble must not reset ACR combat clock" "Development docs must record the opener Reassemble reset guard"
+Assert-Contains (Read-File "Jobs/Machinist/docs/DEVELOPMENT.md") "opener second Reassemble must not reset ACR combat clock" "Development docs must record the opener Reassemble reset guard"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist combat tracking reset validation failed:"

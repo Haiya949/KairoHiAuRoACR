@@ -182,8 +182,8 @@ Assert-Contains $templatePath '"\$type"\s*:\s*"KairoMCHPotion"' "Execution-axis 
 Assert-Contains $templatePath ([regex]::Escape((U @(0x673a, 0x5de5, 0x6267, 0x884c, 0x8f74, 0x6a21, 0x677f)))) "Execution-axis template must display an execution-axis label"
 Assert-NotContains $templatePath 'AEAssist|Kairo\.Machinist\.Triggers|TriggerAction_QT|TriggerAction_NewQt|UsePotion QT|JobViewWindow' "Execution-axis template must not leak old plugin trigger names"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/templates/MCH-execution-axis-template.json" "Development docs must point to the HiAuRo MCH execution-axis template"
-Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_axis_variables.md" "Development docs must point to the execution-axis authoring docs"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Jobs/Machinist/docs/templates/MCH-execution-axis-template.json" "Development docs must point to the HiAuRo MCH execution-axis template"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_axis_variables.md" "Development docs must point to the execution-axis authoring docs"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist timeline authoring validation failed:"

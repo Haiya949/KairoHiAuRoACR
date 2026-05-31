@@ -91,7 +91,7 @@ Assert-NotContains "Jobs/Machinist/Triggers/TriggerAction_Hotkey.cs" 'QTKey\.Use
 
 Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" 'new TriggerAction_Hotkey\(\)' "Rotation must register the generic hotkey trigger"
 Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" 'new TriggerAction_Potion\(\)' "Rotation must register the dedicated potion trigger"
-Assert-Contains "docs/DEVELOPMENT.md" "Potion remains explicit hotkey/timeline request" "Development docs must record potion as explicit hotkey/timeline request"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Potion remains explicit hotkey/timeline request" "Development docs must record potion as explicit hotkey/timeline request"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "KairoMCHPotion" "Execution-axis docs must expose the dedicated potion trigger"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" 'MachinistHotkeyIds\.Potion' "Execution-axis docs must describe the shared potion hotkey id"
 Assert-NotContains "Jobs/Machinist" 'AEAssist|JobViewWindow|MachinistActionId|QTKey\.UsePotion|UsePotion QT' "Potion migration must not leak old plugin APIs, local IDs, or old UsePotion QT"

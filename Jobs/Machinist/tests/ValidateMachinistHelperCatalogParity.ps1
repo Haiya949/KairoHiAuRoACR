@@ -12,7 +12,7 @@ function Read-ProjectFile([string]$relativePath) {
 }
 
 $helperCatalog = Read-ProjectFile 'Helper/HiAuRo.Helper/MCHHelper.cs'
-$docs = Read-ProjectFile 'docs/DEVELOPMENT.md'
+$docs = Read-ProjectFile 'Jobs/Machinist/docs/DEVELOPMENT.md'
 $failures = [System.Collections.Generic.List[string]]::new()
 
 $requiredActions = [ordered]@{

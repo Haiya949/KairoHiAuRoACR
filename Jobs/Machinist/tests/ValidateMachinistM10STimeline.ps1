@@ -163,7 +163,7 @@ function Get-ActionsFromNodes {
 $timelinePath = "Jobs/Machinist/docs/execution_timelines/M10S-MCH-execution.json"
 $timelineText = Read-File $timelinePath
 
-Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_timelines/M10S-MCH-execution\.json" "Development docs must point to the concrete M10S HiAuRo execution-axis example"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_timelines/M10S-MCH-execution\.json" "Development docs must point to the concrete M10S HiAuRo execution-axis example"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "Jobs/Machinist/docs/execution_timelines/M10S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M10S example"
 
 if (-not [string]::IsNullOrWhiteSpace($timelineText)) {

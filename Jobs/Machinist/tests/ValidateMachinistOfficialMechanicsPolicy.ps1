@@ -187,10 +187,10 @@ if (-not $reassemblePriority.Success) {
     Assert-BodyNotContains $reassemblePriority.Groups["body"].Value "ActionId\.FullMetalField" "Full Metal Field must not be a Reassemble target"
 }
 
-Assert-Contains "docs/DEVELOPMENT.md" "Hot Shot" "Development docs must record the low-level Hot Shot fallback"
-Assert-Contains "docs/DEVELOPMENT.md" "Bioblaster.*Scattergun" "Development docs must record official MCH AOE actions"
-Assert-Contains "docs/DEVELOPMENT.md" "Barrel Stabilizer.*Hypercharged.*Full Metal Machinist" "Development docs must record Dawntrail Barrel Stabilizer mechanics"
-Assert-Contains "docs/DEVELOPMENT.md" "Reassemble.*Full Metal Field" "Development docs must record why Full Metal Field is excluded from Reassemble targets"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Hot Shot" "Development docs must record the low-level Hot Shot fallback"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Bioblaster.*Scattergun" "Development docs must record official MCH AOE actions"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Barrel Stabilizer.*Hypercharged.*Full Metal Machinist" "Development docs must record Dawntrail Barrel Stabilizer mechanics"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Reassemble.*Full Metal Field" "Development docs must record why Full Metal Field is excluded from Reassemble targets"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist official mechanics validation failed:"

@@ -141,7 +141,7 @@ Assert-BodyContains $helper "private static int GetTimeToNextTwoMinuteBurstWindo
 
 Assert-Contains "Jobs/Machinist/Triggers/TriggerAction_TimelineVariable.cs" "MachinistSpellHelper\.ReanchorBurstCycleToCurrentTime\(\)" "Delayed burst release trigger must re-anchor the cycle"
 
-Assert-Contains "docs/DEVELOPMENT.md" "opener Wildfire.*must not shift.*120s" "Development docs must record the fixed 120s anchor model"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "opener Wildfire.*must not shift.*120s" "Development docs must record the fixed 120s anchor model"
 
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "MachinistActionId|MachinistStatusId|Kairo\.Machinist|AEAssist" "Dynamic burst-anchor policy must stay HiAuRo-native and Helper-backed"
 

@@ -80,7 +80,7 @@ function Assert-Order {
 }
 
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
-$docs = Read-File "docs/DEVELOPMENT.md"
+$docs = Read-File "Jobs/Machinist/docs/DEVELOPMENT.md"
 
 foreach ($pattern in @(
     "private static long\? _acrCombatClockStartedAtTick",

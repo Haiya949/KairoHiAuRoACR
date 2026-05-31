@@ -167,8 +167,8 @@ Assert-BodyContains $opener "private static Spell SelfAbility\(uint actionId\)" 
     "new Spell\(actionId,\s*SpellTargetType\.Self\) \{ Type = SpellType\.Ability \}"
 ) "Self opener weaves must be marked as Ability"
 
-Assert-Contains "docs/DEVELOPMENT.md" 'G5 `Drill` -> `Checkmate` -> `Wildfire`' "Development docs must record the saved-ammo G5 opener order"
-Assert-Contains "docs/DEVELOPMENT.md" 'G6 `Full Metal Field` -> `Double Check` -> `Hypercharge`' "Development docs must record the saved-ammo G6 opener order"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" 'G5 `Drill` -> `Checkmate` -> `Wildfire`' "Development docs must record the saved-ammo G5 opener order"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" 'G6 `Full Metal Field` -> `Double Check` -> `Hypercharge`' "Development docs must record the saved-ammo G6 opener order"
 
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist|UseActionManager|UseAction\(" "MCH standard opener must stay HiAuRo-native and Helper-backed"
 

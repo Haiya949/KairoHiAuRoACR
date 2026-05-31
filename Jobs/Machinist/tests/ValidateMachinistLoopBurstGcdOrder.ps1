@@ -80,7 +80,7 @@ function Assert-InOrder {
 }
 
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
-$docs = Read-File "docs/DEVELOPMENT.md"
+$docs = Read-File "Jobs/Machinist/docs/DEVELOPMENT.md"
 
 Assert-NotContains $helper "LoopOpeningComboLeadMs|ShouldDelayStrongGcdForLoopOpeningCombo|TrackLoopOpeningComboAction|HasLoopOpeningComboForAnchor|_lastLoopOpeningComboAnchorMs" "Loop burst must not keep the removed first-GCD ordinary combo delay"
 Assert-NotContains $helper "LoopBurstStrongGcdPriority|ShouldDelayFullMetalFieldForLoopBurst|FullMetalWildfireReadyLeadMs|TrackLoopBurstToolAction|HasLoopChainSawForAnchor|HasLoopExcavatorForAnchor" "Loop burst must not use the failed fight 9 package state machine"

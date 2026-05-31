@@ -167,7 +167,7 @@ Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "ActionId\.Reassemble
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "ActionId\.Wildfire" "MCH opener must weave Wildfire after second Drill"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "ActionId\.Hypercharge" "MCH opener must weave Hypercharge after Full Metal Field"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "SpellType\.Ability" "MCH opener oGCD spells must be marked as Ability for SlotExecutor"
-Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "4s prepull Reassemble" "Docs must record the HiAuRo-only 4s prepull Reassemble decision"
+Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "4s prepull Reassemble" "Docs must record the HiAuRo-only 4s prepull Reassemble decision"
 Assert-InOrder "Jobs/Machinist/MachinistRotationEntry.cs" @(
     "MachinistQueenOverdriveResolver",
     "MachinistWildfireResolver",
@@ -223,7 +223,7 @@ Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" 'Stop all MCH actions
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" "QTKey\.(UsePotion|RangedSafety|CastLog|PrepullReassemble)" "MCH UI must not expose unimplemented QT toggles"
 Assert-NotContains "Jobs/Machinist/QTKey.cs" "(UsePotion|RangedSafety|CastLog|PrepullReassemble)" "MCH QT catalog must not keep unimplemented keys"
 Assert-NotContains "Jobs/Machinist/MachinistSettings.cs" "PrepullReassembleCountdownMs|CountdownPullActionQueueLeadMs" "MCH settings must not keep countdown bridge settings after returning to documented IOpener countdown handling"
-Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "visible UI labels.*Chinese" "Kairo author guide compliance must document Chinese visible UI labels"
+Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "visible UI labels.*Chinese" "Kairo author guide compliance must document Chinese visible UI labels"
 
 Assert-Contains "Helper/HiAuRo.Helper/MCHHelper.cs" "FullMetalField\s*=\s*36982" "Helper MCH action catalog must include Dawntrail actions"
 Assert-Contains "Helper/HiAuRo.Helper/MCHHelper.cs" "Overheated\s*=\s*2688" "Helper MCH status catalog must include Overheated"
@@ -250,10 +250,10 @@ Assert-NotContains "Jobs/Machinist/MachinistRotationEntry.cs" "_targetResolver|T
 Assert-NotContains "Jobs/Machinist/MachinistRotationUi.cs" 'TrySelectTarget\(\)' "MCH UI must not trigger target selection; Runtime TargetResolvers handle selection"
 Assert-NotContains "Jobs/Machinist/MachinistRotationEventHandler.cs" "MachinistTargetResolver|TrySelectTarget\(\)" "MCH event handler must not run ACR-side target selection hooks"
 Assert-NotContains "Jobs/Machinist/MachinistRotationEntry.cs" "BuildTargetResolvers" "Target selection must not be frozen at Rotation Build time"
-Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "CombatContext\.State\.InCombat" "Docs must state that normal ACR loop starts only after InCombat"
-Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "IOpener" "Docs must state that countdown pull actions belong to Opener"
-Assert-Contains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "production opener logic" "Docs must distinguish production countdown handling from read-only debug display"
-Assert-NotContains "docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" 'ACR 面板可以只读显示|read-only display .*Countdown\.CountdownTimer|Countdown\.CountdownTimer.*CountDownHandler' "Docs must not permit ACR UI to read countdown IPC directly"
+Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "CombatContext\.State\.InCombat" "Docs must state that normal ACR loop starts only after InCombat"
+Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "IOpener" "Docs must state that countdown pull actions belong to Opener"
+Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "production opener logic" "Docs must distinguish production countdown handling from read-only debug display"
+Assert-NotContains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" 'ACR 面板可以只读显示|read-only display .*Countdown\.CountdownTimer|Countdown\.CountdownTimer.*CountDownHandler' "Docs must not permit ACR UI to read countdown IPC directly"
 Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
     "public static Spell? GetHyperchargeOffGcd()",
     "var hasHyperchargedReady = HelperRuntime.HasStatus(StatusId.Hypercharged);",

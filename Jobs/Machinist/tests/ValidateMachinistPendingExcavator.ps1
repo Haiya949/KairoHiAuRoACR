@@ -84,9 +84,9 @@ Assert-BodyContains $helper "private static bool HasPendingExcavatorFollowUp\(\)
     "GetAcrBattleTimeMs\(\) - lastChainSawUsedAtMs <= ReassemblePendingTargetExpireMs"
 ) "Pending Excavator follow-up must be based on Helper action IDs and issued-action tracking"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Chain Saw -> Excavator follow-up" "Development docs must record the pending Excavator follow-up rule"
-Assert-Contains "docs/DEVELOPMENT.md" "4\.5s" "Development docs must record the pending target window"
-Assert-Contains "docs/DEVELOPMENT.md" "StatusId\.ExcavatorReady" "Development docs must explain the real server state checked after the pending window"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Chain Saw -> Excavator follow-up" "Development docs must record the pending Excavator follow-up rule"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "4\.5s" "Development docs must record the pending target window"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "StatusId\.ExcavatorReady" "Development docs must explain the real server state checked after the pending window"
 
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist" "Pending Excavator tracking must stay HiAuRo-native and Helper-backed"
 

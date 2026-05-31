@@ -124,10 +124,10 @@ Assert-BodyContains $gaussBody @(
     "spell\.Charges >= 2"
 ) "Checkmate and Double Check must keep the natural two-charge release instead of a hidden loop-burst hold"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Hypercharged.*not Overheated" "Development docs must record the Hypercharged/Overheated status split"
-Assert-Contains "docs/DEVELOPMENT.md" "loop Wildfire package.*Full Metal Field.*Hypercharge.*Wildfire" "Development docs must record the loop Wildfire package rule"
-Assert-Contains "docs/DEVELOPMENT.md" "Wildfire.*late oGCD window" "Development docs must record the late-window Wildfire rule"
-Assert-Contains "docs/DEVELOPMENT.md" "Checkmate / Double Check.*Charges >= 2" "Development docs must record the natural Checkmate/Double Check release"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Hypercharged.*not Overheated" "Development docs must record the Hypercharged/Overheated status split"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "loop Wildfire package.*Full Metal Field.*Hypercharge.*Wildfire" "Development docs must record the loop Wildfire package rule"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Wildfire.*late oGCD window" "Development docs must record the late-window Wildfire rule"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Checkmate / Double Check.*Charges >= 2" "Development docs must record the natural Checkmate/Double Check release"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist Hypercharged status validation failed:"

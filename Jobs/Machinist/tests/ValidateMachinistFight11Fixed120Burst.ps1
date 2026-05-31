@@ -80,7 +80,7 @@ function Assert-Order {
 }
 
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
-$docs = Read-File "docs/DEVELOPMENT.md"
+$docs = Read-File "Jobs/Machinist/docs/DEVELOPMENT.md"
 
 $trackBody = Get-Body $helper "private static void TrackBurstPackageAction\(uint actionId, int actionBattleTimeMs\)" "burst package tracker"
 Assert-NotContains $trackBody "_firstPostOpenerBurstAnchorMs = _currentBattleTimeMs \+ MachinistBurstPlanner\.BurstCycleMs" "Fight 11: opener Wildfire must not shift the fixed 120s loop anchor"

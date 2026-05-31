@@ -129,8 +129,8 @@ Assert-Contains "Jobs/Machinist/Resolvers/OffGCD/MachinistReassembleResolver.cs"
 Assert-Contains "Jobs/Machinist/Resolvers/OffGCD/MachinistReassembleResolver.cs" "private uint\? _targetActionId" "Reassemble resolver must cache the target selected during Check for Build"
 Assert-NotContains "Jobs/Machinist/Resolvers/OffGCD/MachinistReassembleResolver.cs" "MarkReassembleOffGcdIssued\(\);" "Reassemble resolver must not call the old target-less issued marker"
 
-Assert-Contains "docs/DEVELOPMENT.md" "pending Reassemble target" "Development docs must record pending Reassemble target protection"
-Assert-Contains "docs/DEVELOPMENT.md" "next GCD" "Development docs must describe that the pending target protects the next consuming GCD"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "pending Reassemble target" "Development docs must record pending Reassemble target protection"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "next GCD" "Development docs must describe that the pending target protects the next consuming GCD"
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist" "Pending Reassemble target tracking must stay HiAuRo-native and Helper-backed"
 
 if ($failures.Count -gt 0) {

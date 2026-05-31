@@ -112,7 +112,7 @@ foreach ($pattern in @(
     }
 }
 
-Assert-Contains "docs/DEVELOPMENT.md" "mch_hold_all_burst.*90.*mch_hold_battery" "Development docs must record battery hold vs overcap priority"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "mch_hold_all_burst.*90.*mch_hold_battery" "Development docs must record battery hold vs overcap priority"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist battery hold/overcap priority validation failed:"

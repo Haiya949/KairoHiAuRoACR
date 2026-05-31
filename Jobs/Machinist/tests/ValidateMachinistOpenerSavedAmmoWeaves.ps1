@@ -126,10 +126,10 @@ Assert-BodyContains $fullMetal @(
     "ActionId\.Hypercharge"
 ) "G6 opener slot must keep Double Check and Hypercharge in one native Slot"
 
-Assert-Contains "docs/DEVELOPMENT.md" 'G1 `Drill`.*`Double Check`.*`Checkmate`' "Development docs must record G1 opener ammo behavior"
-Assert-Contains "docs/DEVELOPMENT.md" 'G2 `Air Anchor`.*G3 `Chain Saw`.*saved second `Double Check` / `Checkmate`' "Development docs must record saved ammo hold through G2/G3"
-Assert-Contains "docs/DEVELOPMENT.md" 'G5 first weave spends saved `Checkmate`, then `Wildfire` takes the second weave' "Development docs must record G5 saved-ammo weave order"
-Assert-Contains "docs/DEVELOPMENT.md" 'G6 first weave spends saved `Double Check`, then `Hypercharge` takes the second weave' "Development docs must record G6 saved-ammo weave order"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" 'G1 `Drill`.*`Double Check`.*`Checkmate`' "Development docs must record G1 opener ammo behavior"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" 'G2 `Air Anchor`.*G3 `Chain Saw`.*saved second `Double Check` / `Checkmate`' "Development docs must record saved ammo hold through G2/G3"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" 'G5 first weave spends saved `Checkmate`, then `Wildfire` takes the second weave' "Development docs must record G5 saved-ammo weave order"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" 'G6 first weave spends saved `Double Check`, then `Hypercharge` takes the second weave' "Development docs must record G6 saved-ammo weave order"
 
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "ShouldDelayOpenerWildfireForSavedAmmo|ShouldDelayOpenerHyperchargeForSavedAmmo|ShouldUseSavedAmmoBeforeOpenerBurst|ShouldPreferCheckmateBeforeOpenerWildfire" "HiAuRo IOpener must express opener saved-ammo ordering through Slot order, not old resolver delay helpers"
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist" "Opener saved-ammo migration must remain Helper-backed and HiAuRo-native"

@@ -95,7 +95,7 @@ Assert-BodyNotContains $dumpByHpBody "GetCurrentTargetHpPercent\(\) <= DumpResou
 
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "private static bool HasTarget\(\)" "MCH policy must keep a shared live-target helper"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "target\.CurrentHp > 0" "MCH live-target helper must reject dead or stale targets"
-Assert-Contains "docs/DEVELOPMENT.md" "requires a live target" "Development docs must record that daily auto-dump is not active without a live target"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "requires a live target" "Development docs must record that daily auto-dump is not active without a live target"
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "Core\\.Me\\.GetCurrTarget|AEAssist|MachinistActionId|MachinistStatusId" "No-target dump policy must stay HiAuRo-native and Helper-backed"
 
 if ($failures.Count -gt 0) {

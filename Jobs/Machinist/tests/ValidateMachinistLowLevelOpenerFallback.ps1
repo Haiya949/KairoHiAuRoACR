@@ -133,10 +133,10 @@ Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "ActionId\.ChainSaw =
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "ActionId\.Excavator => LevelAtLeast\(96\)" "MCH opener must keep Excavator level gate"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "ActionId\.FullMetalField => LevelAtLeast\(100\)" "MCH opener must keep Full Metal Field level gate"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Low-level opener rule" "Development docs must record the low-level opener fallback"
-Assert-Contains "docs/DEVELOPMENT.md" "skip locked opener steps" "Development docs must state locked opener steps are skipped"
-Assert-Contains "docs/DEVELOPMENT.md" "must not wait forever" "Development docs must record the no-empty-slot low-level invariant"
-Assert-Contains "docs/DEVELOPMENT.md" "second Drill only exists after Air Anchor, Chain Saw, and Excavator" "Development docs must record the late-opener second Drill low-level invariant"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Low-level opener rule" "Development docs must record the low-level opener fallback"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "skip locked opener steps" "Development docs must state locked opener steps are skipped"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "must not wait forever" "Development docs must record the no-empty-slot low-level invariant"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "second Drill only exists after Air Anchor, Chain Saw, and Excavator" "Development docs must record the late-opener second Drill low-level invariant"
 
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist|UseActionManager|UseAction\(" "MCH low-level opener fallback must stay HiAuRo-native and Helper-backed"
 

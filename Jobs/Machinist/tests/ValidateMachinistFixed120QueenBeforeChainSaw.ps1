@@ -153,13 +153,13 @@ Assert-BodyContains $helper "public static Spell\? GetQueenOffGcd\(\)" @(
     "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryInFixed120Burst \|\| shouldSpendBatteryByBudget \|\| CanUseBurstResource\(\)"
 ) "Queen/Rook resolver must own the summon and may clip if needed before Chain Saw"
 
-Assert-InOrder "docs/DEVELOPMENT.md" @(
+Assert-InOrder "Jobs/Machinist/docs/DEVELOPMENT.md" @(
     "fixed 120s burst order",
     "Drill -> Queen/Rook",
     "Chain Saw"
 ) "Development docs must record that Queen/Rook is released before Chain Saw"
 
-Assert-NotContains "docs/DEVELOPMENT.md" "Air Anchor.*Barrel Stabilizer \\+ Queen/Rook|AddIssuedStrongGcdSpell|Air Anchor double-weave|Air Anchor battery double-weave" "Development docs must not describe the removed Air Anchor-bound Queen/Rook plan"
+Assert-NotContains "Jobs/Machinist/docs/DEVELOPMENT.md" "Air Anchor.*Barrel Stabilizer \\+ Queen/Rook|AddIssuedStrongGcdSpell|Air Anchor double-weave|Air Anchor battery double-weave" "Development docs must not describe the removed Air Anchor-bound Queen/Rook plan"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist fixed-120 Queen-before-ChainSaw validation failed:"

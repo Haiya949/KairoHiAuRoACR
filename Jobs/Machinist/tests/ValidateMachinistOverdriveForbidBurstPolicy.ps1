@@ -85,7 +85,7 @@ function U {
 }
 
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
-$docs = Read-File "docs/DEVELOPMENT.md"
+$docs = Read-File "Jobs/Machinist/docs/DEVELOPMENT.md"
 $body = Get-Body $helper "public static Spell\? GetQueenOverdriveOffGcd\(\)" "Queen/Rook overdrive policy"
 $forbidBurstLabel = [regex]::Escape((U @(0x4fdd, 0x7559, 0x7206, 0x53d1)))
 

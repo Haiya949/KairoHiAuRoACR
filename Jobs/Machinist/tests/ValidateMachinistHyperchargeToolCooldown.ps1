@@ -134,10 +134,10 @@ Assert-BodyContains $unlockBody @(
     "ActionId\.FullMetalField => LevelAtLeast\(100\)"
 ) "Cooldown lookahead must keep level gates for all MCH tools"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Chain Saw and Air Anchor cooldown integrity" "Development docs must record Hypercharge tool cooldown protection"
-Assert-Contains "docs/DEVELOPMENT.md" "exact 8s" "Development docs must record the exact Hypercharge tool cooldown window"
-Assert-Contains "docs/DEVELOPMENT.md" "current heat does not override this guard" "Development docs must record that heat does not bypass the tool guard"
-Assert-Contains "docs/DEVELOPMENT.md" "Barrel Stabilizer.*Hypercharged.*Full Metal Machinist" "Development docs must record Dawntrail Barrel Stabilizer mechanics"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Chain Saw and Air Anchor cooldown integrity" "Development docs must record Hypercharge tool cooldown protection"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "exact 8s" "Development docs must record the exact Hypercharge tool cooldown window"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "current heat does not override this guard" "Development docs must record that heat does not bypass the tool guard"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Barrel Stabilizer.*Hypercharged.*Full Metal Machinist" "Development docs must record Dawntrail Barrel Stabilizer mechanics"
 
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist" "Hypercharge tool cooldown migration must stay HiAuRo-native and Helper-backed"
 

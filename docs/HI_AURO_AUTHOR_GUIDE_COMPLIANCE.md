@@ -81,13 +81,13 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 - 副本特化、停手、保留、强制爆发、转火和药水窗口不要硬编码进基础循环。
 - 需要覆盖高优先级插入时，使用官方 `CanUseHighPrioritySlotCheck` 这类 Rotation 钩子。
 
-当前差距：
+当前通用要求：
 
-- MCH 已接基础最近敌人 `TargetResolver`，由 HiAuRo Runtime 在各状态统一调度；ACR 主控不再暴露手动目标选择。
-- MCH 已接 HiAuRo 原生 `IOpener` 起手，并按当前 `CountDownHandler` 整数秒接口使用 4s prepull Reassemble。
-- HiAuRo Runtime v0.1.83 会在倒计时开始事件重置 `CountDownHandler` / `OpenerMgr` 并懒注册 `InitCountDown`，倒计时结束后自动启动 `OpenerMgr`；普通 ACR 循环仍只在 `CombatContext.State.InCombat` 后执行。
-- 副本时间线、事实轴、辅助轴策略尚未接入 Kairo 职业逻辑。
-- 面板已要求游戏内可见文案中文化，但新增职业仍需要逐项验证。
+- 目标选择通过 `Rotation.TargetResolvers` 交给 HiAuRo Runtime 统一调度；ACR 主控不暴露手动目标选择。
+- 起手与倒计时动作通过 HiAuRo 原生 `IOpener` 和 `CountDownHandler` 接入。
+- 普通 ACR 循环仍只在 `CombatContext.State.InCombat` 后执行。
+- 副本时间线、事实轴、辅助轴策略不能写进基础循环。
+- 面板已要求游戏内可见文案中文化，新增职业仍需要逐项验证。
 
 ## 4. SlotMode
 
@@ -193,10 +193,6 @@ dotnet build E:\ff14\HiAuRo\KairoHiAuRoACR\KairoHiAuRoACR.slnx -c Debug
 - Helper 状态、量谱、技能 ID 有来源。
 - 基础循环不包含副本时间线特化。
 
-## 10. MCH 起手边界
+## 10. 职业专属补充
 
-- `MachinistOpener` 作为 HiAuRo `IOpener` 倒计时和起手入口，`InitCountDown` 声明 4s prepull Reassemble。
-- 完整多 GCD 起手写进 `IOpener.Sequence`，由 Runtime `OpenerMgr` 在倒计时结束或进入战斗后启动。
-- 每个起手 Slot 以 GCD 开头，后接该 GCD 后的固定 oGCD；Runtime v0.1.83 按 ActionCategory/recast group 判断 GCD/oGCD，ACR 保留 `SpellType.Ability` 标记用于兼容事件记录。
-- 倒计时阶段的 production opener logic 只走 Runtime `CountDownHandler` 处理已注册动作；ACR 代码不直接读取 `Countdown.CountdownTimer`，也不在职业侧重注册或排队倒计时技能。
-- ACR 面板不保留 Runtime 倒计时/起手调试诊断；需要排查时临时加日志，问题定位后移除。
+职业专属合规记录放在 `Jobs/<JobName>/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md`，不要写回顶层通用清单。

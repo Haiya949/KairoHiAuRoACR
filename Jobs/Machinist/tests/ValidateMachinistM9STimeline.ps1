@@ -207,7 +207,7 @@ function Assert-TimelineActionTimedGate {
 $timelinePath = "Jobs/Machinist/docs/execution_timelines/M9S-MCH-execution.json"
 $timelineText = Read-File $timelinePath
 
-Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_timelines/M9S-MCH-execution\.json" "Development docs must point to the concrete M9S HiAuRo execution-axis example"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_timelines/M9S-MCH-execution\.json" "Development docs must point to the concrete M9S HiAuRo execution-axis example"
 Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "Jobs/Machinist/docs/execution_timelines/M9S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M9S example"
 
 if (-not [string]::IsNullOrWhiteSpace($timelineText)) {

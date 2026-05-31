@@ -66,9 +66,9 @@ Assert-BodyContains $helper "public static Spell\? GetQueenOverdriveOffGcd\(\)" 
     "spell\.IsReadyWithCanCast\(\)"
 ) "Robot overdrive must finish active Rook/Queen during explicit battery release or generic DumpResources"
 
-Assert-Contains "docs/DEVELOPMENT.md" "Queen/Rook Overdrive dump policy" "Development docs must record the robot overdrive dump policy"
-Assert-Contains "docs/DEVELOPMENT.md" "ShouldReleaseBatteryForTimeline" "Development docs must mention timeline battery release for overdrive"
-Assert-Contains "docs/DEVELOPMENT.md" "ShouldUseDumpResources" "Development docs must mention generic DumpResources for overdrive"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "Queen/Rook Overdrive dump policy" "Development docs must record the robot overdrive dump policy"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "ShouldReleaseBatteryForTimeline" "Development docs must mention timeline battery release for overdrive"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "ShouldUseDumpResources" "Development docs must mention generic DumpResources for overdrive"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist Queen/Rook overdrive dump validation failed:"

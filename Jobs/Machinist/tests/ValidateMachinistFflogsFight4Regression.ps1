@@ -61,7 +61,7 @@ function Assert-NotContains {
 }
 
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
-$docs = Read-File "docs/DEVELOPMENT.md"
+$docs = Read-File "Jobs/Machinist/docs/DEVELOPMENT.md"
 
 $anchorBody = Get-Body $helper "private static int GetCurrentBurstAnchorMs\(\)" "current burst anchor"
 Assert-Contains $anchorBody "_firstPostOpenerBurstAnchorMs \?\? _settings\.FirstBurstAnchorMs" "Timeline release re-anchor must remain available"
