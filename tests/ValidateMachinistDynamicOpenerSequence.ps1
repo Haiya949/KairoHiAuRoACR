@@ -94,8 +94,8 @@ Assert-Contains "docs/DEVELOPMENT.md" "IOpener\.Sequence" "Development docs must
 Assert-Contains "docs/DEVELOPMENT.md" "dynamic Sequence snapshot" "Development docs must record why opener Sequence is snapshotted at StartCheck"
 Assert-Contains "docs/DEVELOPMENT.md" "before OpenerMgr starts" "Development docs must state the Air Anchor first variable timing"
 Assert-Contains "docs/DEVELOPMENT.md" "same Sequence snapshot" "Development docs must state Runtime opener execution uses the same Sequence snapshot"
-Assert-Contains "docs/timeline_variables.md" "before OpenerMgr starts" "Timeline docs must state when mch_opener_air_anchor_first is consumed"
-Assert-Contains "docs/timeline_variables.md" "running opener snapshot" "Timeline docs must state opener variables do not mutate the running opener snapshot"
+Assert-Contains "docs/execution_axis_variables.md" "before OpenerMgr starts" "Execution-axis docs must state when mch_opener_air_anchor_first is consumed"
+Assert-Contains "docs/execution_axis_variables.md" "running opener snapshot" "Execution-axis docs must state opener variables do not mutate the running opener snapshot"
 
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" 'AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist|UseActionManager|UseAction\(' "Dynamic opener Sequence must stay HiAuRo-native and Helper-backed"
 

@@ -1,6 +1,24 @@
-# 机工时间轴变量
+# 机工执行轴变量
 
-本文档记录 Kairo 机工 ACR 暴露给 HiAuRo 执行轴使用的触发动作和变量。执行轴必须使用 HiAuRo 原生节点，例如 `HiAuRo.Execution.TreeActionNode, HiAuRo`，动作 `$type` 使用 ACR 注册的 `TriggerTypeName` 短名。
+本文档记录 Kairo 机工 ACR 暴露给 HiAuRo 执行轴使用的触发动作和变量。这里的示例只属于执行轴，不是事实轴或辅助轴。执行轴必须使用 HiAuRo 原生节点，例如 `HiAuRo.Execution.TreeActionNode, HiAuRo`，动作 `$type` 使用 ACR 注册的 `TriggerTypeName` 短名。
+
+## 轴类型边界
+
+HiAuRo 运行时有三类轴，文件不要混放：
+
+- 执行轴：放在 `ExecutionTimelines/{TerritoryTypeId}.json`，用于执行动作、请求热键、强制技能、切换 Kairo 机工变量。
+- 事实轴：放在 `FactTimelines/{TerritoryTypeId}.json`，用于描述事实事件或机制锚点；本仓库当前不提供事实轴示例。
+- 辅助轴：放在 `AssistTimelines/{TerritoryTypeId}.json`，用于辅助提示；本仓库当前不提供辅助轴示例。
+
+本仓库的 `docs/execution_timelines/` 只存放执行轴示例。复制到游戏配置目录时需要改名为副本 TerritoryTypeId：
+
+| 副本 | 作者示例 | 运行时目标 |
+|---|---|---|
+| M9S | `docs/execution_timelines/M9S-MCH-execution.json` | `ExecutionTimelines/1321.json` |
+| M10S | `docs/execution_timelines/M10S-MCH-execution.json` | `ExecutionTimelines/1323.json` |
+| M11S | `docs/execution_timelines/M11S-MCH-execution.json` | `ExecutionTimelines/1325.json` |
+
+这些执行轴使用 `KairoMCH*` 触发动作；运行时必须先加载 Kairo ACR，让 Rotation 注册触发动作类型。如果在插件已经运行时复制执行轴，复制后需要重载 ACR/执行轴，避免自定义动作在注册前被当成未知类型。
 
 ## 触发动作
 
@@ -72,10 +90,10 @@
 - 副本机制轴优先用 Boss 技能/事实轴锚点替换长 `Delay`；模板里的 Delay 只用于说明写法。
 - 只使用 HiAuRo 原生节点类型和 KairoMCH 触发动作。
 
-模板文件：`docs/templates/MCH-timeline-template.json`。
+模板文件：`docs/templates/MCH-execution-axis-template.json`。
 
 具体副本轴建议从模板复制后另存，并按 Boss 技能锚点、事实轴事件和团队策略补充。当前可参考：
 
-- `docs/timelines/M9S-MCH.json`
-- `docs/timelines/M10S-MCH.json`
-- `docs/timelines/M11S-MCH.json`
+- `docs/execution_timelines/M9S-MCH-execution.json`
+- `docs/execution_timelines/M10S-MCH-execution.json`
+- `docs/execution_timelines/M11S-MCH-execution.json`

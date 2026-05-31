@@ -238,11 +238,11 @@ function Assert-TimedTimelineAction {
     }
 }
 
-$timelinePath = "docs/timelines/M11S-MCH.json"
+$timelinePath = "docs/execution_timelines/M11S-MCH-execution.json"
 $timelineText = Read-File $timelinePath
 
-Assert-Contains "docs/DEVELOPMENT.md" "docs/timelines/M11S-MCH\.json" "Development docs must point to the concrete M11S HiAuRo timeline"
-Assert-Contains "docs/timeline_variables.md" "docs/timelines/M11S-MCH\.json" "Timeline authoring docs must point to the concrete M11S example"
+Assert-Contains "docs/DEVELOPMENT.md" "docs/execution_timelines/M11S-MCH-execution\.json" "Development docs must point to the concrete M11S HiAuRo execution-axis example"
+Assert-Contains "docs/execution_axis_variables.md" "docs/execution_timelines/M11S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M11S example"
 
 if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     try {
@@ -254,8 +254,8 @@ if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     }
 
     if ($null -ne $timeline) {
-        if ($timeline.Name -ne "M11S-MCH") {
-            Add-Failure "M11S timeline Name must be M11S-MCH"
+        if ($timeline.Name -ne "M11S-MCH-Execution") {
+            Add-Failure "M11S execution-axis Name must be M11S-MCH-Execution"
         }
         if ($timeline.Author -ne "Kairo") {
             Add-Failure "M11S timeline Author must be Kairo"

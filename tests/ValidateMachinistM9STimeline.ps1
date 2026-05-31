@@ -204,11 +204,11 @@ function Assert-TimelineActionTimedGate {
     }
 }
 
-$timelinePath = "docs/timelines/M9S-MCH.json"
+$timelinePath = "docs/execution_timelines/M9S-MCH-execution.json"
 $timelineText = Read-File $timelinePath
 
-Assert-Contains "docs/DEVELOPMENT.md" "docs/timelines/M9S-MCH\.json" "Development docs must point to the concrete M9S HiAuRo timeline"
-Assert-Contains "docs/timeline_variables.md" "docs/timelines/M9S-MCH\.json" "Timeline authoring docs must point to the concrete M9S example"
+Assert-Contains "docs/DEVELOPMENT.md" "docs/execution_timelines/M9S-MCH-execution\.json" "Development docs must point to the concrete M9S HiAuRo execution-axis example"
+Assert-Contains "docs/execution_axis_variables.md" "docs/execution_timelines/M9S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M9S example"
 
 if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     try {
@@ -220,8 +220,8 @@ if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     }
 
     if ($null -ne $timeline) {
-        if ($timeline.Name -ne "M9S-MCH") {
-            Add-Failure "M9S timeline Name must be M9S-MCH"
+        if ($timeline.Name -ne "M9S-MCH-Execution") {
+            Add-Failure "M9S execution-axis Name must be M9S-MCH-Execution"
         }
         if ($timeline.Author -ne "Kairo") {
             Add-Failure "M9S timeline Author must be Kairo"

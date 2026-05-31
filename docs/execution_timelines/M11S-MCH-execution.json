@@ -1,9 +1,9 @@
 {
-  "Guid": "kairo-mch-hiauro-m11s",
+  "Guid": "kairo-mch-hiauro-m11s-execution-axis",
   "ConfigVersion": 1,
-  "Name": "M11S-MCH",
+  "Name": "M11S-MCH-Execution",
   "TerritoryTypeId": 1325,
-  "Note": "M11S Machinist HiAuRo timeline by Kairo. This concrete axis keeps the old M11S strategy while using only HiAuRo-native execution nodes and KairoMCH trigger discriminators. The fight is treated as a normal dummy rotation except the six-minute Majestic Meteor phase: heat is briefly held around 46148 Explosion, then released on 46150 Fire Breath so the six-minute package does not double-Hypercharge through tower and knockback downtime. This axis does not use ReleaseDelayedBurstPackage and does not re-anchor the 120s cycle. Potion plan defaults to 0 / 5 / 10 through KairoMCHPotion requests. Progression fallback can be 0 / 6 / 10:30 by moving the middle potion manually after the three meteor explosions and two GCDs. The five-minute potion reserves Reassemble from 278s, holds strong GCD at 298s so the 5:00 Drill cannot go naked before potion, releases Reassemble plus strong GCD at 302s, and clears at 312s. Mitigation is boss-spell gated with Tactician and Dismantle; Dismantle selects boss DataId 3913 before TriggerActionHighPrioritySlot.",
+  "Note": "M11S Machinist HiAuRo execution axis by Kairo. Install as ExecutionTimelines/1325.json. This concrete execution axis keeps the old M11S strategy while using only HiAuRo-native execution nodes and KairoMCH trigger discriminators. The fight is treated as a normal dummy rotation except the six-minute Majestic Meteor phase: heat is briefly held around 46148 Explosion, then released on 46150 Fire Breath so the six-minute package does not double-Hypercharge through tower and knockback downtime. This axis does not use ReleaseDelayedBurstPackage and does not re-anchor the 120s cycle. Potion plan defaults to 0 / 5 / 10 through KairoMCHPotion requests. Progression fallback can be 0 / 6 / 10:30 by moving the middle potion manually after the three meteor explosions and two GCDs. The five-minute potion reserves Reassemble from 278s, holds strong GCD at 298s so the 5:00 Drill cannot go naked before potion, releases Reassemble plus strong GCD at 302s, and clears at 312s. Mitigation is boss-spell gated with Tactician and Dismantle; Dismantle selects boss DataId 3913 before TriggerActionHighPrioritySlot.",
   "Author": "Kairo",
   "TargetAcrAuthor": "Kairo",
   "TargetJob": 31,
@@ -29,7 +29,7 @@
     "mch_dump_reassemble_drill",
     "mch_opener_air_anchor_first"
   ],
-  "ExposedVarDesc": "Kairo MCH M11S timeline variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
+  "ExposedVarDesc": "Kairo MCH M11S execution-axis variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
   "TreeRoot": {
     "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
     "DisplayName": "Root",

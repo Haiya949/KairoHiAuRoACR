@@ -1,9 +1,9 @@
 {
-  "Guid": "kairo-mch-hiauro-timeline-template",
+  "Guid": "kairo-mch-hiauro-execution-axis-template",
   "ConfigVersion": 1,
-  "Name": "Kairo MCH HiAuRo timeline authoring template",
+  "Name": "Kairo MCH HiAuRo execution-axis authoring template",
   "TerritoryTypeId": 0,
-  "Note": "Copy this template, replace Delay nodes with boss anchors where possible, and keep actions on KairoMCH* trigger discriminators.",
+  "Note": "Execution-axis template only. Copy this template to ExecutionTimelines/{TerritoryTypeId}.json, replace Delay nodes with boss anchors where possible, and keep actions on KairoMCH* trigger discriminators.",
   "Author": "Kairo",
   "TargetAcrAuthor": "Kairo",
   "TargetJob": 31,
@@ -29,19 +29,19 @@
     "mch_dump_reassemble_drill",
     "mch_opener_air_anchor_first"
   ],
-  "ExposedVarDesc": "Kairo MCH timeline variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
+  "ExposedVarDesc": "Kairo MCH execution-axis variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
   "TreeRoot": {
     "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
     "DisplayName": "Root",
     "Id": 1,
     "Enable": true,
-    "Remark": "Kairo MCH HiAuRo timeline template",
+    "Remark": "Kairo MCH HiAuRo execution-axis template",
     "Tag": "Kairo-MCH",
     "IgnoreNodeResult": true,
     "Childs": [
       {
         "$type": "HiAuRo.Execution.TreeParallel, HiAuRo",
-        "DisplayName": "机工时间轴模板",
+        "DisplayName": "机工执行轴模板",
         "Id": 2,
         "Enable": true,
         "Remark": "每条分支可替换为副本机制锚点",

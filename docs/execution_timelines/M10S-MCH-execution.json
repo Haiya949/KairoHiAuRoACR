@@ -1,9 +1,9 @@
 {
-  "Guid": "kairo-mch-hiauro-m10s",
+  "Guid": "kairo-mch-hiauro-m10s-execution-axis",
   "ConfigVersion": 1,
-  "Name": "M10S-MCH",
+  "Name": "M10S-MCH-Execution",
   "TerritoryTypeId": 1323,
-  "Note": "M10S Machinist HiAuRo timeline by Kairo. This concrete axis keeps the old M10S strategy while using only HiAuRo-native execution nodes and KairoMCH trigger discriminators. Opener sets mch_opener_air_anchor_first so the ACR uses Air Anchor -> Drill -> Chain Saw for this fight. The water/surf delayed burst segment is boss-spell gated: 46519/46533/46534/46535/46536/44487 hold burst, 46520/46521 release the delayed burst package, and 46486 resets temporary burst variables. Mitigation is boss-spell gated with Tactician and Dismantle actions; Dismantle uses TriggerActionSelectenemy plus TriggerActionHighPrioritySlot.",
+  "Note": "M10S Machinist HiAuRo execution axis by Kairo. Install as ExecutionTimelines/1323.json. This concrete execution axis keeps the old M10S strategy while using only HiAuRo-native execution nodes and KairoMCH trigger discriminators. Opener sets mch_opener_air_anchor_first so the ACR uses Air Anchor -> Drill -> Chain Saw for this fight. The water/surf delayed burst segment is boss-spell gated: 46519/46533/46534/46535/46536/44487 hold burst, 46520/46521 release the delayed burst package, and 46486 resets temporary burst variables. Mitigation is boss-spell gated with Tactician and Dismantle actions; Dismantle uses TriggerActionSelectenemy plus TriggerActionHighPrioritySlot.",
   "Author": "Kairo",
   "TargetAcrAuthor": "Kairo",
   "TargetJob": 31,
@@ -29,7 +29,7 @@
     "mch_dump_reassemble_drill",
     "mch_opener_air_anchor_first"
   ],
-  "ExposedVarDesc": "Kairo MCH M10S timeline variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
+  "ExposedVarDesc": "Kairo MCH M10S execution-axis variables. 0 = off, 1 = on. Use KairoMCHTimelineVariable for hold/release/reset actions.",
   "TreeRoot": {
     "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
     "DisplayName": "Root",

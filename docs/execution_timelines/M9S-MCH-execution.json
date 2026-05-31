@@ -1,9 +1,9 @@
 {
-  "Guid": "kairo-mch-hiauro-m9s",
+  "Guid": "kairo-mch-hiauro-m9s-execution-axis",
   "ConfigVersion": 1,
-  "Name": "M9S-MCH",
+  "Name": "M9S-MCH-Execution",
   "TerritoryTypeId": 1321,
-  "Note": "M9S Machinist HiAuRo timeline by Kairo. This concrete axis migrates the old M9S add plan without legacy plugin fields. Potion requests are at 125s and 485s. M9S add control uses boss cast anchors and add DataId 19170: first 45875 starts short holds, first 45963 selects the rod and dumps heat/oGCD/battery, 45956 briefly holds strong GCD for the 5m tool, second 45963 selects the rod and dumps strong GCD/Reassemble, third 45963 keeps heat/oGCD/battery dumping, and the later 45875 cleanup restores normal loop. Mitigation uses boss DataId 19167 before Dismantle.",
+  "Note": "M9S Machinist HiAuRo execution axis by Kairo. Install as ExecutionTimelines/1321.json. This concrete execution axis migrates the old M9S add plan without legacy plugin fields. Potion requests are at 125s and 485s. M9S add control uses boss cast anchors and add DataId 19170: first 45875 starts short holds, first 45963 selects the rod and dumps heat/oGCD/battery, 45956 briefly holds strong GCD for the 5m tool, second 45963 selects the rod and dumps strong GCD/Reassemble, third 45963 keeps heat/oGCD/battery dumping, and the later 45875 cleanup restores normal loop. Mitigation uses boss DataId 19167 before Dismantle.",
   "Author": "Kairo",
   "TargetAcrAuthor": "Kairo",
   "TargetJob": 31,
@@ -29,7 +29,7 @@
     "mch_dump_reassemble_drill",
     "mch_opener_air_anchor_first"
   ],
-  "ExposedVarDesc": "Kairo MCH M9S timeline variables. 0 = off, 1 = on.",
+  "ExposedVarDesc": "Kairo MCH M9S execution-axis variables. 0 = off, 1 = on.",
   "TreeRoot": {
     "$type": "HiAuRo.Execution.TreeRoot, HiAuRo",
     "DisplayName": "Root",

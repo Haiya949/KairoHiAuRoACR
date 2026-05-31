@@ -160,11 +160,11 @@ function Get-ActionsFromNodes {
     return $result
 }
 
-$timelinePath = "docs/timelines/M10S-MCH.json"
+$timelinePath = "docs/execution_timelines/M10S-MCH-execution.json"
 $timelineText = Read-File $timelinePath
 
-Assert-Contains "docs/DEVELOPMENT.md" "docs/timelines/M10S-MCH\.json" "Development docs must point to the concrete M10S HiAuRo timeline"
-Assert-Contains "docs/timeline_variables.md" "docs/timelines/M10S-MCH\.json" "Timeline authoring docs must point to the concrete M10S example"
+Assert-Contains "docs/DEVELOPMENT.md" "docs/execution_timelines/M10S-MCH-execution\.json" "Development docs must point to the concrete M10S HiAuRo execution-axis example"
+Assert-Contains "docs/execution_axis_variables.md" "docs/execution_timelines/M10S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M10S example"
 
 if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     try {
@@ -176,8 +176,8 @@ if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     }
 
     if ($null -ne $timeline) {
-        if ($timeline.Name -ne "M10S-MCH") {
-            Add-Failure "M10S timeline Name must be M10S-MCH"
+        if ($timeline.Name -ne "M10S-MCH-Execution") {
+            Add-Failure "M10S execution-axis Name must be M10S-MCH-Execution"
         }
         if ($timeline.Author -ne "Kairo") {
             Add-Failure "M10S timeline Author must be Kairo"

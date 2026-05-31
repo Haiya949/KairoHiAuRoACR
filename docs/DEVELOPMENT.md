@@ -244,29 +244,31 @@ E:\ff14\HiAuRo\KairoHiAuRoACR\scripts\deploy.ps1
 - xivanalysis Helper catalog parity: 机工实际会用到的 `PileBunker`、`ArmPunch`、`RollerDash`、`CrownedCollider` 以及 `Tactician`、`Hypercharged`、`ExcavatorReady`、`FullMetalMachinist` 必须保留在 `HiAuRo.Helper.MCHHelper`；职业代码需要这些 ID 时继续从 Helper 取。
 - 所有技能和状态 ID 继续来自 `HiAuRo.Helper.MCHHelper`；不在职业代码里恢复本地 `MachinistActionId` / `MachinistStatusId`。
 
-## 机工时间轴变量
+## 机工执行轴变量
 
-- 机工时间轴变量通过 HiAuRo trigger action `KairoMCHTimelineVariable` 写入 Kairo 自有状态；动作类只实现 `ITriggerAction`、`IUiBuilder.Draw()` 和 ACR 自有状态写入。
+- 机工执行轴变量通过 HiAuRo trigger action `KairoMCHTimelineVariable` 写入 Kairo 自有状态；动作类只实现 `ITriggerAction`、`IUiBuilder.Draw()` 和 ACR 自有状态写入。
 - 变量名保持当前轴兼容：`mch_hold_wildfire`、`mch_dump_wildfire`、`mch_hold_barrel`、`mch_dump_barrel`、`mch_hold_battery`、`mch_dump_battery`、`mch_hold_heat`、`mch_dump_heat`、`mch_hold_strong_gcd`、`mch_dump_strong_gcd`、`mch_hold_reassemble_drill`、`mch_dump_reassemble_drill` 等。
 - `StartDelayedBurstHold` 会打开禁止爆发、总留资源和各细分 hold，并关闭释放标记；用于机制前整体延后两分钟爆发。
 - `ReleaseDelayedBurstPackage` 会重锚后续 120s 爆发周期，关闭 hold，打开强制爆发、释放延迟爆发和各细分 dump。
 - `ResetDelayedBurstPackage` 会还原强制/禁止/总留/释放标记和所有细分 hold/dump，避免机制状态污染后续轴。
 
-## 机工时间轴热键
+## 机工执行轴热键
 
 - 机工热键通过 HiAuRo trigger action `KairoMCHHotkey` 暴露，通过 enum 选择一次性动作。
 - 机工爆发药通过 HiAuRo trigger action `KairoMCHPotion` 暴露，只请求一次已经在 UI 注册的爆发药热键。
 - trigger authoring UI uses Chinese labels：触发器作者界面额外显示中文动作名；`KairoMCHHotkey.Key` 和 `KairoMCHTimelineVariable.Action` 的 JSON 值继续使用英文 enum，避免破坏已有执行轴和模板。
 - Potion remains explicit hotkey/timeline request：爆发药不放进 QT，也不构造技能 Slot；UI、`KairoMCHHotkey Key=Potion` 和 `KairoMCHPotion` 都通过 `HotkeyHelper.ExecuteById(MachinistHotkeyIds.Potion)` 请求一次已注册热键。
-- 爆发药热键 ID 使用 `MachinistHotkeyIds.Potion`，值为 UI 稳定标签生成的 `hk_爆发药`；时间轴不要重新引入 `UsePotion QT`。
+- 爆发药热键 ID 使用 `MachinistHotkeyIds.Potion`，值为 UI 稳定标签生成的 `hk_爆发药`；执行轴不要重新引入 `UsePotion QT`。
 - 非药水热键使用 Helper 技能 ID 生成 `SpellType.Ability` 的 Slot，并通过 `SlotHelper.Enqueue` 交给 HiAuRo 队列执行。
-- Dismantle remains explicit hotkey/timeline control：`武装解除` 不注册自动 OffGCD resolver、不放进 QT；需要使用时由 UI 热键或 `KairoMCHHotkey` 时间轴动作显式请求。
+- Dismantle remains explicit hotkey/timeline control：`武装解除` 不注册自动 OffGCD resolver、不放进 QT；需要使用时由 UI 热键或 `KairoMCHHotkey` 执行轴动作显式请求。
 
-## 机工时间轴写作交付物
+## 机工执行轴写作交付物
 
-- 作者说明在 `docs/timeline_variables.md`，记录 `KairoMCHTimelineVariable`、`KairoMCHHotkey`、`KairoMCHPotion` 的字段、变量和写轴规则。
-- HiAuRo 原生模板在 `docs/templates/MCH-timeline-template.json`，节点类型使用 `HiAuRo.Execution.Tree*`，动作 `$type` 使用 `KairoMCH*` discriminator。
+- 作者说明在 `docs/execution_axis_variables.md`，记录 `KairoMCHTimelineVariable`、`KairoMCHHotkey`、`KairoMCHPotion` 的字段、变量和写轴规则。
+- HiAuRo 原生执行轴模板在 `docs/templates/MCH-execution-axis-template.json`，节点类型使用 `HiAuRo.Execution.Tree*`，动作 `$type` 使用 `KairoMCH*` discriminator。
 - 模板只保留通用延迟爆发和单项泄资源示例；具体副本应复制模板后替换 Delay 为 Boss 锚点或事实轴事件。
-- M9S 具体迁移轴在 `docs/timelines/M9S-MCH.json`，覆盖两次爆发药、三轮小怪 DataId 19170 目标选择、资源 hold/dump、策动和武装解除 Boss 技能门。
-- M10S 具体迁移轴在 `docs/timelines/M10S-MCH.json`，覆盖 Air Anchor -> Drill -> Chain Saw 特殊起手、water/surf 延后爆发释放、策动和武装解除 Boss 技能门。
-- M11S 具体迁移轴在 `docs/timelines/M11S-MCH.json`，覆盖 0/5/10 爆发药、5 分整备/强 GCD 保留释放、王室陨石热量控制、策动和武装解除 Boss 技能门。
+- 本仓库当前只提供执行轴示例；事实轴应放 `FactTimelines/{TerritoryTypeId}.json`，辅助轴应放 `AssistTimelines/{TerritoryTypeId}.json`，不要和执行轴文件混名。
+- 运行时使用时，把作者示例复制到 HiAuRo 配置目录的 `ExecutionTimelines/{TerritoryTypeId}.json`；M9S/M10S/M11S 分别是 `1321.json`、`1323.json`、`1325.json`。
+- M9S 具体执行轴示例在 `docs/execution_timelines/M9S-MCH-execution.json`，覆盖两次爆发药、三轮小怪 DataId 19170 目标选择、资源 hold/dump、策动和武装解除 Boss 技能门。
+- M10S 具体执行轴示例在 `docs/execution_timelines/M10S-MCH-execution.json`，覆盖 Air Anchor -> Drill -> Chain Saw 特殊起手、water/surf 延后爆发释放、策动和武装解除 Boss 技能门。
+- M11S 具体执行轴示例在 `docs/execution_timelines/M11S-MCH-execution.json`，覆盖 0/5/10 爆发药、5 分整备/强 GCD 保留释放、王室陨石热量控制、策动和武装解除 Boss 技能门。

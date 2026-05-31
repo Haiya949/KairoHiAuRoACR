@@ -100,8 +100,8 @@ foreach ($item in $timelineLabels.GetEnumerator()) {
     }
 }
 
-Assert-Contains 'docs/timeline_variables.md' ([regex]::Escape((U @(0x89e6, 0x53d1, 0x5668, 0x4f5c, 0x8005, 0x754c, 0x9762, 0x663e, 0x793a, 0x4e2d, 0x6587, 0x540d, 0x79f0)))) 'Timeline docs must explain Chinese authoring labels'
-Assert-Contains 'docs/timeline_variables.md' 'JSON.*Key.*Action.*enum' 'Timeline docs must preserve the stable enum JSON contract'
+Assert-Contains 'docs/execution_axis_variables.md' ([regex]::Escape((U @(0x89e6, 0x53d1, 0x5668, 0x4f5c, 0x8005, 0x754c, 0x9762, 0x663e, 0x793a, 0x4e2d, 0x6587, 0x540d, 0x79f0)))) 'Execution-axis docs must explain Chinese authoring labels'
+Assert-Contains 'docs/execution_axis_variables.md' 'JSON.*Key.*Action.*enum' 'Execution-axis docs must preserve the stable enum JSON contract'
 Assert-Contains 'docs/DEVELOPMENT.md' 'trigger authoring UI uses Chinese labels' 'Development docs must record trigger authoring UI language policy'
 
 if ($hotkey -notmatch 'Enum\.GetNames<MachinistHotkeyAction>\(\)') {
