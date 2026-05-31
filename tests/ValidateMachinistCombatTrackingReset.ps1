@@ -91,9 +91,10 @@ Assert-BodyContains $helper "public static void RecordCombatActionUse\(uint acti
     "if \(_lastRecordedActionId == actionId && now - _lastRecordedActionAtMs < 250\)",
     "if \(ShouldResetStaleCombatTrackingOnPull\(actionId\)\)",
     "ResetCombatTracking\(\)",
-    "TrackBurstPackageAction\(actionId\)",
+    "var actionBattleTimeMs = GetAcrBattleTimeMs\(now\);",
+    "TrackBurstPackageAction\(actionId, actionBattleTimeMs\)",
     "CombatActionUseCounts\[actionId\]",
-    "CombatActionLastUsedAtMs\[actionId\]"
+    "CombatActionLastUsedAtMs\[actionId\] = actionBattleTimeMs"
 ) "First pull action must be able to drop stale previous-combat action tracking before recording the new action"
 
 Assert-BodyContains $helper "private static bool ShouldResetStaleCombatTrackingOnPull\(uint actionId\)" @(
@@ -106,9 +107,11 @@ Assert-BodyContains $helper "private static bool ShouldResetStaleCombatTrackingO
     "_lastHyperchargePackageStartedAtMs is not null",
     "_lastFullMetalFieldStartedAtMs is not null",
     "_robotActiveUntilMs > 0"
-) "Early Reassemble from the native opener must reset stale state from an earlier pull"
+) "Early Reassemble may reset stale previous-pull state only before the ACR combat clock has started"
 
 Assert-Contains $helper "ActionId\.Reassemble" "Stale opener reset must use the Helper action alias, not a local ID catalog"
+Assert-Contains $helper "if \(_acrCombatClockStartedAtTick is not null\)\s*return false;" "Active opener combat clock must prevent Reassemble stale-reset"
+Assert-Contains (Read-File "docs/DEVELOPMENT.md") "opener second Reassemble must not reset ACR combat clock" "Development docs must record the opener Reassemble reset guard"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist combat tracking reset validation failed:"

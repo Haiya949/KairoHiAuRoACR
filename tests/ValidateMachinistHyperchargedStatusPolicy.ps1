@@ -101,11 +101,9 @@ Assert-BodyContains $fullMetalDelayBody @(
 $wildfireDelayBody = Get-Body $helper "private static bool ShouldDelayWildfireUntilHyperchargeForBurstPackage\(\)" "Wildfire package guard"
 Assert-BodyContains $wildfireDelayBody @(
     "ShouldDumpWildfireForTimeline\(\)",
-    "CanUseWildfireBurstPackage\(\)",
     "!HasRecentFullMetalFieldForWildfirePackage\(\)",
-    "CanUseLoopBurstPackage\(\)",
     "return !HasRecentHyperchargeForWildfirePackage\(\);"
-) "Non-opener Wildfire must wait for the loop Full Metal Field and Hypercharge package instead of firing naked before Barrel/Full Metal"
+) "Loop Wildfire must wait only for the recent Full Metal Field and Hypercharge package, matching the old ACR model"
 
 $wildfireLateWindowBody = Get-Body $helper "private static bool ShouldDelayWildfireForLateWeaveWindow\(\)" "Wildfire late-weave guard"
 Assert-BodyContains $wildfireLateWindowBody @(
@@ -116,16 +114,10 @@ Assert-BodyContains $wildfireLateWindowBody @(
 
 $barrelBody = Get-Body $helper "public static Spell\? GetBarrelStabilizerOffGcd\(\)" "Barrel Stabilizer oGCD policy"
 Assert-BodyContains $barrelBody @(
-    "CanUseLoopBurstPackage\(\)"
-) "Barrel Stabilizer must be allowed in the loop package lead so Full Metal Field is ready after Excavator"
+    "CanUseBurstResource\(\)"
+) "Barrel Stabilizer must follow the old ACR burst-resource gate instead of a loop package state machine"
 
-$loopPackageBody = Get-Body $helper "private static bool CanUseLoopBurstPackage\(\)" "loop burst package lead"
-Assert-BodyContains $loopPackageBody @(
-    "LoopBurstPackageLeadMs",
-    "ShouldUseTwoMinuteBurstPlan\(\)",
-    "IsInTwoMinuteBurstWindow\(\)",
-    "GetTimeToNextTwoMinuteBurstAnchor\(\) <= LoopBurstPackageLeadMs"
-) "Loop burst package lead must be high-end two-minute planning, not a hidden daily-mode burst"
+Assert-BodyNotContains $helper "CanUseLoopBurstPackage|LoopBurstPackageLeadMs" "Hypercharged policy must not reintroduce the failed loop-package state machine"
 
 $gaussBody = Get-Body $helper "public static Spell\? GetGaussRoundOffGcd\(\)" "Checkmate/Double Check oGCD policy"
 Assert-BodyContains $gaussBody @(

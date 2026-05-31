@@ -69,8 +69,8 @@ function Assert-BuildMarksAfterAdd {
     }
 
     $body = $match.Groups["body"].Value
-    if ($body -notmatch "MachinistSpellHelper\.AddIssuedSpell\(slot,\s*_spell\)") {
-        $failures.Add("Resolver must use MachinistSpellHelper.AddIssuedSpell for immediate issued tracking ($Path)")
+    if ($body -notmatch "MachinistSpellHelper\.AddIssued(?:StrongGcd)?Spell\(slot,") {
+        $failures.Add("Resolver must use a MachinistSpellHelper AddIssued* helper for immediate issued tracking ($Path)")
     }
 }
 
@@ -96,9 +96,10 @@ Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "public static void Mar
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "public static void AddIssuedSpell\(Slot slot, Spell spell\)[\s\S]*slot\.Add\(spell\)[\s\S]*MarkCombatActionIssued\(spell\.Id\)" "Shared issued-action helper must mark after slot.Add"
 
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "public static void MarkCombatActionIssued\(uint actionId\)" "MCH helper must expose issued-action tracking for resolvers"
-Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "TrackBurstPackageAction\(actionId\)" "Issued-action tracking must update burst package state before success callbacks arrive"
-Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "CombatActionLastUsedAtMs\[actionId\] = _currentBattleTimeMs" "Issued-action tracking must update tracked tool recasts before success callbacks arrive"
-Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "if \(actionId is ActionId\.AutomatonQueen or ActionId\.RookAutoturret\)\s*_robotActiveUntilMs = _currentBattleTimeMs \+ QueenActiveEstimateMs;" "Issued-action tracking must mark robot active when Queen/Rook is queued"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "var actionBattleTimeMs = GetAcrBattleTimeMs\(now\)" "Issued-action tracking must use the ACR combat clock before Runtime battle time catches up"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "TrackBurstPackageAction\(actionId, actionBattleTimeMs\)" "Issued-action tracking must update burst package state before success callbacks arrive"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "CombatActionLastUsedAtMs\[actionId\] = actionBattleTimeMs" "Issued-action tracking must update tracked tool recasts before success callbacks arrive"
+Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "if \(actionId is ActionId\.AutomatonQueen or ActionId\.RookAutoturret\)\s*_robotActiveUntilMs = actionBattleTimeMs \+ QueenActiveEstimateMs;" "Issued-action tracking must mark robot active when Queen/Rook is queued"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "if \(actionId is ActionId\.QueenOverdrive or ActionId\.RookOverdrive or ActionId\.Detonator\)\s*_robotActiveUntilMs = 0;" "Issued-action tracking must clear robot active when overdrive/detonator is queued"
 
 Assert-Contains "docs/DEVELOPMENT.md" "Issued-action tracking" "Development docs must record resolver issued-action tracking"

@@ -57,7 +57,7 @@ function Assert-NotContains {
 $helper = Read-File "Jobs/Machinist/MachinistSpellHelper.cs"
 
 foreach ($pattern in @(
-    "private const int FullMetalWildfireWeaveReserveMs = 4_000",
+    "private const int FullMetalWildfireWeaveReserveMs = 5_000",
     "private static bool ShouldReserveFullMetalWildfireWeaves\(\)",
     "private static bool HasRecentFullMetalFieldForWildfirePackage\(\)",
     "private static bool HasRecentHyperchargeForWildfirePackage\(\)",
@@ -84,9 +84,9 @@ Assert-BodyContains $helper "private static bool ShouldReserveFullMetalWildfireW
     "!HasRecentWildfireForFullMetalPackage\(\)"
 ) "Full Metal weave reserve must stay active until both Hypercharge and Wildfire are recorded"
 
-Assert-BodyContains $helper "private static void TrackBurstPackageAction\(uint actionId\)" @(
+Assert-BodyContains $helper "private static void TrackBurstPackageAction\(uint actionId, int actionBattleTimeMs\)" @(
     "if \(actionId == ActionId\.FullMetalField\)",
-    "_lastFullMetalFieldStartedAtMs = _currentBattleTimeMs"
+    "_lastFullMetalFieldStartedAtMs = actionBattleTimeMs"
 ) "Full Metal Field uses must be tracked for the weave reserve window"
 
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "AEAssist|MachinistActionId|MachinistStatusId|Kairo\.Machinist" "Full Metal weave reserve must not leak old ACR APIs or local ID catalogs"

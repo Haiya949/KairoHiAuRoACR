@@ -76,13 +76,13 @@ $budgetBody = Get-Body $helper "private static bool ShouldSpendBatteryByBudget\(
 Assert-Order $queenBody @(
     "if (IsForbidBurstActive())",
     "if (ShouldReleaseBatteryForTimeline())",
-    "var shouldSpendBatteryAfterLoopAirAnchor = ShouldSpendBatteryAfterLoopAirAnchor();",
+    "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
     "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();",
     "if (ShouldHoldBatteryForTimeline())",
-    "if (ShouldReserveBatteryForLoopAirAnchor())",
+    "if (ShouldHoldBatteryForFixed120Burst())",
     "if (ShouldReserveFullMetalWildfireWeaves())",
-    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryAfterLoopAirAnchor || shouldSpendBatteryByBudget || CanUseBurstResource())"
-) "Queen policy must keep ForbidBurst first, release second, then compute overcap pressure before timeline hold"
+    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())"
+) "Queen policy must keep ForbidBurst first, release second, then compute fixed-120/overcap pressure before timeline hold"
 
 foreach ($pattern in @(
     "IsTimelineHoldBatteryActive\(\)",

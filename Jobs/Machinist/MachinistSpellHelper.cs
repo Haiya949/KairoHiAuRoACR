@@ -13,11 +13,11 @@ public static class MachinistSpellHelper
     private const int WildfirePackageDurationMs = 10_000;
     private const int HyperchargeBeforeWildfireWindowMs = 4_000;
     private const int WildfireBurstPackageLookaheadMs = 40_000;
-    private const int LoopBurstPackageLeadMs = 5_000;
-    private const int LoopOpeningComboLeadMs = 12_000;
-    private const int LoopAirAnchorBatteryReserveLeadMs = 30_000;
     private const int WildfirePreGcdClipWindowMs = 1_000;
-    private const int FullMetalWildfireWeaveReserveMs = 4_000;
+    private const int FullMetalWildfireWeaveReserveMs = 5_000;
+    private const int Fixed120BurstPackageLeadMs = 2_500;
+    private const int Fixed120BurstPackageTailMs = 18_000;
+    private const int Fixed120BatteryHoldLeadMs = 30_000;
     private const int PreWildfireOvercapHeatThreshold = 100;
     private const int PreWildfireOvercapHyperchargeMinCooldownMs = 20_000;
     private const int PreWildfireOvercapHyperchargeMaxCooldownMs = 30_000;
@@ -38,7 +38,7 @@ public static class MachinistSpellHelper
         ActionId.Drill,
     ];
 
-    private static readonly uint[] LoopBurstStrongGcdPriority =
+    private static readonly uint[] Fixed120StrongGcdPriority =
     [
         ActionId.Drill,
         ActionId.AirAnchor,
@@ -57,12 +57,12 @@ public static class MachinistSpellHelper
 
     private static MachinistSettings _settings = new();
     private static int _currentBattleTimeMs;
+    private static long? _acrCombatClockStartedAtTick;
+    private static int _acrCombatClockStartedAtBattleTimeMs;
     private static int? _firstPostOpenerBurstAnchorMs;
     private static int? _lastWildfirePackageStartedAtMs;
     private static int? _lastHyperchargePackageStartedAtMs;
     private static int? _lastFullMetalFieldStartedAtMs;
-    private static int? _lastLoopOpeningComboAnchorMs;
-    private static int? _lastLoopAirAnchorAnchorMs;
     private static int _robotActiveUntilMs;
     private static uint? _pendingReassembleTargetActionId;
     private static int _pendingReassembleTargetExpiresAtMs;
@@ -84,12 +84,12 @@ public static class MachinistSpellHelper
 
     private static void ResetCombatTracking()
     {
+        _acrCombatClockStartedAtTick = null;
+        _acrCombatClockStartedAtBattleTimeMs = 0;
         _firstPostOpenerBurstAnchorMs = null;
         _lastWildfirePackageStartedAtMs = null;
         _lastHyperchargePackageStartedAtMs = null;
         _lastFullMetalFieldStartedAtMs = null;
-        _lastLoopOpeningComboAnchorMs = null;
-        _lastLoopAirAnchorAnchorMs = null;
         _robotActiveUntilMs = 0;
         ClearPendingReassembleTarget();
         _lastRecordedActionId = 0;
@@ -119,17 +119,17 @@ public static class MachinistSpellHelper
         _lastRecordedActionId = actionId;
         _lastRecordedActionAtMs = now;
 
-        TrackBurstPackageAction(actionId);
-        TrackLoopOpeningComboAction(actionId);
-        TrackLoopAirAnchorAction(actionId);
+        StartAcrCombatClockIfNeeded(actionId, now);
+        var actionBattleTimeMs = GetAcrBattleTimeMs(now);
+        TrackBurstPackageAction(actionId, actionBattleTimeMs);
         CombatActionUseCounts[actionId] = CombatActionUseCounts.GetValueOrDefault(actionId) + 1;
-        CombatActionLastUsedAtMs[actionId] = _currentBattleTimeMs;
+        CombatActionLastUsedAtMs[actionId] = actionBattleTimeMs;
 
         if (_pendingReassembleTargetActionId == actionId)
             ClearPendingReassembleTarget();
 
         if (actionId is ActionId.AutomatonQueen or ActionId.RookAutoturret)
-            _robotActiveUntilMs = _currentBattleTimeMs + QueenActiveEstimateMs;
+            _robotActiveUntilMs = actionBattleTimeMs + QueenActiveEstimateMs;
 
         if (actionId is ActionId.QueenOverdrive or ActionId.RookOverdrive or ActionId.Detonator)
             _robotActiveUntilMs = 0;
@@ -143,6 +143,9 @@ public static class MachinistSpellHelper
         if (actionId != ActionId.Reassemble)
             return false;
 
+        if (_acrCombatClockStartedAtTick is not null)
+            return false;
+
         return CombatActionUseCounts.Count > 0
             || CombatActionLastUsedAtMs.Count > 0
             || _firstPostOpenerBurstAnchorMs is not null
@@ -154,13 +157,14 @@ public static class MachinistSpellHelper
 
     public static void MarkCombatActionIssued(uint actionId)
     {
-        TrackBurstPackageAction(actionId);
-        TrackLoopOpeningComboAction(actionId);
-        TrackLoopAirAnchorAction(actionId);
-        CombatActionLastUsedAtMs[actionId] = _currentBattleTimeMs;
+        var now = Environment.TickCount64;
+        StartAcrCombatClockIfNeeded(actionId, now);
+        var actionBattleTimeMs = GetAcrBattleTimeMs(now);
+        TrackBurstPackageAction(actionId, actionBattleTimeMs);
+        CombatActionLastUsedAtMs[actionId] = actionBattleTimeMs;
 
         if (actionId is ActionId.AutomatonQueen or ActionId.RookAutoturret)
-            _robotActiveUntilMs = _currentBattleTimeMs + QueenActiveEstimateMs;
+            _robotActiveUntilMs = actionBattleTimeMs + QueenActiveEstimateMs;
 
         if (actionId is ActionId.QueenOverdrive or ActionId.RookOverdrive or ActionId.Detonator)
             _robotActiveUntilMs = 0;
@@ -184,7 +188,7 @@ public static class MachinistSpellHelper
 
     public static bool IsRobotActive()
     {
-        return _robotActiveUntilMs > _currentBattleTimeMs
+        return _robotActiveUntilMs > GetAcrBattleTimeMs()
             || HelperRuntime.RecentlyUsedSpell(ActionId.AutomatonQueen, QueenActiveEstimateMs)
             || HelperRuntime.RecentlyUsedSpell(ActionId.RookAutoturret, QueenActiveEstimateMs);
     }
@@ -198,9 +202,72 @@ public static class MachinistSpellHelper
         return GCDHelper.GetGCDCooldown() >= minGcdCooldownMs;
     }
 
+    private static int GetAcrBattleTimeMs()
+    {
+        return GetAcrBattleTimeMs(Environment.TickCount64);
+    }
+
+    private static int GetAcrBattleTimeMs(long now)
+    {
+        if (_acrCombatClockStartedAtTick is null)
+            return _currentBattleTimeMs;
+
+        var elapsedMs = Math.Max(0, now - _acrCombatClockStartedAtTick.Value);
+        return _acrCombatClockStartedAtBattleTimeMs + (int)Math.Min(int.MaxValue, elapsedMs);
+    }
+
+    private static void StartAcrCombatClockIfNeeded(uint actionId, long now)
+    {
+        if (_acrCombatClockStartedAtTick is not null)
+            return;
+
+        if (!ShouldStartAcrCombatClock(actionId))
+            return;
+
+        _acrCombatClockStartedAtTick = now;
+        _acrCombatClockStartedAtBattleTimeMs = 0;
+    }
+
+    private static bool ShouldStartAcrCombatClock(uint actionId)
+    {
+        if (actionId == ActionId.Reassemble && _currentBattleTimeMs <= 0)
+            return false;
+
+        return IsCombatClockAction(actionId);
+    }
+
+    private static bool IsCombatClockAction(uint actionId)
+    {
+        return actionId is ActionId.Drill
+            or ActionId.AirAnchor
+            or ActionId.ChainSaw
+            or ActionId.Excavator
+            or ActionId.FullMetalField
+            or ActionId.SplitShot
+            or ActionId.SlugShot
+            or ActionId.CleanShot
+            or ActionId.HeatedSplitShot
+            or ActionId.HeatedSlugShot
+            or ActionId.HeatedCleanShot
+            or ActionId.HeatBlast
+            or ActionId.BlazingShot
+            or ActionId.AutoCrossbow
+            or ActionId.SpreadShot
+            or ActionId.Scattergun
+            or ActionId.Bioblaster
+            or ActionId.Wildfire
+            or ActionId.Hypercharge
+            or ActionId.BarrelStabilizer
+            or ActionId.AutomatonQueen
+            or ActionId.RookAutoturret;
+    }
+
     public static Spell? GetAoeGcd()
     {
         if (!HasTarget() || !QTHelper.IsEnabled(QTKey.Aoe))
+            return null;
+
+        if (ShouldHoldGcdForFixed120Queen())
             return null;
 
         if (HasReassembled())
@@ -239,6 +306,9 @@ public static class MachinistSpellHelper
         if (!HasTarget() || IsOverheated())
             return null;
 
+        if (ShouldHoldGcdForFixed120Queen())
+            return null;
+
         if (ShouldHoldStrongGcdForTimeline() && !ShouldDumpStrongGcdForTimeline())
             return null;
 
@@ -247,9 +317,6 @@ public static class MachinistSpellHelper
 
         foreach (var actionId in GetStrongGcdPriority())
         {
-            if (ShouldDelayStrongGcdForLoopOpeningCombo(actionId))
-                return null;
-
             var spell = GetReadyStrongGcd(actionId);
             if (spell is not null)
                 return spell;
@@ -261,6 +328,9 @@ public static class MachinistSpellHelper
     public static Spell? GetBaseComboGcd()
     {
         if (!HasTarget())
+            return null;
+
+        if (ShouldHoldGcdForFixed120Queen())
             return null;
 
         var lastCombo = HelperRuntime.GetLastComboSpellId();
@@ -314,7 +384,7 @@ public static class MachinistSpellHelper
         if (ShouldHoldBarrelForTimeline())
             return null;
 
-        if (!HasTarget() || (!ShouldDumpBarrelForTimeline() && !CanUseBurstResource() && !CanUseLoopBurstPackage()) || !CanWeave())
+        if (!HasTarget() || (!ShouldDumpBarrelForTimeline() && !CanUseBurstResource() && !ShouldUseFixed120BurstPackage()) || !CanWeave())
             return null;
 
         var spell = SelfAbility(ActionId.BarrelStabilizer);
@@ -410,22 +480,22 @@ public static class MachinistSpellHelper
         if (ShouldReleaseBatteryForTimeline())
             return CanWeave(650) ? BuildQueenSpell() : null;
 
-        var shouldSpendBatteryAfterLoopAirAnchor = ShouldSpendBatteryAfterLoopAirAnchor();
+        var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();
         var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();
-        var minWeaveMs = shouldSpendBatteryAfterLoopAirAnchor || shouldSpendBatteryByBudget ? 650 : 800;
+        var minWeaveMs = shouldSpendBatteryInFixed120Burst ? 0 : shouldSpendBatteryByBudget ? 650 : 800;
         if (!CanWeave(minWeaveMs))
             return null;
 
         if (ShouldHoldBatteryForTimeline())
             return null;
 
-        if (ShouldReserveBatteryForLoopAirAnchor())
+        if (ShouldHoldBatteryForFixed120Burst())
             return null;
 
         if (ShouldReserveFullMetalWildfireWeaves())
             return null;
 
-        if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryAfterLoopAirAnchor || shouldSpendBatteryByBudget || CanUseBurstResource())
+        if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())
             return BuildQueenSpell();
 
         return null;
@@ -485,7 +555,7 @@ public static class MachinistSpellHelper
     public static void MarkReassembleOffGcdIssued(uint targetActionId)
     {
         _pendingReassembleTargetActionId = targetActionId;
-        _pendingReassembleTargetExpiresAtMs = _currentBattleTimeMs + ReassemblePendingTargetExpireMs;
+        _pendingReassembleTargetExpiresAtMs = GetAcrBattleTimeMs() + ReassemblePendingTargetExpireMs;
         MarkCombatActionIssued(ActionId.Reassemble);
     }
 
@@ -655,24 +725,6 @@ public static class MachinistSpellHelper
         return !ShouldHoldBurstForWeakTarget();
     }
 
-    private static bool CanUseLoopBurstPackage()
-    {
-        if (ShouldStopActions() || !HasTarget() || IsForbidBurstActive())
-            return false;
-
-        if (!QTHelper.IsEnabled(BuiltinQt.Burst))
-            return false;
-
-        if (ShouldUseDumpResources() || IsForceBurstActive())
-            return true;
-
-        if (!ShouldUseTwoMinuteBurstPlan())
-            return false;
-
-        return IsInTwoMinuteBurstWindow()
-            || GetTimeToNextTwoMinuteBurstAnchor() <= LoopBurstPackageLeadMs;
-    }
-
     private static bool ShouldUseTwoMinuteBurstPlan()
     {
         return _settings.IsHighEndMode;
@@ -693,6 +745,25 @@ public static class MachinistSpellHelper
             _settings.BurstWindowTailMs);
     }
 
+    private static bool ShouldUseFixed120BurstPackage()
+    {
+        if (ShouldStopActions() || !HasTarget() || IsForbidBurstActive())
+            return false;
+
+        if (!QTHelper.IsEnabled(BuiltinQt.Burst))
+            return false;
+
+        var battleTimeMs = GetAcrBattleTimeMs();
+        if (battleTimeMs <= OpeningBurstWindowMs)
+            return false;
+
+        return MachinistBurstPlanner.IsInBurstWindow(
+            battleTimeMs,
+            _settings.FirstBurstAnchorMs,
+            Fixed120BurstPackageLeadMs,
+            Fixed120BurstPackageTailMs);
+    }
+
     private static int GetCurrentBurstAnchorMs()
     {
         return _firstPostOpenerBurstAnchorMs ?? _settings.FirstBurstAnchorMs;
@@ -700,58 +771,13 @@ public static class MachinistSpellHelper
 
     private static int GetTimeToNextTwoMinuteBurstAnchor()
     {
-        return MachinistBurstPlanner.GetTimeToNextBurstAnchor(_currentBattleTimeMs, GetCurrentBurstAnchorMs());
-    }
-
-    private static IReadOnlyList<uint> GetStrongGcdPriority()
-    {
-        return CanUseLoopBurstPackage() || GetLoopOpeningComboAnchorMs() is not null
-            ? LoopBurstStrongGcdPriority
-            : StrongGcdPriority;
-    }
-
-    private static bool ShouldDelayStrongGcdForLoopOpeningCombo(uint actionId)
-    {
-        if (actionId != ActionId.Drill)
-            return false;
-
-        var anchor = GetLoopOpeningComboAnchorMs();
-        if (anchor is null)
-            return false;
-
-        return !HasLoopOpeningComboForAnchor(anchor.Value);
-    }
-
-    private static int? GetLoopOpeningComboAnchorMs()
-    {
-        if (!ShouldUseTwoMinuteBurstPlan())
-            return null;
-
-        if (ShouldStopActions() || !HasTarget() || IsForbidBurstActive())
-            return null;
-
-        if (!QTHelper.IsEnabled(BuiltinQt.Burst))
-            return null;
-
-        if (_currentBattleTimeMs <= OpeningBurstWindowMs)
-            return null;
-
-        var timeToAnchor = GetTimeToNextTwoMinuteBurstAnchor();
-        if (timeToAnchor <= 0 || timeToAnchor > LoopOpeningComboLeadMs)
-            return null;
-
-        return _currentBattleTimeMs + timeToAnchor;
-    }
-
-    private static bool HasLoopOpeningComboForAnchor(int anchorMs)
-    {
-        return _lastLoopOpeningComboAnchorMs == anchorMs;
+        return MachinistBurstPlanner.GetTimeToNextBurstAnchor(GetAcrBattleTimeMs(), GetCurrentBurstAnchorMs());
     }
 
     private static int GetTimeToNextTwoMinuteBurstWindow()
     {
         return MachinistBurstPlanner.GetTimeToNextBurstWindow(
-            _currentBattleTimeMs,
+            GetAcrBattleTimeMs(),
             GetCurrentBurstAnchorMs(),
             _settings.BurstWindowLeadMs,
             _settings.BurstWindowTailMs);
@@ -817,48 +843,23 @@ public static class MachinistSpellHelper
 
     public static void ReanchorBurstCycleToCurrentTime()
     {
-        if (_currentBattleTimeMs <= 0)
+        var battleTimeMs = GetAcrBattleTimeMs();
+        if (battleTimeMs <= 0)
             return;
 
-        _firstPostOpenerBurstAnchorMs = _currentBattleTimeMs;
+        _firstPostOpenerBurstAnchorMs = battleTimeMs;
     }
 
-    private static void TrackBurstPackageAction(uint actionId)
+    private static void TrackBurstPackageAction(uint actionId, int actionBattleTimeMs)
     {
         if (actionId == ActionId.Wildfire)
-        {
-            _lastWildfirePackageStartedAtMs = _currentBattleTimeMs;
-        }
+            _lastWildfirePackageStartedAtMs = actionBattleTimeMs;
 
         if (actionId == ActionId.Hypercharge)
-            _lastHyperchargePackageStartedAtMs = _currentBattleTimeMs;
+            _lastHyperchargePackageStartedAtMs = actionBattleTimeMs;
 
         if (actionId == ActionId.FullMetalField)
-            _lastFullMetalFieldStartedAtMs = _currentBattleTimeMs;
-    }
-
-    private static void TrackLoopOpeningComboAction(uint actionId)
-    {
-        if (!IsBaseComboAction(actionId))
-            return;
-
-        var anchor = GetLoopOpeningComboAnchorMs();
-        if (anchor is null)
-            return;
-
-        _lastLoopOpeningComboAnchorMs = anchor.Value;
-    }
-
-    private static void TrackLoopAirAnchorAction(uint actionId)
-    {
-        if (actionId != ActionId.AirAnchor)
-            return;
-
-        var anchor = GetLoopOpeningComboAnchorMs();
-        if (anchor is null)
-            return;
-
-        _lastLoopAirAnchorAnchorMs = anchor.Value;
+            _lastFullMetalFieldStartedAtMs = actionBattleTimeMs;
     }
 
     private static bool IsBaseComboAction(uint actionId)
@@ -871,15 +872,10 @@ public static class MachinistSpellHelper
             or ActionId.HeatedCleanShot;
     }
 
-    private static bool HasLoopAirAnchorForAnchor(int anchorMs)
-    {
-        return _lastLoopAirAnchorAnchorMs == anchorMs;
-    }
-
     private static bool HasActiveWildfirePackage()
     {
         if (_lastWildfirePackageStartedAtMs is not null
-            && _currentBattleTimeMs - _lastWildfirePackageStartedAtMs.Value <= WildfirePackageDurationMs)
+            && GetAcrBattleTimeMs() - _lastWildfirePackageStartedAtMs.Value <= WildfirePackageDurationMs)
             return true;
 
         return HelperRuntime.HasStatusOnTarget(StatusId.WildfireOnTarget)
@@ -894,7 +890,7 @@ public static class MachinistSpellHelper
         if (IsInTwoMinuteBurstWindow())
             return false;
 
-        return _currentBattleTimeMs - _lastHyperchargePackageStartedAtMs.Value <= MachinistResourcePlanner.PreBurstBudgetLookaheadMs;
+        return GetAcrBattleTimeMs() - _lastHyperchargePackageStartedAtMs.Value <= MachinistResourcePlanner.PreBurstBudgetLookaheadMs;
     }
 
     private static bool ShouldSpendHeatByBudget()
@@ -923,14 +919,11 @@ public static class MachinistSpellHelper
         if (ShouldDumpWildfireForTimeline())
             return false;
 
-        if (!CanUseWildfireBurstPackage())
-            return false;
+        if (ShouldUseFixed120BurstPackage() && !HasRecentFullMetalFieldForWildfirePackage())
+            return true;
 
         if (!HasRecentFullMetalFieldForWildfirePackage())
-            return CanUseLoopBurstPackage()
-                && (HelperRuntime.HasStatus(StatusId.FullMetalMachinist)
-                    || GetNextStrongGcdActionId() == ActionId.FullMetalField
-                    || SelfAbility(ActionId.BarrelStabilizer).IsReadyWithCanCast());
+            return false;
 
         return !HasRecentHyperchargeForWildfirePackage();
     }
@@ -1018,7 +1011,7 @@ public static class MachinistSpellHelper
 
     private static bool CanUseWildfireBurstPackage()
     {
-        return ShouldDumpWildfireForTimeline() || CanUseBurstResource() || CanUseLoopBurstPackage();
+        return ShouldDumpWildfireForTimeline() || CanUseBurstResource() || ShouldUseFixed120BurstPackage();
     }
 
     private static bool ShouldUseHyperchargeBeforeWildfirePackage()
@@ -1048,20 +1041,20 @@ public static class MachinistSpellHelper
     private static bool HasRecentFullMetalFieldForWildfirePackage()
     {
         return _lastFullMetalFieldStartedAtMs is not null
-            && _currentBattleTimeMs - _lastFullMetalFieldStartedAtMs.Value <= FullMetalWildfireWeaveReserveMs;
+            && GetAcrBattleTimeMs() - _lastFullMetalFieldStartedAtMs.Value <= FullMetalWildfireWeaveReserveMs;
     }
 
     private static bool HasRecentHyperchargeForWildfirePackage()
     {
         return IsOverheated()
             || (_lastHyperchargePackageStartedAtMs is not null
-                && _currentBattleTimeMs - _lastHyperchargePackageStartedAtMs.Value <= HyperchargeBeforeWildfireWindowMs);
+                && GetAcrBattleTimeMs() - _lastHyperchargePackageStartedAtMs.Value <= HyperchargeBeforeWildfireWindowMs);
     }
 
     private static bool HasRecentWildfireForFullMetalPackage()
     {
         return _lastWildfirePackageStartedAtMs is not null
-            && _currentBattleTimeMs - _lastWildfirePackageStartedAtMs.Value <= FullMetalWildfireWeaveReserveMs;
+            && GetAcrBattleTimeMs() - _lastWildfirePackageStartedAtMs.Value <= FullMetalWildfireWeaveReserveMs;
     }
 
     private static bool ShouldDelayWildfireForBurstPackageTiming()
@@ -1090,6 +1083,9 @@ public static class MachinistSpellHelper
         if (!CanUseWildfireBurstPackage())
             return false;
 
+        if (ShouldUseFixed120BurstPackage())
+            return false;
+
         if (GCDHelper.GetGCDCooldown() > WildfirePreGcdClipWindowMs)
             return false;
 
@@ -1111,7 +1107,7 @@ public static class MachinistSpellHelper
             GetTimeToNextTwoMinuteBurstAnchor());
     }
 
-    private static bool ShouldReserveBatteryForLoopAirAnchor()
+    private static bool ShouldHoldBatteryForFixed120Burst()
     {
         if (ShouldUseDumpResources() || IsForceBurstActive() || ShouldReleaseBatteryForTimeline())
             return false;
@@ -1119,32 +1115,56 @@ public static class MachinistSpellHelper
         if (GetBattery() < _settings.BatteryBurstSpendThreshold)
             return false;
 
-        if (!IsActionUnlockedForCooldownLookahead(ActionId.AirAnchor))
+        var battleTimeMs = GetAcrBattleTimeMs();
+        if (battleTimeMs <= OpeningBurstWindowMs)
             return false;
 
-        var anchor = GetLoopOpeningComboAnchorMs();
-        if (anchor is null)
+        if (ShouldUseFixed120BurstPackage())
             return false;
 
-        if (HasLoopAirAnchorForAnchor(anchor.Value))
-            return false;
-
-        if (TargetSpell(ActionId.AirAnchor).CooldownMs <= LoopAirAnchorBatteryReserveLeadMs)
-            return true;
-
-        return GetTimeToNextTwoMinuteBurstAnchor() <= LoopAirAnchorBatteryReserveLeadMs;
+        return MachinistBurstPlanner.GetTimeToNextBurstAnchor(battleTimeMs, _settings.FirstBurstAnchorMs)
+            <= Fixed120BatteryHoldLeadMs;
     }
 
-    private static bool ShouldSpendBatteryAfterLoopAirAnchor()
+    private static bool ShouldSpendBatteryInFixed120Burst()
     {
         if (GetBattery() < _settings.BatteryBurstSpendThreshold)
             return false;
 
-        var anchor = GetLoopOpeningComboAnchorMs();
-        if (anchor is null)
+        return ShouldUseFixed120BurstPackage()
+            && HasUsedCurrentFixed120BurstAction(ActionId.Drill)
+            && !HasUsedCurrentFixed120BurstAction(ActionId.ChainSaw)
+            && !HasUsedCurrentFixed120BurstAction(ActionId.AutomatonQueen)
+            && !HasUsedCurrentFixed120BurstAction(ActionId.RookAutoturret);
+    }
+
+    private static bool ShouldHoldGcdForFixed120Queen()
+    {
+        return ShouldSpendBatteryInFixed120Burst()
+            && !ShouldHoldBatteryForTimeline()
+            && !IsRobotActive()
+            && LevelAtLeast(40);
+    }
+
+    private static bool HasUsedCurrentFixed120BurstAction(uint actionId)
+    {
+        if (!CombatActionLastUsedAtMs.TryGetValue(actionId, out var lastUsedAtMs))
             return false;
 
-        return HasLoopAirAnchorForAnchor(anchor.Value);
+        var currentAnchorMs = GetCurrentFixed120BurstAnchorMs();
+        return lastUsedAtMs >= currentAnchorMs - Fixed120BurstPackageLeadMs
+            && lastUsedAtMs <= currentAnchorMs + Fixed120BurstPackageTailMs;
+    }
+
+    private static int GetCurrentFixed120BurstAnchorMs()
+    {
+        var battleTimeMs = GetAcrBattleTimeMs();
+        var anchor = _settings.FirstBurstAnchorMs;
+        if (battleTimeMs <= anchor)
+            return anchor;
+
+        var cycles = (battleTimeMs - anchor) / MachinistBurstPlanner.BurstCycleMs;
+        return anchor + cycles * MachinistBurstPlanner.BurstCycleMs;
     }
 
     public static bool IsTimelineHoldAllBurstActive()
@@ -1423,7 +1443,7 @@ public static class MachinistSpellHelper
         if (_pendingReassembleTargetActionId is null)
             return null;
 
-        if (_currentBattleTimeMs > _pendingReassembleTargetExpiresAtMs)
+        if (GetAcrBattleTimeMs() > _pendingReassembleTargetExpiresAtMs)
         {
             ClearPendingReassembleTarget();
             return null;
@@ -1561,13 +1581,20 @@ public static class MachinistSpellHelper
 
     private static uint? GetNextStrongGcdActionId()
     {
-        foreach (var actionId in StrongGcdPriority)
+        foreach (var actionId in GetStrongGcdPriority())
         {
             if (GetReadyStrongGcd(actionId) is not null)
                 return actionId;
         }
 
         return GetLowLevelHotShotGcd() is null ? null : ActionId.HotShot;
+    }
+
+    private static IReadOnlyList<uint> GetStrongGcdPriority()
+    {
+        return ShouldUseFixed120BurstPackage()
+            ? Fixed120StrongGcdPriority
+            : StrongGcdPriority;
     }
 
     private static int? GetTrackedReassembleTargetCooldownRemainingMs(uint actionId)
@@ -1586,7 +1613,7 @@ public static class MachinistSpellHelper
             _ => (int?)null,
         };
 
-        return recastMs is null ? null : Math.Max(0, recastMs.Value - (_currentBattleTimeMs - lastUsedAtMs));
+        return recastMs is null ? null : Math.Max(0, recastMs.Value - (GetAcrBattleTimeMs() - lastUsedAtMs));
     }
 
     private static bool HasPendingExcavatorFollowUp()
@@ -1598,7 +1625,7 @@ public static class MachinistSpellHelper
             && lastChainSawUsedAtMs <= lastExcavatorUsedAtMs)
             return false;
 
-        return _currentBattleTimeMs - lastChainSawUsedAtMs <= ReassemblePendingTargetExpireMs;
+        return GetAcrBattleTimeMs() - lastChainSawUsedAtMs <= ReassemblePendingTargetExpireMs;
     }
 
     private static Spell? BuildQueenSpell()
@@ -1627,6 +1654,9 @@ public static class MachinistSpellHelper
 
         if (!gaussReady)
             return ricochet;
+
+        if (ShouldUseFixed120BurstPackage())
+            return gaussRound;
 
         return gaussRound.Charges >= ricochet.Charges ? gaussRound : ricochet;
     }

@@ -75,7 +75,7 @@ foreach ($pattern in @(
     "private static int\? _lastHyperchargePackageStartedAtMs",
     "private static int\? _lastFullMetalFieldStartedAtMs",
     "public static void ReanchorBurstCycleToCurrentTime\(\)",
-    "private static void TrackBurstPackageAction\(uint actionId\)",
+    "private static void TrackBurstPackageAction\(uint actionId, int actionBattleTimeMs\)",
     "private static int GetCurrentBurstAnchorMs\(\)",
     "private static int GetTimeToNextTwoMinuteBurstAnchor\(\)",
     "private static int GetTimeToNextTwoMinuteBurstWindow\(\)"
@@ -86,13 +86,15 @@ foreach ($pattern in @(
 }
 
 Assert-BodyContains $helper "public static void RecordCombatActionUse\(uint actionId\)" @(
-    "TrackBurstPackageAction\(actionId\)",
-    "CombatActionLastUsedAtMs\[actionId\] = _currentBattleTimeMs"
+    "var actionBattleTimeMs = GetAcrBattleTimeMs\(now\);",
+    "TrackBurstPackageAction\(actionId, actionBattleTimeMs\)",
+    "CombatActionLastUsedAtMs\[actionId\] = actionBattleTimeMs"
 ) "Confirmed combat action tracking must seed burst-anchor state"
 
 Assert-BodyContains $helper "public static void MarkCombatActionIssued\(uint actionId\)" @(
-    "TrackBurstPackageAction\(actionId\)",
-    "CombatActionLastUsedAtMs\[actionId\] = _currentBattleTimeMs"
+    "var actionBattleTimeMs = GetAcrBattleTimeMs\(now\);",
+    "TrackBurstPackageAction\(actionId, actionBattleTimeMs\)",
+    "CombatActionLastUsedAtMs\[actionId\] = actionBattleTimeMs"
 ) "Queued opener actions must also seed burst-anchor state before event confirmation"
 
 Assert-BodyContains $helper "private static void ResetCombatTracking\(\)" @(
@@ -103,20 +105,23 @@ Assert-BodyContains $helper "private static void ResetCombatTracking\(\)" @(
 ) "Battle reset must clear dynamic burst-anchor and package tracking"
 
 Assert-BodyContains $helper "public static void ReanchorBurstCycleToCurrentTime\(\)" @(
-    "_currentBattleTimeMs <= 0",
-    "_firstPostOpenerBurstAnchorMs = _currentBattleTimeMs"
+    "var battleTimeMs = GetAcrBattleTimeMs\(\)",
+    "battleTimeMs <= 0",
+    "_firstPostOpenerBurstAnchorMs = battleTimeMs"
 ) "Delayed-burst release must re-anchor later two-minute planning to the release time"
 
-Assert-BodyContains $helper "private static void TrackBurstPackageAction\(uint actionId\)" @(
+Assert-BodyContains $helper "private static void TrackBurstPackageAction\(uint actionId, int actionBattleTimeMs\)" @(
     "actionId == ActionId\.Wildfire",
-    "_lastWildfirePackageStartedAtMs = _currentBattleTimeMs",
+    "_lastWildfirePackageStartedAtMs = actionBattleTimeMs",
     "actionId == ActionId\.Hypercharge",
-    "_lastHyperchargePackageStartedAtMs = _currentBattleTimeMs",
+    "_lastHyperchargePackageStartedAtMs = actionBattleTimeMs",
     "actionId == ActionId\.FullMetalField",
-    "_lastFullMetalFieldStartedAtMs = _currentBattleTimeMs"
-) "Package actions must track recent state without shifting the fixed pull-time two-minute anchor"
+    "_lastFullMetalFieldStartedAtMs = actionBattleTimeMs"
+) "Wildfire should only track package history; fixed 120s planning must not be shifted by opener Wildfire"
 
-Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "_firstPostOpenerBurstAnchorMs = _currentBattleTimeMs \+ 120_000" "Opener Wildfire must not delay the first loop burst anchor"
+Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "_firstPostOpenerBurstAnchorMs = _currentBattleTimeMs \+ MachinistBurstPlanner\.BurstCycleMs" "Opener Wildfire must not shift the fixed 120s loop anchor"
+
+Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "GetCurrentBurstWindowAnchor|ShouldDelayFullMetalFieldForLoopBurst" "Dynamic burst-anchor policy must not reintroduce the loop-package state machine that blocked fight 10 Wildfire"
 
 Assert-BodyContains $helper "private static int GetCurrentBurstAnchorMs\(\)" @(
     "_firstPostOpenerBurstAnchorMs \?\? _settings\.FirstBurstAnchorMs"
@@ -136,8 +141,7 @@ Assert-BodyContains $helper "private static int GetTimeToNextTwoMinuteBurstWindo
 
 Assert-Contains "Jobs/Machinist/Triggers/TriggerAction_TimelineVariable.cs" "MachinistSpellHelper\.ReanchorBurstCycleToCurrentTime\(\)" "Delayed burst release trigger must re-anchor the cycle"
 
-Assert-Contains "docs/DEVELOPMENT.md" "first loop burst anchor.*fixed 120s from pull" "Development docs must record the fixed first loop burst anchor"
-Assert-Contains "docs/DEVELOPMENT.md" "opener Wildfire must not shift" "Development docs must record that opener Wildfire does not move the 120s loop"
+Assert-Contains "docs/DEVELOPMENT.md" "opener Wildfire.*must not shift.*120s" "Development docs must record the fixed 120s anchor model"
 
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "MachinistActionId|MachinistStatusId|Kairo\.Machinist|AEAssist" "Dynamic burst-anchor policy must stay HiAuRo-native and Helper-backed"
 

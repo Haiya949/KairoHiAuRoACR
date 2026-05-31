@@ -66,24 +66,30 @@ $docs = Read-File "docs/DEVELOPMENT.md"
 $anchorBody = Get-Body $helper "private static int GetCurrentBurstAnchorMs\(\)" "current burst anchor"
 Assert-Contains $anchorBody "_firstPostOpenerBurstAnchorMs \?\? _settings\.FirstBurstAnchorMs" "Timeline release re-anchor must remain available"
 
-$trackBody = Get-Body $helper "private static void TrackBurstPackageAction\(uint actionId\)" "burst package tracker"
-Assert-Contains $trackBody "_lastWildfirePackageStartedAtMs = _currentBattleTimeMs" "Wildfire history must still be tracked"
-Assert-NotContains $trackBody "_firstPostOpenerBurstAnchorMs = _currentBattleTimeMs \+ 120_000" "Fight 4: opener Wildfire at 11.349s must not push the 120s loop Wildfire to 2:24"
+$trackBody = Get-Body $helper "private static void TrackBurstPackageAction\(uint actionId, int actionBattleTimeMs\)" "burst package tracker"
+Assert-Contains $trackBody "_lastWildfirePackageStartedAtMs = actionBattleTimeMs" "Wildfire history must still be tracked"
+Assert-NotContains $trackBody "_firstPostOpenerBurstAnchorMs = _currentBattleTimeMs \+ MachinistBurstPlanner\.BurstCycleMs" "Fight 11: opener Wildfire must not shift the fixed 120s loop anchor"
 
-$loopAnchorBody = Get-Body $helper "private static int\? GetLoopOpeningComboAnchorMs\(\)" "loop opening combo anchor"
-Assert-Contains $loopAnchorBody "GetTimeToNextTwoMinuteBurstAnchor\(\)" "Loop combo still follows the rolling two-minute anchor"
-Assert-Contains $loopAnchorBody "LoopOpeningComboLeadMs" "Loop combo should only add one ordinary GCD before the fixed 120s package"
+Assert-NotContains $helper "LoopOpeningComboLeadMs|ShouldDelayStrongGcdForLoopOpeningCombo|TrackLoopOpeningComboAction|ShouldDelayFullMetalFieldForLoopBurst|GetCurrentBurstWindowAnchor" "Fight 10: loop burst must not use package-state rules that can block Wildfire"
 
 $barrelBody = Get-Body $helper "public static Spell\? GetBarrelStabilizerOffGcd\(\)" "Barrel Stabilizer policy"
-Assert-Contains $barrelBody "CanUseLoopBurstPackage\(\)" "Fight 4: Barrel Stabilizer must be allowed around the 120s package, not wait until 2:18"
+Assert-Contains $barrelBody "CanUseBurstResource\(\)" "Barrel Stabilizer should use the old ACR burst-resource gate"
+Assert-NotContains $barrelBody "ShouldPrioritizeBarrelAfterLoopAirAnchor|CanUseLoopBurstPackage" "Barrel Stabilizer must not depend on loop Air Anchor package state"
 
-$batteryReserveBody = Get-Body $helper "private static bool ShouldReserveBatteryForLoopAirAnchor\(\)" "loop Air Anchor battery reserve"
-Assert-Contains $batteryReserveBody "LoopAirAnchorBatteryReserveLeadMs" "Fight 4: battery reserve must cover the pre-120s Queen/Rook leak"
-Assert-Contains $batteryReserveBody "HasLoopAirAnchorForAnchor\(anchor\.Value\)" "Battery reserve must stop after the 120s Air Anchor lands"
+$queenBody = Get-Body $helper "public static Spell\? GetQueenOffGcd\(\)" "Queen/Rook policy"
+Assert-NotContains $queenBody "ShouldPrioritizeBarrelAfterLoopAirAnchor|ShouldReserveBatteryForLoopAirAnchor|ShouldSpendBatteryAfterLoopAirAnchor" "Queen/Rook should not use loop Air Anchor package state after reverting to old ACR model"
+
+$reassembleBody = Get-Body $helper "public static Spell\? GetReassembleOffGcd\(\)" "Reassemble policy"
+Assert-NotContains $reassembleBody "ShouldPrioritizeBarrelAfterLoopAirAnchor" "Reassemble should not use loop Air Anchor package state after reverting to old ACR model"
+
+$nextStrongBody = Get-Body $helper "private static uint\? GetNextStrongGcdActionId\(\)" "next strong GCD probe"
+Assert-Contains $nextStrongBody "foreach \(var actionId in GetStrongGcdPriority\(\)\)" "Timing probes must use fixed 120s priority during the fixed package and old priority elsewhere"
 
 Assert-Contains $docs "Fight 4" "Development docs must record the FFLogs fight 4 regression"
 Assert-Contains $docs "2:24 Wildfire" "Development docs must record the delayed Wildfire symptom"
 Assert-Contains $docs "2:10.*ordinary combo" "Development docs must record the ordinary combo symptom"
+Assert-Contains $docs "Fight 10" "Development docs must record the FFLogs fight 10 regression"
+Assert-Contains $docs "loop-package state machine" "Development docs must record why the loop-package state machine was removed"
 Assert-Contains $docs "1:40.*Queen/Rook" "Development docs must record the early Queen/Rook symptom"
 
 if ($failures.Count -gt 0) {

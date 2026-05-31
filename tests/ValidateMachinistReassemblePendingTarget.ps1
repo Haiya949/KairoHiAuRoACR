@@ -92,7 +92,7 @@ Assert-BodyContains $helper "public static void RecordCombatActionUse\(uint acti
 
 Assert-BodyContains $helper "public static void MarkReassembleOffGcdIssued\(uint targetActionId\)" @(
     "_pendingReassembleTargetActionId = targetActionId",
-    "_pendingReassembleTargetExpiresAtMs = _currentBattleTimeMs \+ ReassemblePendingTargetExpireMs",
+    "_pendingReassembleTargetExpiresAtMs = GetAcrBattleTimeMs\(\) \+ ReassemblePendingTargetExpireMs",
     "MarkCombatActionIssued\(ActionId\.Reassemble\)"
 ) "Reassemble oGCD issue marker must remember the strong GCD that should consume it"
 
@@ -110,7 +110,7 @@ Assert-BodyContains $helper "private static Spell\? GetReassembleTargetSpell\(\)
 
 Assert-BodyContains $helper "private static uint\? GetPendingReassembleTargetActionId\(\)" @(
     "_pendingReassembleTargetActionId is null",
-    "_currentBattleTimeMs > _pendingReassembleTargetExpiresAtMs",
+    "GetAcrBattleTimeMs\(\) > _pendingReassembleTargetExpiresAtMs",
     "ClearPendingReassembleTarget\(\)",
     "return _pendingReassembleTargetActionId"
 ) "Pending Reassemble target must expire after the short delayed-state window"

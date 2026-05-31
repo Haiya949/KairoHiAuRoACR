@@ -91,39 +91,21 @@ Assert-Order $gaussBody @(
     "if (IsOverheated() || ShouldUseDumpResources() || spell.Charges >= 2)"
 ) "Checkmate/Double Check should keep timeline dump and Full Metal weave reserve before the natural two-charge release"
 
-Assert-Contains $helper "private const int LoopAirAnchorBatteryReserveLeadMs = 30_000" "Loop battery reserve must cover the 1:40 pre-120s Queen/Rook leak"
-Assert-Contains $helper "_lastLoopAirAnchorAnchorMs" "Loop battery reserve must track Air Anchor per two-minute anchor"
-Assert-Contains $helper "TrackLoopAirAnchorAction\(actionId\)" "Issued/combat action tracking must update the Air Anchor marker"
-
-$trackAirAnchorBody = Get-Body $helper "private static void TrackLoopAirAnchorAction\(uint actionId\)" "loop Air Anchor tracker"
-Assert-Contains $trackAirAnchorBody "actionId != ActionId\.AirAnchor" "Loop Air Anchor tracker must only record Air Anchor"
-Assert-Contains $trackAirAnchorBody "GetLoopOpeningComboAnchorMs\(\)" "Loop Air Anchor tracker must bind to the rolling two-minute anchor"
-Assert-Contains $trackAirAnchorBody "_lastLoopAirAnchorAnchorMs = anchor\.Value" "Loop Air Anchor tracker must mark the anchor as Air Anchor handled"
-
-$reserveBatteryBody = Get-Body $helper "private static bool ShouldReserveBatteryForLoopAirAnchor\(\)" "loop Air Anchor battery reserve"
-Assert-Contains $reserveBatteryBody "GetLoopOpeningComboAnchorMs\(\)" "Battery reserve must follow the loop opening anchor"
-Assert-Contains $reserveBatteryBody "HasLoopAirAnchorForAnchor\(anchor\.Value\)" "Battery reserve must stop after Air Anchor lands"
-Assert-Contains $reserveBatteryBody "ActionId\.AirAnchor" "Battery reserve must specifically wait for Air Anchor"
-Assert-Contains $reserveBatteryBody "LoopAirAnchorBatteryReserveLeadMs" "Battery reserve must use the Air Anchor reserve lead"
-
-$spendBatteryBody = Get-Body $helper "private static bool ShouldSpendBatteryAfterLoopAirAnchor\(\)" "post-Air Anchor battery spender"
-Assert-Contains $spendBatteryBody "GetLoopOpeningComboAnchorMs\(\)" "Post-Air Anchor spend must follow the loop opening anchor"
-Assert-Contains $spendBatteryBody "HasLoopAirAnchorForAnchor\(anchor\.Value\)" "Post-Air Anchor spend must require Air Anchor for that anchor"
+Assert-NotContains $helper "_lastLoopAirAnchorAnchorMs|TrackLoopBurstToolAction|ShouldReserveBatteryForLoopAirAnchor|ShouldSpendBatteryAfterLoopAirAnchor|ShouldPrioritizeBarrelAfterLoopAirAnchor" "Loop battery policy must not use the removed Air Anchor package state"
 
 $queenBody = Get-Body $helper "public static Spell\? GetQueenOffGcd\(\)" "Queen/Rook battery policy"
 Assert-Order $queenBody @(
-    "var shouldSpendBatteryAfterLoopAirAnchor = ShouldSpendBatteryAfterLoopAirAnchor();",
+    "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
     "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();",
     "if (ShouldHoldBatteryForTimeline())",
-    "if (ShouldReserveBatteryForLoopAirAnchor())",
+    "if (ShouldHoldBatteryForFixed120Burst())",
     "if (ShouldReserveFullMetalWildfireWeaves())",
-    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryAfterLoopAirAnchor || shouldSpendBatteryByBudget || CanUseBurstResource())"
-) "Queen/Rook policy must reserve battery until loop Air Anchor, then spend after Air Anchor before normal burst-resource fallback"
+    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())"
+) "Queen/Rook policy must use fixed-120 Drill-before-Chain-Saw release plus budget/overcap/resource gates without hidden package state"
 
 Assert-Contains $docs "Checkmate / Double Check.*Charges >= 2" "Development docs must record the natural Checkmate/Double Check release"
 Assert-Contains $docs "1:40.*Queen/Rook" "Development docs must record the 1:40 pre-120s Queen/Rook leak guard"
-Assert-Contains $docs "120s Air Anchor.*Queen/Rook" "Development docs must record Queen/Rook after the 120s Air Anchor"
-Assert-Contains $docs "maximize.*Battery" "Development docs must record the post-Air Anchor max battery intent"
+Assert-Contains $docs "Battery.*budget.*overcap" "Development docs must record the budget/overcap battery intent"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist loop battery/ammo validation failed:"

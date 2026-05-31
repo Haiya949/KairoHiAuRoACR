@@ -81,7 +81,7 @@ Assert-BodyContains $helper "private static bool HasPendingExcavatorFollowUp\(\)
     "CombatActionLastUsedAtMs\.TryGetValue\(ActionId\.ChainSaw, out var lastChainSawUsedAtMs\)",
     "CombatActionLastUsedAtMs\.TryGetValue\(ActionId\.Excavator, out var lastExcavatorUsedAtMs\)",
     "lastChainSawUsedAtMs <= lastExcavatorUsedAtMs",
-    "_currentBattleTimeMs - lastChainSawUsedAtMs <= ReassemblePendingTargetExpireMs"
+    "GetAcrBattleTimeMs\(\) - lastChainSawUsedAtMs <= ReassemblePendingTargetExpireMs"
 ) "Pending Excavator follow-up must be based on Helper action IDs and issued-action tracking"
 
 Assert-Contains "docs/DEVELOPMENT.md" "Chain Saw -> Excavator follow-up" "Development docs must record the pending Excavator follow-up rule"

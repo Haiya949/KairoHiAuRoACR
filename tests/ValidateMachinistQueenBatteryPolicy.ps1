@@ -97,12 +97,12 @@ Assert-BodyContains $helper "public static Spell\? GetQueenOffGcd\(\)" @(
     "IsForbidBurstActive\(\)",
     "ShouldReleaseBatteryForTimeline\(\)",
     "ShouldHoldBatteryForTimeline\(\)",
-    "var shouldSpendBatteryAfterLoopAirAnchor = ShouldSpendBatteryAfterLoopAirAnchor\(\)",
+    "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst\(\)",
     "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget\(\)",
-    "var minWeaveMs = shouldSpendBatteryAfterLoopAirAnchor \|\| shouldSpendBatteryByBudget \? 650 : 800",
-    "ShouldReserveBatteryForLoopAirAnchor\(\)",
+    "var minWeaveMs = shouldSpendBatteryInFixed120Burst \? 0 : shouldSpendBatteryByBudget \? 650 : 800",
+    "ShouldHoldBatteryForFixed120Burst\(\)",
     "ShouldReserveFullMetalWildfireWeaves\(\)",
-    "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryAfterLoopAirAnchor \|\| shouldSpendBatteryByBudget \|\| CanUseBurstResource\(\)"
+    "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryInFixed120Burst \|\| shouldSpendBatteryByBudget \|\| CanUseBurstResource\(\)"
 ) "Queen summon must follow HiAuRo battery, burst, hold, dump, and weave-reserve policy"
 
 $queen = [regex]::Match(
@@ -114,12 +114,12 @@ if ($queen.Success) {
     Assert-Order $body @(
         "if (IsForbidBurstActive())",
         "if (ShouldReleaseBatteryForTimeline())",
-        "var shouldSpendBatteryAfterLoopAirAnchor = ShouldSpendBatteryAfterLoopAirAnchor();",
+        "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
         "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();",
         "if (ShouldHoldBatteryForTimeline())",
-        "if (ShouldReserveBatteryForLoopAirAnchor())",
+        "if (ShouldHoldBatteryForFixed120Burst())",
         "if (ShouldReserveFullMetalWildfireWeaves())"
-    ) "Queen policy must respect ForbidBurst first, timeline release second, then battery pressure before hold and Full Metal reserve"
+    ) "Queen policy must respect ForbidBurst first, timeline release second, then fixed 120s/battery pressure before hold and Full Metal reserve"
 }
 
 Assert-BodyContains $helper "private static bool ShouldSpendBatteryByBudget\(\)" @(
@@ -127,11 +127,6 @@ Assert-BodyContains $helper "private static bool ShouldSpendBatteryByBudget\(\)"
     "MachinistResourcePlanner\.ShouldSpendBatteryBeforeBurst",
     "GetTimeToNextTwoMinuteBurstAnchor\(\)"
 ) "Battery budget must use overcap pressure and the migrated 120s resource planner"
-
-Assert-BodyContains $helper "private static bool ShouldSpendBatteryAfterLoopAirAnchor\(\)" @(
-    "GetLoopOpeningComboAnchorMs\(\)",
-    "HasLoopAirAnchorForAnchor\(anchor\.Value\)"
-) "Battery policy must spend the saved battery after the loop Air Anchor"
 
 Assert-BodyContains $helper "public static Spell\? GetQueenOverdriveOffGcd\(\)" @(
     "IsRobotActive\(\)",
@@ -148,6 +143,7 @@ Assert-BodyContains $helper "private static Spell\? BuildQueenSpell\(\)" @(
 ) "Queen summon must use Helper action IDs and support Rook below level 80"
 
 Assert-Contains "Jobs/Machinist/Burst/MachinistResourcePlanner.cs" "public static bool ShouldSpendBatteryBeforeBurst" "Battery policy must keep the migrated resource planner"
+Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "ShouldSpendBatteryAfterLoopAirAnchor|ShouldReserveBatteryForLoopAirAnchor|ShouldPrioritizeBarrelAfterLoopAirAnchor|_lastLoopAirAnchorAnchorMs" "Queen battery policy must not depend on the removed loop Air Anchor package state"
 Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "MachinistActionId|MachinistStatusId|Kairo\.Machinist|AEAssist" "Queen battery policy must not leak old ACR APIs or local ID catalogs"
 
 if ($failures.Count -gt 0) {

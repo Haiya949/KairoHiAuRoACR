@@ -103,7 +103,7 @@ Assert-InOrder $wildfireBody @(
 Assert-InOrder $barrelBody @(
     "if (IsForbidBurstActive())",
     "if (ShouldHoldBarrelForTimeline())",
-    "if (!HasTarget() || (!ShouldDumpBarrelForTimeline() && !CanUseBurstResource() && !CanUseLoopBurstPackage()) || !CanWeave())"
+    "if (!HasTarget() || (!ShouldDumpBarrelForTimeline() && !CanUseBurstResource() && !ShouldUseFixed120BurstPackage()) || !CanWeave())"
 ) "Barrel Stabilizer must respect ForbidBurst before timeline hold/dump or burst package checks"
 
 Assert-InOrder $hyperchargeBody @(
