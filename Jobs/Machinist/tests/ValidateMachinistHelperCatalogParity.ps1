@@ -1,6 +1,6 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
 
-$root = Split-Path -Parent $PSScriptRoot
+$root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 
 function Read-ProjectFile([string]$relativePath) {
     $path = Join-Path $root $relativePath

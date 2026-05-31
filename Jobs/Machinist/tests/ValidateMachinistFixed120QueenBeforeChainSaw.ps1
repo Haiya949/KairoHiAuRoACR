@@ -1,5 +1,5 @@
-param(
-    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+﻿param(
+    [string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 )
 
 $ErrorActionPreference = "Stop"
@@ -17,7 +17,7 @@ function Read-File {
     if ((Get-Item -LiteralPath $fullPath) -is [System.IO.DirectoryInfo]) {
         $builder = New-Object System.Text.StringBuilder
         Get-ChildItem -LiteralPath $fullPath -Recurse -File |
-            Where-Object { $_.Extension -in ".cs", ".md", ".json", ".ps1" } |
+            Where-Object { $_.Extension -eq ".cs" -and $_.FullName -notmatch '\\(docs|tests)\\' } |
             Sort-Object FullName |
             ForEach-Object {
                 [void]$builder.AppendLine((Get-Content -LiteralPath $_.FullName -Raw -Encoding utf8))

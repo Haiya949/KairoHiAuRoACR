@@ -69,6 +69,34 @@ foreach ($text in @($compliance)) {
     Assert-Contains $text "Kairo\.dll" "Docs must record the deployed ACR DLL name"
 }
 
+$topLevelMachinistTests = @(Get-ChildItem -LiteralPath (Join-Path $Root "tests") -File -Filter "ValidateMachinist*.ps1" -ErrorAction SilentlyContinue)
+if ($topLevelMachinistTests.Count -gt 0) {
+    $failures.Add("Machinist-specific validation scripts must live under Jobs/Machinist/tests. Top-level files: $($topLevelMachinistTests.Name -join ', ')")
+}
+
+foreach ($path in @(
+    "docs\execution_axis_variables.md",
+    "docs\execution_timelines",
+    "docs\templates\MCH-execution-axis-template.json"
+)) {
+    if (Test-Path -LiteralPath (Join-Path $Root $path)) {
+        $failures.Add("Machinist-specific docs must live under Jobs/Machinist/docs instead of $path")
+    }
+}
+
+foreach ($path in @(
+    "Jobs\Machinist\docs\execution_axis_variables.md",
+    "Jobs\Machinist\docs\execution_timelines\M9S-MCH-execution.json",
+    "Jobs\Machinist\docs\execution_timelines\M10S-MCH-execution.json",
+    "Jobs\Machinist\docs\execution_timelines\M11S-MCH-execution.json",
+    "Jobs\Machinist\docs\templates\MCH-execution-axis-template.json",
+    "Jobs\Machinist\tests\ValidateMachinistPort.ps1"
+)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $Root $path))) {
+        $failures.Add("Missing Machinist-specific artifact: $path")
+    }
+}
+
 $notCopyHelper = (U 0x8F93,0x51FA,0x4E0D,0x590D,0x5236) + ' `HiAuRo.Helper.dll`'
 Assert-Contains $compliance ([regex]::Escape($notCopyHelper)) "Compliance docs must say Helper DLL is not copied"
 

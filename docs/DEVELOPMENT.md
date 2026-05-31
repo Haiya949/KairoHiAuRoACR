@@ -264,11 +264,11 @@ E:\ff14\HiAuRo\KairoHiAuRoACR\scripts\deploy.ps1
 
 ## 机工执行轴写作交付物
 
-- 作者说明在 `docs/execution_axis_variables.md`，记录 `KairoMCHTimelineVariable`、`KairoMCHHotkey`、`KairoMCHPotion` 的字段、变量和写轴规则。
-- HiAuRo 原生执行轴模板在 `docs/templates/MCH-execution-axis-template.json`，节点类型使用 `HiAuRo.Execution.Tree*`，动作 `$type` 使用 `KairoMCH*` discriminator。
+- 作者说明在 `Jobs/Machinist/docs/execution_axis_variables.md`，记录 `KairoMCHTimelineVariable`、`KairoMCHHotkey`、`KairoMCHPotion` 的字段、变量和写轴规则。
+- HiAuRo 原生执行轴模板在 `Jobs/Machinist/docs/templates/MCH-execution-axis-template.json`，节点类型使用 `HiAuRo.Execution.Tree*`，动作 `$type` 使用 `KairoMCH*` discriminator。
 - 模板只保留通用延迟爆发和单项泄资源示例；具体副本应复制模板后替换 Delay 为 Boss 锚点或事实轴事件。
 - 本仓库当前只提供执行轴示例；事实轴应放 `FactTimelines/{TerritoryTypeId}.json`，辅助轴应放 `AssistTimelines/{TerritoryTypeId}.json`，不要和执行轴文件混名。
 - 运行时使用时，把作者示例复制到 HiAuRo 配置目录的 `ExecutionTimelines/{TerritoryTypeId}.json`；M9S/M10S/M11S 分别是 `1321.json`、`1323.json`、`1325.json`。
-- M9S 具体执行轴示例在 `docs/execution_timelines/M9S-MCH-execution.json`，覆盖两次爆发药、三轮小怪 DataId 19170 目标选择、资源 hold/dump、策动和武装解除 Boss 技能门。
-- M10S 具体执行轴示例在 `docs/execution_timelines/M10S-MCH-execution.json`，覆盖 Air Anchor -> Drill -> Chain Saw 特殊起手、water/surf 延后爆发释放、策动和武装解除 Boss 技能门。
-- M11S 具体执行轴示例在 `docs/execution_timelines/M11S-MCH-execution.json`，覆盖 0/5/10 爆发药、5 分整备/强 GCD 保留释放、王室陨石热量控制、策动和武装解除 Boss 技能门。
+- M9S 具体执行轴示例在 `Jobs/Machinist/docs/execution_timelines/M9S-MCH-execution.json`，覆盖两次爆发药、三轮小怪 DataId 19170 目标选择、资源 hold/dump、策动和武装解除 Boss 技能门。
+- M10S 具体执行轴示例在 `Jobs/Machinist/docs/execution_timelines/M10S-MCH-execution.json`，覆盖 Air Anchor -> Drill -> Chain Saw 特殊起手、water/surf 延后爆发释放、策动和武装解除 Boss 技能门。
+- M11S 具体执行轴示例在 `Jobs/Machinist/docs/execution_timelines/M11S-MCH-execution.json`，覆盖 0/5/10 爆发药、5 分整备/强 GCD 保留释放、王室陨石热量控制、策动和武装解除 Boss 技能门。

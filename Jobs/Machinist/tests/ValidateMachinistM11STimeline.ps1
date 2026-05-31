@@ -1,5 +1,5 @@
-param(
-    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+﻿param(
+    [string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 )
 
 $ErrorActionPreference = "Stop"
@@ -238,11 +238,11 @@ function Assert-TimedTimelineAction {
     }
 }
 
-$timelinePath = "docs/execution_timelines/M11S-MCH-execution.json"
+$timelinePath = "Jobs/Machinist/docs/execution_timelines/M11S-MCH-execution.json"
 $timelineText = Read-File $timelinePath
 
-Assert-Contains "docs/DEVELOPMENT.md" "docs/execution_timelines/M11S-MCH-execution\.json" "Development docs must point to the concrete M11S HiAuRo execution-axis example"
-Assert-Contains "docs/execution_axis_variables.md" "docs/execution_timelines/M11S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M11S example"
+Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_timelines/M11S-MCH-execution\.json" "Development docs must point to the concrete M11S HiAuRo execution-axis example"
+Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "Jobs/Machinist/docs/execution_timelines/M11S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M11S example"
 
 if (-not [string]::IsNullOrWhiteSpace($timelineText)) {
     try {

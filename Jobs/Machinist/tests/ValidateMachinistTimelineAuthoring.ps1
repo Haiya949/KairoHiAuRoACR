@@ -1,5 +1,5 @@
-param(
-    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+﻿param(
+    [string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 )
 
 $ErrorActionPreference = "Stop"
@@ -66,8 +66,8 @@ function Walk-Node {
     }
 }
 
-$templatePath = "docs/templates/MCH-execution-axis-template.json"
-$docPath = "docs/execution_axis_variables.md"
+$templatePath = "Jobs/Machinist/docs/templates/MCH-execution-axis-template.json"
+$docPath = "Jobs/Machinist/docs/execution_axis_variables.md"
 $templateText = Read-File $templatePath
 
 Assert-Contains $docPath "KairoMCHTimelineVariable" "Execution-axis authoring docs must document the MCH timeline variable action"
@@ -85,9 +85,9 @@ Assert-Contains $docPath ([regex]::Escape((U @(0x8f85, 0x52a9, 0x8f74)))) "Execu
 Assert-Contains $docPath "ExecutionTimelines" "Execution-axis authoring docs must state the runtime execution-axis directory"
 Assert-Contains $docPath "FactTimelines" "Execution-axis authoring docs must state that fact-axis files are separate"
 Assert-Contains $docPath "AssistTimelines" "Execution-axis authoring docs must state that assist-axis files are separate"
-Assert-Contains $docPath "docs/execution_timelines/M9S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M9S execution-axis example"
-Assert-Contains $docPath "docs/execution_timelines/M10S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M10S execution-axis example"
-Assert-Contains $docPath "docs/execution_timelines/M11S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M11S execution-axis example"
+Assert-Contains $docPath "Jobs/Machinist/docs/execution_timelines/M9S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M9S execution-axis example"
+Assert-Contains $docPath "Jobs/Machinist/docs/execution_timelines/M10S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M10S execution-axis example"
+Assert-Contains $docPath "Jobs/Machinist/docs/execution_timelines/M11S-MCH-execution\.json" "Execution-axis authoring docs must point to the concrete M11S execution-axis example"
 Assert-NotContains $docPath 'AEAssist|Kairo\.Machinist\.Triggers|TriggerAction_QT|TriggerAction_NewQt|UsePotion QT' "Execution-axis authoring docs must not leak old plugin trigger names"
 
 if (-not [string]::IsNullOrWhiteSpace($templateText)) {
@@ -182,8 +182,8 @@ Assert-Contains $templatePath '"\$type"\s*:\s*"KairoMCHPotion"' "Execution-axis 
 Assert-Contains $templatePath ([regex]::Escape((U @(0x673a, 0x5de5, 0x6267, 0x884c, 0x8f74, 0x6a21, 0x677f)))) "Execution-axis template must display an execution-axis label"
 Assert-NotContains $templatePath 'AEAssist|Kairo\.Machinist\.Triggers|TriggerAction_QT|TriggerAction_NewQt|UsePotion QT|JobViewWindow' "Execution-axis template must not leak old plugin trigger names"
 
-Assert-Contains "docs/DEVELOPMENT.md" "docs/templates/MCH-execution-axis-template.json" "Development docs must point to the HiAuRo MCH execution-axis template"
-Assert-Contains "docs/DEVELOPMENT.md" "docs/execution_axis_variables.md" "Development docs must point to the execution-axis authoring docs"
+Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/templates/MCH-execution-axis-template.json" "Development docs must point to the HiAuRo MCH execution-axis template"
+Assert-Contains "docs/DEVELOPMENT.md" "Jobs/Machinist/docs/execution_axis_variables.md" "Development docs must point to the execution-axis authoring docs"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist timeline authoring validation failed:"

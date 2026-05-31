@@ -1,5 +1,5 @@
-param(
-    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+﻿param(
+    [string]$Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 )
 
 $ErrorActionPreference = "Stop"
@@ -86,9 +86,9 @@ Assert-BodyContains $opener "private static bool CanStart\(\)" @(
     "IsGcdUnlocked\(ActionId\.Drill\)"
 ) "Start check must require Air Anchor only when the special opener is active"
 
-Assert-Contains "docs/execution_axis_variables.md" "Air Anchor" "Execution-axis docs must explain the Air Anchor first opener variable"
+Assert-Contains "Jobs/Machinist/docs/execution_axis_variables.md" "Air Anchor" "Execution-axis docs must explain the Air Anchor first opener variable"
 Assert-Contains "docs/DEVELOPMENT.md" "mch_opener_air_anchor_first" "Development docs must mention the special Air Anchor first opener"
-Assert-NotContains "docs/execution_axis_variables.md" "尚未消费|not consumed|not yet consumed" "Execution-axis docs must not say the Air Anchor first variable is unused"
+Assert-NotContains "Jobs/Machinist/docs/execution_axis_variables.md" "尚未消费|not consumed|not yet consumed" "Execution-axis docs must not say the Air Anchor first variable is unused"
 
 if ($failures.Count -gt 0) {
     Write-Host "Machinist Air Anchor first opener validation failed:"
