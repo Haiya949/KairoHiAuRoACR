@@ -78,7 +78,9 @@ public sealed class ViperQuickOpener : IOpener
     private static void BuildHuntersCoilSlot(Slot slot)
     {
         PrepareSlot(slot);
-        slot.Add(TargetSpell(ActionId.HuntersCoil));
+        var spell = TargetSpell(ActionId.HuntersCoil);
+        ViperSpellHelper.PushPositionalHint(spell);
+        slot.Add(spell);
         slot.Add(TargetAbility(ActionId.TwinfangBite));
         slot.Add(TargetAbility(ActionId.TwinbloodBite));
     }
@@ -86,7 +88,9 @@ public sealed class ViperQuickOpener : IOpener
     private static void BuildSwiftskinsCoilSlot(Slot slot)
     {
         PrepareSlot(slot);
-        slot.Add(TargetSpell(ActionId.SwiftskinsCoil));
+        var spell = TargetSpell(ActionId.SwiftskinsCoil);
+        ViperSpellHelper.PushPositionalHint(spell);
+        slot.Add(spell);
         slot.Add(TargetAbility(ActionId.TwinbloodBite));
         slot.Add(TargetAbility(ActionId.TwinfangBite));
     }
@@ -94,7 +98,9 @@ public sealed class ViperQuickOpener : IOpener
     private static void BuildBaseFinisherSlot(Slot slot)
     {
         PrepareSlot(slot);
-        slot.Add(ViperSpellHelper.GetBaseGcd() ?? TargetSpell(ActionId.HindsbaneFang));
+        var spell = ViperSpellHelper.GetBaseGcd() ?? TargetSpell(ActionId.HindsbaneFang);
+        ViperSpellHelper.PushPositionalHint(spell);
+        slot.Add(spell);
     }
 
     private static Spell TargetSpell(uint actionId)

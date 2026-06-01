@@ -10,6 +10,8 @@ Skill and status IDs come from `HiAuRo.Helper.VPRHelper`. Viper-specific status 
 
 AOE and base combo policy consumes Helper-backed Honed Steel / Honed Reavers before falling back to Noxious Gnash timing. Dreadwinder starts use charge readiness plus an action-change sanity gate so stale Hunter/Swiftskin replacements do not block a fresh Vicewinder or Vicepit chain. True North automation uses the 700-1200ms decision window and does not preempt pending follow-up oGCDs or Serpent's Ire.
 
+HiAuRo v0.1.90 exposes target-circle positional VFX through `HiAuRo.Rendering.PositionalState.Push`. Viper pushes this from GCD slot builds for flank/behind actions such as Flanksting Strike, Hindsting Strike, Hunter's Coil, and Swiftskin's Coil; UI progress remains only a helper/debug hint.
+
 Ability spells must be created with `SpellType.Ability` whenever the action is an oGCD, opener weave, or hotkey-triggered ability. This keeps HiAuRo event accounting and slot execution aligned with the official SlotMode contract.
 
 ## Migration Audit

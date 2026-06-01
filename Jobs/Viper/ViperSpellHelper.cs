@@ -1,4 +1,5 @@
 using OmenTools.Dalamud.Services.ObjectTable.Abstractions.ObjectKinds;
+using HiAuRo.Rendering;
 using ActionId = HiAuRo.Helper.VPRHelper.EN.Skills;
 using StatusId = HiAuRo.Helper.VPRHelper.EN.Buffs;
 
@@ -780,6 +781,25 @@ public static class ViperSpellHelper
             ActionId.HindstingStrike or ActionId.HindsbaneFang or ActionId.SwiftskinsCoil => ViperPositionalRequirement.Behind,
             _ => ViperPositionalRequirement.None,
         };
+    }
+
+    public static void PushPositionalHint(Spell? spell)
+    {
+        if (spell is null)
+            return;
+
+        var dir = SpellNeedsPositional(spell.Id) switch
+        {
+            ViperPositionalRequirement.Flank => PositionalDir.Flank,
+            ViperPositionalRequirement.Behind => PositionalDir.Behind,
+            _ => PositionalDir.None,
+        };
+
+        if (dir == PositionalDir.None)
+            return;
+
+        var durationMs = Math.Max(1, (int)Math.Max(GetTrueNorthGcdCooldown(), GCDHelper.GetGCDDuration()));
+        PositionalState.Push(dir, durationMs, spell.Id);
     }
 
     public static bool ShouldUseTrueNorth()

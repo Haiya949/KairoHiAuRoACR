@@ -19,6 +19,9 @@ public sealed class ViperBaseGcdResolver : ISlotResolver
     public void Build(Slot slot)
     {
         if (_spell is not null)
+        {
+            ViperSpellHelper.PushPositionalHint(_spell);
             slot.Add(_spell);
+        }
     }
 }
