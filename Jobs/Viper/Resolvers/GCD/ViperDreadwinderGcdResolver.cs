@@ -25,6 +25,7 @@ public sealed class ViperDreadwinderGcdResolver : ISlotResolver
             return;
 
         slot.Add(_spell);
+        ViperSpellHelper.PushPositionalHint(_spell);
         ViperSpellHelper.MarkDreadwinderIssued(_spell.Id);
     }
 }

@@ -235,6 +235,11 @@ Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "StatusId\.ReadyToReawaken" "Vi
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetTrueNorthGcdCooldown" "Viper helper must expose True North GCD cooldown decision value"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "IsInTrueNorthDecisionWindow" "Viper helper must preserve True North decision window"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetPositionalHintProgress" "Viper helper must preserve positional hint progress for UI/debug"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "using HiAuRo\.Rendering;" "Viper helper must use HiAuRo v0.1.90 positional rendering API"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "PushPositionalHint" "Viper helper must expose target-circle positional VFX push"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "PositionalState\.Push" "Viper helper must push target-circle positional VFX through HiAuRo"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "PositionalDir\.Flank" "Viper helper must map flank requirements to HiAuRo positional VFX"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "PositionalDir\.Behind" "Viper helper must map behind requirements to HiAuRo positional VFX"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetReawakenGcd" "Viper must port Reawaken chain strategy"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetDreadwinderGcd" "Viper must port Dreadwinder strategy"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetRattlingCoilGcd" "Viper must port Rattling Coil strategy"
@@ -267,6 +272,9 @@ Assert-Contains "Jobs/Viper/Triggers/TriggerAction_Potion.cs" "QTHelper\.IsEnabl
 Assert-Contains "Jobs/Viper/Triggers/ViperHotkeyIds.cs" 'public const string Potion = "hk_爆发药";' "Viper potion hotkey id must target the registered Chinese UI hotkey"
 
 Assert-Contains "Jobs/Viper/Resolvers/GCD/ViperDreadwinderGcdResolver.cs" "CanUseDreadwinderGcd" "Viper Dreadwinder resolver must use the helper's fresh-start readiness policy"
+Assert-Contains "Jobs/Viper/Resolvers/GCD/ViperBaseGcdResolver.cs" "PushPositionalHint\(_spell\)" "Viper base GCD resolver must push positional VFX for flank/behind combo finishers"
+Assert-Contains "Jobs/Viper/Resolvers/GCD/ViperDreadwinderGcdResolver.cs" "PushPositionalHint\(_spell\)" "Viper Dreadwinder resolver must push positional VFX for Hunter/Swiftskin Coil"
+Assert-Contains "Jobs/Viper/Opener/ViperQuickOpener.cs" "PushPositionalHint\(spell\)" "Viper opener must push positional VFX for opener positional GCDs"
 
 foreach ($resolverPath in @(
     "Jobs/Viper/Resolvers/GCD/ViperReawakenGcdResolver.cs",
@@ -311,7 +319,9 @@ Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "VPRHelper" "Viper development 
 Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "Honed Steel" "Viper development docs must record the Helper-backed Honed status policy"
 Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "Dreadwinder" "Viper development docs must record the Dreadwinder action-change policy"
 Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "True North" "Viper development docs must record the True North decision window"
+Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "PositionalState.Push" "Viper development docs must record HiAuRo positional VFX usage"
 Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "HiAuRo.Helper" "Viper compliance docs must record Helper usage"
+Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "PositionalState.Push" "Viper compliance docs must record target-circle positional VFX usage"
 Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "SpellType.Ability" "Viper compliance docs must record the explicit ability marker rule"
 
 $viperHelperText = Read-File "Jobs/Viper/ViperSpellHelper.cs"
