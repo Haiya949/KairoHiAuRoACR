@@ -10,6 +10,10 @@ Black Mage code lives under `Jobs/BlackMage/`. Other jobs are read-only template
 
 - Follow `E:\ff14\HiAuRo\HiAuRo-master\doc\ACR_AUTHOR_GUIDE.md` first.
 - Use HiAuRo native `IRotationEntry`, `Rotation`, `IOpener`, `ISlotResolver`, `IAcrUiBuilder`, and `CountDownHandler`.
+- Runtime flow is now `Refresh -> UpdateCountDown -> AiLoop.Update`. Do not describe or depend on the deleted three-stage runtime or old opener peek/state model.
+- Countdown actions are registered through `CountDownHandler` and executed by `BattleData.AddSpell2NextSlot`, which fills `BattleData.NextSlot` before the normal loop.
+- Opener execution is owned by `OpenerMgr.UseOpener`, which pushes the active opener snapshot into `BattleData.CurrSequence`; BLM must keep the whole fixed 5+7 package inside `IOpener.Sequence`.
+- Manual BLM hotkeys and trigger requests must not use the old `SpellQueue` path. Use `SlotHelper.Execute()` so requests enter `HighPrioritySlots_GCD` / `HighPrioritySlots_OffGCD` in the AE-style `SlotExecutor` chain.
 - Use `HiAuRo.Helper` for BLM skill IDs, buff IDs, and gauge data. Current code uses `BLMHelper.EN.Skills`, `BLMHelper.EN.Buffs`, and BLM gauge shortcuts.
 - Do not keep local `BlackMageActionId` or `BlackMageStatusId` catalogs when Helper has the relevant values.
 

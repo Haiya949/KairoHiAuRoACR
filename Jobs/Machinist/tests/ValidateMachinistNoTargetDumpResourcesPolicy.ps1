@@ -88,10 +88,10 @@ Assert-BodyContains $dumpByHpBody @(
     "var target = GetCurrentTarget\(\)",
     "target is null \|\| target\.MaxHp <= 0",
     "return false",
-    "\(float\)target\.CurrentHp / target\.MaxHp <= DumpResourcesHpThreshold"
+    "\(float\)target\.CurrentHp / target\.MaxHp <= _settings\.DailyDumpResourcesHpThreshold"
 ) "Daily low-HP dump must require a live target before treating the target as nearly dead"
 
-Assert-BodyNotContains $dumpByHpBody "GetCurrentTargetHpPercent\(\) <= DumpResourcesHpThreshold" "Daily low-HP dump must not use the no-target HP helper because it returns 0 for missing targets"
+Assert-BodyNotContains $dumpByHpBody "GetCurrentTargetHpPercent\(\) <= _settings\.DailyDumpResourcesHpThreshold" "Daily low-HP dump must not use the no-target HP helper because it returns 0 for missing targets"
 
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "private static bool HasTarget\(\)" "MCH policy must keep a shared live-target helper"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "target\.CurrentHp > 0" "MCH live-target helper must reject dead or stale targets"

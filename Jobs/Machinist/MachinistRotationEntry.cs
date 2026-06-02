@@ -42,6 +42,11 @@ public sealed class MachinistRotationEntry : IRotationEntry, ISettingsProvider<M
                 new TriggerAction_Hotkey(),
                 new TriggerAction_Potion(),
             ],
+            TriggerConditions =
+            [
+                new TriggerCond_Heat(),
+                new TriggerCond_Battery(),
+            ],
             TargetResolvers = [targetResolver],
             AcrType = AcrType.PvE,
             MinLevel = 1,

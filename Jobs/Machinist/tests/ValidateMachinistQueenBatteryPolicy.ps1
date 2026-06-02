@@ -98,11 +98,11 @@ Assert-BodyContains $helper "public static Spell\? GetQueenOffGcd\(\)" @(
     "ShouldReleaseBatteryForTimeline\(\)",
     "ShouldHoldBatteryForTimeline\(\)",
     "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst\(\)",
-    "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget\(\)",
-    "var minWeaveMs = shouldSpendBatteryInFixed120Burst \? 0 : shouldSpendBatteryByBudget \? 650 : 800",
+    "var shouldSpendBatteryBySelectedStrategy = ShouldSpendBatteryBySelectedStrategy\(\)",
+    "var minWeaveMs = shouldSpendBatteryInFixed120Burst \? 0 : shouldSpendBatteryBySelectedStrategy \? 650 : 800",
     "ShouldHoldBatteryForFixed120Burst\(\)",
     "ShouldReserveFullMetalWildfireWeaves\(\)",
-    "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryInFixed120Burst \|\| shouldSpendBatteryByBudget \|\| CanUseBurstResource\(\)"
+    "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryInFixed120Burst \|\| shouldSpendBatteryBySelectedStrategy \|\| CanUseBatteryByBurstResourcePermission\(\)"
 ) "Queen summon must follow HiAuRo battery, burst, hold, dump, and weave-reserve policy"
 
 $queen = [regex]::Match(
@@ -115,12 +115,24 @@ if ($queen.Success) {
         "if (IsForbidBurstActive())",
         "if (ShouldReleaseBatteryForTimeline())",
         "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
-        "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();",
+        "var shouldSpendBatteryBySelectedStrategy = ShouldSpendBatteryBySelectedStrategy();",
         "if (ShouldHoldBatteryForTimeline())",
         "if (ShouldHoldBatteryForFixed120Burst())",
         "if (ShouldReserveFullMetalWildfireWeaves())"
     ) "Queen policy must respect ForbidBurst first, timeline release second, then fixed 120s/battery pressure before hold and Full Metal reserve"
 }
+
+Assert-BodyContains $helper "private static bool ShouldSpendBatteryBySelectedStrategy\(\)" @(
+    "ShouldUseBudgetBatteryStrategy\(\)",
+    "ShouldSpendBatteryByBudget\(\)",
+    "ShouldUseFullFirstBatteryStrategy\(\)",
+    "ShouldUseThresholdFirstBatteryStrategy\(\)"
+) "Selected battery strategy must preserve budget mode while adding daily strategy modes"
+
+Assert-BodyContains $helper "private static bool CanUseBatteryByBurstResourcePermission\(\)" @(
+    "ShouldUseBudgetBatteryStrategy\(\)",
+    "CanUseBurstResource\(\)"
+) "Generic Burst permission must not bypass non-budget battery strategies"
 
 Assert-BodyContains $helper "private static bool ShouldSpendBatteryByBudget\(\)" @(
     "GetBattery\(\) >= _settings\.BatteryOvercapSpendThreshold",

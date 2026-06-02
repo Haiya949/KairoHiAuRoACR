@@ -26,7 +26,7 @@ public sealed class TriggerAction_Hotkey : ITriggerAction
 
         var slot = new Slot();
         slot.Add(spell);
-        SlotHelper.Enqueue(slot);
+        SlotHelper.Execute(slot);
         return true;
     }
 

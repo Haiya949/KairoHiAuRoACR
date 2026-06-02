@@ -150,7 +150,7 @@ Assert-BodyContains $helper "public static Spell\? GetAoeGcd\(\)" @(
 Assert-BodyContains $helper "public static Spell\? GetQueenOffGcd\(\)" @(
     "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst\(\);",
     "shouldSpendBatteryInFixed120Burst \? 0 :",
-    "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryInFixed120Burst \|\| shouldSpendBatteryByBudget \|\| CanUseBurstResource\(\)"
+    "ShouldUseDumpResources\(\) \|\| IsForceBurstActive\(\) \|\| shouldSpendBatteryInFixed120Burst \|\| shouldSpendBatteryBySelectedStrategy \|\| CanUseBatteryByBurstResourcePermission\(\)"
 ) "Queen/Rook resolver must own the summon and may clip if needed before Chain Saw"
 
 Assert-InOrder "Jobs/Machinist/docs/DEVELOPMENT.md" @(

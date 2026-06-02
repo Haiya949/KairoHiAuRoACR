@@ -32,26 +32,29 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 必须按官方运行时全景图理解 ACR 执行顺序：
 
+当前基线：HiAuRo Runtime v0.1.92。该版本已改为 AE CalSlot 架构；不要再按旧三阶段栈模型理解执行顺序。
+
 ```text
 RuntimeCore.OnTick
 → ACRLifecycle.Update
-→ AIRunner.Update
-→ OnBattleUpdate
-→ 执行轴 / 事实轴 / 辅助轴
-→ Opener
-→ SpellQueue
-→ AILoop_Normal.GetNextSlot
-→ SlotResolvers
-→ SlotExecutor.Execute
+→ AIRunner.Refresh(state)
+→ AIRunner.UpdateCountDown()
+→ AiLoop.Update(runner)
+→ AIRunner.CalSlotAsync
+→ BattleData.NextSlot / CurrSlot / CurrSequence
+→ SlotExecutor.HandleSlotSequence 或 ResolveSlots(mode)
 ```
 
 因此：
 
-- 基础 Resolver 属于 `AILoop` 正常循环，是最后一层常规决策。
+- 基础 Resolver 属于 `AILoop` 正常循环，由 `CalSlotAsync` 在战斗门控后按 GCD / oGCD 窗口调用。
+- 倒计时动作由 `CountDownHandler.Update(battleData)` 通过 `BattleData.AddSpell2NextSlot(spell)` 进入 `BattleData.NextSlot`，职业侧只通过 `IOpener.InitCountDown` 注册动作。
+- 起手由 `OpenerMgr.UseOpener(battleData, rotation)` 推入 `BattleData.CurrSequence`，职业侧提供 `IOpener.Sequence` 和 `StartCheck()`，不要直接操作 Runtime `BattleData`。
+- 高优先级队列按 `BattleData.HighPrioritySlots_GCD` / `BattleData.HighPrioritySlots_OffGCD` 分流；普通 resolver 继续用 `SlotMode.Gcd` / `SlotMode.OffGcd` 表达窗口。
 - 副本时间线、强制技能、强制爆发、特定停手不要隐藏在基础 Resolver 里。
 - 需要时间线或事实轴配合的行为，应放到 HiAuRo 官方支持的执行轴、事实轴、触发器、QT、热键或事件回调中。
-- `OnBattleUpdate` 可以维护轻量状态，但不能替代 SlotResolver 的窗口控制。
-- Opener 和 SpellQueue 的优先级高于正常循环，职业逻辑必须能接受这一点。
+- `OnBattleUpdate` 可以维护轻量状态，但不能替代 SlotResolver 的窗口控制；Runtime 会在 `AIRunner.Refresh` 的战斗态阶段调用它。
+- `NextSlot`、`CurrSequence`、高优先级队列都可能先于正常循环出手，职业逻辑必须能接受这一点。
 
 ## 工程结构
 

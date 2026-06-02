@@ -26,9 +26,6 @@ public static class MachinistSpellHelper
     private const int ReassembleBurstSafetyMs = 3_000;
     private const int ReassembleExcavatorReserveMs = 8_000;
     private const int ReassemblePendingTargetExpireMs = 4_500;
-    private const float WeakTargetBurstHpThreshold = 0.12f;
-    private const float DumpResourcesHpThreshold = 0.03f;
-
     private static readonly uint[] StrongGcdPriority =
     [
         ActionId.Excavator,
@@ -481,8 +478,8 @@ public static class MachinistSpellHelper
             return CanWeave(650) ? BuildQueenSpell() : null;
 
         var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();
-        var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();
-        var minWeaveMs = shouldSpendBatteryInFixed120Burst ? 0 : shouldSpendBatteryByBudget ? 650 : 800;
+        var shouldSpendBatteryBySelectedStrategy = ShouldSpendBatteryBySelectedStrategy();
+        var minWeaveMs = shouldSpendBatteryInFixed120Burst ? 0 : shouldSpendBatteryBySelectedStrategy ? 650 : 800;
         if (!CanWeave(minWeaveMs))
             return null;
 
@@ -495,7 +492,10 @@ public static class MachinistSpellHelper
         if (ShouldReserveFullMetalWildfireWeaves())
             return null;
 
-        if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())
+        if (ShouldHoldQueenForWeakDailyTarget())
+            return null;
+
+        if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryBySelectedStrategy || CanUseBatteryByBurstResourcePermission())
             return BuildQueenSpell();
 
         return null;
@@ -792,7 +792,7 @@ public static class MachinistSpellHelper
 
     private static bool ShouldUseDailyTargetHpPolicy()
     {
-        return !_settings.IsHighEndMode;
+        return _settings.DailyMinionResourceGuardEnabled && !_settings.IsHighEndMode;
     }
 
     private static float GetCurrentTargetHpPercent()
@@ -813,7 +813,7 @@ public static class MachinistSpellHelper
         if (target is null || target.MaxHp <= 0)
             return false;
 
-        return (float)target.CurrentHp / target.MaxHp <= DumpResourcesHpThreshold;
+        return (float)target.CurrentHp / target.MaxHp <= _settings.DailyDumpResourcesHpThreshold;
     }
 
     private static bool ShouldHoldBurstForWeakTarget()
@@ -825,7 +825,19 @@ public static class MachinistSpellHelper
         if (target is null || target.IsBoss())
             return false;
 
-        return GetCurrentTargetHpPercent() <= WeakTargetBurstHpThreshold;
+        return GetCurrentTargetHpPercent() <= _settings.DailyWeakTargetBurstHpThreshold;
+    }
+
+    private static bool ShouldHoldQueenForWeakDailyTarget()
+    {
+        if (!ShouldUseDailyTargetHpPolicy())
+            return false;
+
+        var target = GetCurrentTarget();
+        if (target is null || target.IsBoss())
+            return false;
+
+        return GetCurrentTargetHpPercent() <= _settings.DailyQueenHpThreshold;
     }
 
     private static bool IsForceBurstActive()
@@ -1105,6 +1117,46 @@ public static class MachinistSpellHelper
         return MachinistResourcePlanner.ShouldSpendBatteryBeforeBurst(
             GetBattery(),
             GetTimeToNextTwoMinuteBurstAnchor());
+    }
+
+    private static bool ShouldUseBudgetBatteryStrategy()
+    {
+        return _settings.IsHighEndMode
+            || _settings.BatteryStrategy == MachinistSettings.BatteryStrategyBudgetFirst;
+    }
+
+    private static bool ShouldUseFullFirstBatteryStrategy()
+    {
+        return !_settings.IsHighEndMode
+            && _settings.BatteryStrategy == MachinistSettings.BatteryStrategyFullFirst;
+    }
+
+    private static bool ShouldUseThresholdFirstBatteryStrategy()
+    {
+        return !_settings.IsHighEndMode
+            && _settings.BatteryStrategy == MachinistSettings.BatteryStrategyThresholdFirst;
+    }
+
+    private static bool ShouldSpendBatteryBySelectedStrategy()
+    {
+        if (ShouldUseBudgetBatteryStrategy())
+            return ShouldSpendBatteryByBudget();
+
+        if (ShouldUseFullFirstBatteryStrategy())
+            return GetBattery() >= _settings.BatteryOvercapSpendThreshold
+                || ShouldSpendBatteryByBudget();
+
+        if (ShouldUseThresholdFirstBatteryStrategy())
+            return GetBattery() >= _settings.BatteryThresholdStrategySpendThreshold
+                || ShouldSpendBatteryByBudget();
+
+        return false;
+    }
+
+    private static bool CanUseBatteryByBurstResourcePermission()
+    {
+        return ShouldUseBudgetBatteryStrategy()
+            && CanUseBurstResource();
     }
 
     private static bool ShouldHoldBatteryForFixed120Burst()

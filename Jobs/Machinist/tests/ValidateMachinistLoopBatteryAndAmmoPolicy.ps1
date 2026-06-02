@@ -96,11 +96,11 @@ Assert-NotContains $helper "_lastLoopAirAnchorAnchorMs|TrackLoopBurstToolAction|
 $queenBody = Get-Body $helper "public static Spell\? GetQueenOffGcd\(\)" "Queen/Rook battery policy"
 Assert-Order $queenBody @(
     "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
-    "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();",
+    "var shouldSpendBatteryBySelectedStrategy = ShouldSpendBatteryBySelectedStrategy();",
     "if (ShouldHoldBatteryForTimeline())",
     "if (ShouldHoldBatteryForFixed120Burst())",
     "if (ShouldReserveFullMetalWildfireWeaves())",
-    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())"
+    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryBySelectedStrategy || CanUseBatteryByBurstResourcePermission())"
 ) "Queen/Rook policy must use fixed-120 Drill-before-Chain-Saw release plus budget/overcap/resource gates without hidden package state"
 
 Assert-Contains $docs "Checkmate / Double Check.*Charges >= 2" "Development docs must record the natural Checkmate/Double Check release"

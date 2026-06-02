@@ -1,14 +1,14 @@
 using OmenTools.Interop.Game.Lumina;
 
-namespace KairoHiAuRoACR.Jobs.Viper;
+namespace KairoHiAuRoACR.Jobs.BlackMage.Triggers;
 
-public sealed class ViperSpellHotkeyResolver : IHotkeyResolver
+public sealed class BlackMageSpellHotkeyResolver : IHotkeyResolver
 {
     private readonly uint _actionId;
     private readonly SpellTargetType _targetType;
     private readonly SpellCategory _category;
 
-    public ViperSpellHotkeyResolver(
+    public BlackMageSpellHotkeyResolver(
         string id,
         string label,
         uint actionId,
@@ -53,6 +53,27 @@ public sealed class ViperSpellHotkeyResolver : IHotkeyResolver
             SpellCategory = _category,
             Type = SpellType.Ability,
         });
-        SlotHelper.Enqueue(slot);
+        SlotHelper.Execute(slot);
+    }
+}
+
+public sealed class BlackMagePotionHotkeyResolver : IHotkeyResolver
+{
+    public string Id => BlackMageHotkeyIds.Potion;
+    public string Label => "爆发药";
+    public string DefaultKey => string.Empty;
+    public uint IconId => LuminaWrapper.GetItemIconID(ItemHelper.GetCurrJobPotionItemId());
+
+    public int Check()
+    {
+        return ItemHelper.CheckCurrJobPotion() ? 0 : -1;
+    }
+
+    public void Execute()
+    {
+        if (!ItemHelper.CheckCurrJobPotion())
+            return;
+
+        _ = ItemHelper.ForceUsePotion(ItemHelper.GetCurrJobPotionItemId());
     }
 }

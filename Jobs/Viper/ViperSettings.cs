@@ -12,6 +12,8 @@ public sealed class ViperSettings : AcrSettings
     public int BurstWindowLeadMs { get; set; } = 2_500;
     public int BurstWindowTailMs { get; set; } = 17_500;
     public int ReawakenPreBurstHoldMs { get; set; } = 30_000;
+    public int SerpentsIreResourceForecastLookaheadMs { get; set; } = 30_000;
+    public int SerpentsIreResourceForecastSafetyMs { get; set; } = 600;
     public int BuffRefreshThresholdMs { get; set; } = 8_000;
     public int ReawakenBuffCoverageMs { get; set; } = 18_000;
     public int RattlingCoilOvercapStacks { get; set; } = 3;

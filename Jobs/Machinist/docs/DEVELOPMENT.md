@@ -5,13 +5,15 @@
 ## 机工起手实现
 
 - `IOpener.InitCountDown` 保留为官方倒计时入口，只注册 4s prepull Reassemble。
-- HiAuRo Runtime v0.1.83 在倒计时开始事件中 `CountDownHandler.Reset()`、`OpenerMgr.Reset()`，随后懒注册 `InitCountDown`；倒计时结束后由 Runtime 自动启动 `OpenerMgr`。
-- 多 GCD 起手写进 `IOpener.Sequence`，由 Runtime `OpenerMgr` 启动并逐个 Slot 推进；机工使用 dynamic Sequence snapshot，`StartCheck` 按当前等级和时间轴变量生成本轮起手，执行中使用 same Sequence snapshot，不再重建，避免 Runtime 每步读取 `Sequence` 时发生步骤漂移。
-- 每个起手 Slot 以 GCD 开头，后接该 GCD 后的固定 oGCD；Runtime v0.1.83 会按 ActionCategory/recast group 自动判断能力技，ACR 仍保留 `SpellType.Ability` 标记用于兼容事件记录。
+- HiAuRo Runtime 现在每帧按 `ACRLifecycle.Update(): Refresh -> UpdateCountDown -> AiLoop.Update(runner)` 推进；`AiLoop.Update` 进入 `AIRunner.CalSlotAsync`，由 `BattleData.NextSlot`、`CurrSlot`、`CurrSequence` 和 `SlotExecutor.ResolveSlots(mode)` 决定本帧只处理一个 slot。
+- 倒计时动作通过 `CountDownHandler.Update(battleData)` 到点后调用 `BattleData.AddSpell2NextSlot(spell)` 进入 `BattleData.NextSlot`；MCH 只在 `InitCountDown` 注册 4s Reassemble，不直接读倒计时 IPC，也不直接操作 `BattleData`。
+- 多 GCD 起手写进 `IOpener.Sequence`，由 Runtime `OpenerMgr.UseOpener(battleData, rotation)` 推入 `BattleData.CurrSequence` 后逐个 Slot 推进；机工使用 dynamic Sequence snapshot，`StartCheck` 按当前等级和时间轴变量生成本轮起手，执行中使用 same Sequence snapshot，不再重建，避免 Runtime 每步读取 `Sequence` 时发生步骤漂移。
+- 每个起手 Slot 以 GCD 开头，后接该 GCD 后的固定 oGCD；Runtime `SlotExecutor` 按 GCD/oGCD mode 分流，ACR 仍保留 `SpellType.Ability` 标记用于事件记录；4s prepull Reassemble 使用动态 `CountDownHandler.AddAction` 显式创建 Ability。
 - 标准起手保存弹药顺序：G5 `Drill` -> `Checkmate` -> `Wildfire`，G6 `Full Metal Field` -> `Double Check` -> `Hypercharge`。
 - standard loop opener ammo rule: G1 `Drill` consumes prepull `Reassemble` and may spend one `Double Check` plus one `Checkmate`; G2 `Air Anchor` and G3 `Chain Saw` must not spend the saved second `Double Check` / `Checkmate` charges.
 - G5 first weave spends saved `Checkmate`, then `Wildfire` takes the second weave；G6 first weave spends saved `Double Check`, then `Hypercharge` takes the second weave。
 - Low-level opener rule: `IOpener.Sequence` 在初始化时 skip locked opener steps；低等级不能生成空 Slot，must not wait forever。第二个 `Drill` 是后段爆发步骤，second Drill only exists after Air Anchor, Chain Saw, and Excavator，避免 58-95 级在前置步骤被跳过后重复尝试 Drill。
+- Low-level opener matrix: 58-75 只生成 Drill 起手入口；76-89 生成 Drill / Air Anchor 两步并跳过后段爆发；90-95 加入 Chain Saw 但仍不生成 second Drill；96-99 加入 Excavator、Rook/Queen 和 second Reassemble 后才允许 second Drill；100 加入 Full Metal Field、Double Check 和 Hypercharge。该矩阵 must not generate empty Slot，second Drill 仅在 96+ 且 Air Anchor、Chain Saw、Excavator 都可用后出现。
 - ACR 生产逻辑不直接读取倒计时 IPC，也不在职业侧重注册或排队倒计时技能；倒计时恢复交给 Runtime。
 - 特殊轴可在起手前打开 `mch_opener_air_anchor_first`，必须在 before OpenerMgr starts 的时间点生效；由 `MachinistOpener` 在 `StartCheck` 的 `IOpener.Sequence` 快照内把前两个 GCD 调整为 Air Anchor -> Drill；普通起手仍是 Drill -> Air Anchor。
 
@@ -40,10 +42,11 @@
 - opener Wildfire must not shift fixed 120s anchor：起手野火只记录 Wildfire package 历史，不改变 120s 循环爆发锚点；只有时间线 `ReleaseDelayedBurstPackage` 这种显式延后爆发动作才允许 `ReanchorBurstCycleToCurrentTime()` 重锚后续 120s 周期。
 - 电量预算按机工循环工具和连击总收益：Air Anchor / Chain Saw / Excavator 共 7 * 20 = 140 Battery，27/3=9 个 Clean Shot 给 90 Battery，合计 230 Battery，用于判断是否在下个两分钟爆发前提前释放 Queen，避免只靠 90 电量阈值。
 - Battery hold priority: `mch_hold_all_burst` 是延后爆发用的总 hold，90+ 电量或预算防溢出可以绕过它；`mch_hold_battery` 是显式单项电量 hold，不被防溢出绕过；`mch_dump_battery`/release 仍然优先释放。
+- Battery strategy modes: `BatteryStrategyBudgetFirst` / 预算优先是默认策略，沿用当前 120s 预算器和防溢出判断；high-end mode / 高难 always forces budget-first / 预算优先，不允许日随策略回退或绕过高难预算。`BatteryStrategyFullFirst` / 满电优先和 `BatteryStrategyThresholdFirst` / 阈值优先只在日随侧调整普通 Queen/Rook 释放解释性；显式时间线释放、ForceBurst、ForbidBurst、固定 120s burst release、timeline hold 和 Full Metal/Wildfire weave reserve 的优先级不变。
 - ForbidBurst/`保留爆发` 是最高优先级爆发资源硬门控：阻止 Wildfire、Barrel Stabilizer、Hypercharge、Queen/Rook summon 和 Queen/Rook Overdrive；显式 timeline dump/release 不绕过它。
 - Queen/Rook Overdrive dump policy: 已召出的机器人只在 `ShouldReleaseBatteryForTimeline` 或 `ShouldUseDumpResources` 明确释放资源时主动超档；普通循环不提前终结机器人；ForbidBurst/`保留爆发` 会阻止 Queen/Rook Overdrive，低等级继续用 `RookOverdrive`，80 级后用 `QueenOverdrive`。
 - Hypercharge tool guard: Chain Saw and Air Anchor cooldown integrity 高于普通热量倾泻；在非野火爆发包、非显式热量释放时，Hypercharge must not start if Chain Saw or Air Anchor is inside the exact 8s cooldown guard, and current heat does not override this guard. Barrel Stabilizer 在 Dawntrail 提供 Hypercharged 和 Full Metal Machinist，不按 50 Heat 处理。
-- Daily target HP policy 只在 `日随模式` 生效：非 Boss 目标低于 12% HP 时保留计划爆发，目标低于 3% HP 时自动视为泄资源；自动泄资源 requires a live target，无目标不能被当成 0% HP；该策略 disabled in high-end mode，高难资源控制仍由 Burst/Hold QT、显式触发器或时间线变量负责。
+- Daily target HP policy settings 只在 `日随模式` 生效：非 Boss 目标低于 `DailyWeakTargetBurstHpThreshold`（默认 12%）时保留计划爆发，目标低于 `DailyDumpResourcesHpThreshold`（默认 3%）时自动视为泄资源，机器人对非 Boss 弱目标受 `DailyQueenHpThreshold`（默认 75%）保护；自动泄资源 requires a live target，无目标不能被当成 0% HP；该策略 disabled in high-end mode，高难资源控制仍由 Burst/Hold QT、显式触发器或时间线变量负责。
 - AOE target policy: AOE GCDs use HiAuRo `TargetHelper.GetMostCanTargetObjects` to pick the best AOE center for Auto Crossbow, Bioblaster, Scattergun/Spread Shot; this does not replace Runtime target selection, and Runtime `TargetResolvers` still owns normal current-target selection.
 - Low-level Hot Shot fallback: 76 级前没有 Air Anchor 时，强 GCD fallback 使用 Helper 的 `ActionId.HotShot`，保持 `MinLevel = 1` 的低等级可运行边界。
 - xivanalysis Helper catalog parity: 机工实际会用到的 `PileBunker`、`ArmPunch`、`RollerDash`、`CrownedCollider` 以及 `Tactician`、`Hypercharged`、`ExcavatorReady`、`FullMetalMachinist` 必须保留在 `HiAuRo.Helper.MCHHelper`；职业代码需要这些 ID 时继续从 Helper 取。

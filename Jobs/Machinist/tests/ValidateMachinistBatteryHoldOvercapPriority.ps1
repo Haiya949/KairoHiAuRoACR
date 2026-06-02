@@ -77,11 +77,11 @@ Assert-Order $queenBody @(
     "if (IsForbidBurstActive())",
     "if (ShouldReleaseBatteryForTimeline())",
     "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
-    "var shouldSpendBatteryByBudget = ShouldSpendBatteryByBudget();",
+    "var shouldSpendBatteryBySelectedStrategy = ShouldSpendBatteryBySelectedStrategy();",
     "if (ShouldHoldBatteryForTimeline())",
     "if (ShouldHoldBatteryForFixed120Burst())",
     "if (ShouldReserveFullMetalWildfireWeaves())",
-    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())"
+    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryBySelectedStrategy || CanUseBatteryByBurstResourcePermission())"
 ) "Queen policy must keep ForbidBurst first, release second, then compute fixed-120/overcap pressure before timeline hold"
 
 foreach ($pattern in @(

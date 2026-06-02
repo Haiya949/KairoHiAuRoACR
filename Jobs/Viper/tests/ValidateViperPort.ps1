@@ -254,6 +254,15 @@ Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldHoldReawakenByTimeline" 
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldHoldDreadwinderByTimeline" "Viper must preserve Dreadwinder timeline variable gates"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldHoldRattlingCoilByTimeline" "Viper must preserve Rattling Coil timeline variable gates"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldDumpRattlingCoilByTimeline" "Viper must preserve Rattling Coil dump timeline variable gates"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetPredictedNextGcd" "Viper helper must expose a diagnostic next-GCD prediction for timeline and positional validation"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "GetSerpentsIreForecastOfferingGain" "Viper helper must forecast Serpents Ire resource gain using Helper-backed gauge, combo, and cooldown data"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldHoldReawakenForSerpentsIreForecast" "Viper Reawaken policy must hold for high-end Serpents Ire resource forecasts"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldHoldDreadwinderForSerpentsIreForecast" "Viper Dreadwinder policy must preserve a charge for high-end Serpents Ire alignment"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "ShouldSpendRattlingCoilForSerpentsIreForecast" "Viper Rattling Coil policy must spend when it helps refill offering for an upcoming Serpents Ire package"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "HelperRuntime\.GetCooldownRemaining\(ActionId\.SerpentsIre\)" "Viper Serpents Ire forecast must read cooldown through HiAuRo.Helper runtime"
+Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "HelperRuntime\.GetCooldownRemaining\(ActionId\.Vicewinder\)" "Viper forecast must read Dreadwinder cooldown through HiAuRo.Helper runtime"
+Assert-Contains "Jobs/Viper/ViperSettings.cs" "SerpentsIreResourceForecastLookaheadMs" "Viper settings must expose the high-end Serpents Ire forecast lookahead"
+Assert-Contains "Jobs/Viper/ViperSettings.cs" "SerpentsIreResourceForecastSafetyMs" "Viper settings must expose the high-end Serpents Ire forecast safety buffer"
 
 Assert-Contains "Jobs/Viper/Timeline/ViperTimelineVariable.cs" 'viper_force_burst' "Viper timeline variables must keep force burst key"
 Assert-Contains "Jobs/Viper/Timeline/ViperTimelineVariable.cs" 'viper_forbid_burst' "Viper timeline variables must keep forbid burst key"
@@ -292,7 +301,7 @@ foreach ($resolverPath in @(
 
 Assert-Contains "Jobs/Viper/Opener/ViperQuickOpener.cs" "class\s+ViperQuickOpener\s*:\s*IOpener" "Viper quick opener must use HiAuRo IOpener"
 Assert-Contains "Jobs/Viper/Opener/ViperQuickOpener.cs" "handler\.AddAction\(100,\s*ActionId\.Slither,\s*SpellTargetType\.Target\)" "Viper quick opener must preserve 0.1s countdown Slither through HiAuRo CountDownHandler"
-Assert-Contains "Jobs/Viper/Opener/ViperQuickOpener.cs" "public\s+List<Action<Slot>>\s+Sequence\s*=>\s*_activeSequence\s*\?\?=\s*BuildSequence\(\)" "Viper quick opener must snapshot Sequence before Runtime indexed execution"
+Assert-Contains "Jobs/Viper/Opener/ViperQuickOpener.cs" "public\s+List<Action<Slot>>\s+Sequence\s*=>\s*_activeSequence\s*\?\?=\s*BuildSequence\(\)" "Viper quick opener must snapshot Sequence before OpenerMgr pushes it into BattleData.CurrSequence"
 Assert-InOrder "Jobs/Viper/Opener/ViperQuickOpener.cs" @(
     "ActionId.ReavingFangs",
     "ActionId.SwiftskinsSting",
@@ -309,6 +318,10 @@ Assert-NotContains "Jobs/Viper/ViperSpellHelper.cs" "HasStatus\((3672|3772|3667|
 Assert-NotContains "Jobs/Viper/Opener/ViperQuickOpener.cs" "AEAssist|Core\.|SettingMgr|Kairo\.Viper" "Viper opener must not leak old AEAssist APIs"
 Assert-NotContains "Jobs/Viper/Triggers/TriggerAction_Hotkey.cs" "AEAssist|JobViewWindow|ViperRotationEntry\.QT|GetHotkeyArray|SetHotkey" "Viper hotkey trigger must use HiAuRo hotkey APIs"
 Assert-NotContains "Jobs/Viper/Triggers/TriggerAction_Potion.cs" "QTKey\.UsePotion|ViperRotationEntry\.QT" "Viper potion trigger must use built-in Potion and timeline request, not old custom UsePotion QT"
+Assert-NotContains "Jobs/Viper/Triggers/ViperSpellHotkeyResolver.cs" "ACRLifecycle\.Runner\.SpellQueue" "Viper hotkey resolver must enqueue through SlotHelper for the AE-style runner compatibility layer"
+Assert-NotContains "Jobs/Viper/Triggers/ViperPotionHotkeyResolver.cs" "ACRLifecycle\.Runner\.SpellQueue" "Viper potion hotkey resolver must enqueue through SlotHelper for the AE-style runner compatibility layer"
+Assert-Contains "Jobs/Viper/Triggers/ViperSpellHotkeyResolver.cs" "SlotHelper\.Enqueue\(slot\)" "Viper hotkey resolver must use the framework SlotHelper enqueue API"
+Assert-Contains "Jobs/Viper/Triggers/ViperPotionHotkeyResolver.cs" "SlotHelper\.Enqueue\(slot\)" "Viper potion hotkey resolver must use the framework SlotHelper enqueue API"
 Assert-Contains "Jobs/Viper/ViperSpellHelper.cs" "SpellType\.Ability" "Viper ability spells must be explicitly marked as Ability"
 Assert-Contains "Jobs/Viper/Opener/ViperQuickOpener.cs" "SpellType\.Ability" "Viper opener oGCD spells must be explicitly marked as Ability"
 Assert-Contains "Jobs/Viper/Triggers/ViperSpellHotkeyResolver.cs" "SpellType\.Ability" "Viper hotkey spells must be explicitly marked as Ability"
@@ -320,9 +333,15 @@ Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "Honed Steel" "Viper developmen
 Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "Dreadwinder" "Viper development docs must record the Dreadwinder action-change policy"
 Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "True North" "Viper development docs must record the True North decision window"
 Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "PositionalState.Push" "Viper development docs must record HiAuRo positional VFX usage"
+Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "BattleData\.CurrSequence" "Viper development docs must record the new OpenerMgr BattleData.CurrSequence execution chain"
+Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "BattleData\.NextSlot" "Viper development docs must record countdown actions entering BattleData.NextSlot"
+Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "SlotExecutor" "Viper development docs must record the AE-style SlotExecutor runtime"
+Assert-Contains "Jobs/Viper/docs/DEVELOPMENT.md" "SpellActionTracker" "Viper development docs must record server-confirmed spell tracking in the new execution chain"
 Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "HiAuRo.Helper" "Viper compliance docs must record Helper usage"
 Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "PositionalState.Push" "Viper compliance docs must record target-circle positional VFX usage"
 Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "SpellType.Ability" "Viper compliance docs must record the explicit ability marker rule"
+Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "BattleData\.CurrSequence" "Viper compliance docs must record opener sequencing through BattleData.CurrSequence"
+Assert-Contains "Jobs/Viper/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "BattleData\.NextSlot" "Viper compliance docs must record countdown slots through BattleData.NextSlot"
 
 $viperHelperText = Read-File "Jobs/Viper/ViperSpellHelper.cs"
 $followUpBody = Get-MethodBlock $viperHelperText "public static Spell? GetFollowUpOffGcd()"
@@ -339,6 +358,23 @@ if ($followUpBody -notmatch "ShouldUseSerpentsIre\(\)[\s\S]+return\s+null") {
 $rattlingCoilBody = Get-MethodBlock $viperHelperText "public static Spell? GetRattlingCoilGcd()"
 if ($rattlingCoilBody -notmatch "IsTargetOutsideMelee\(\)[\s\S]+return\s+null") {
     $failures.Add("Viper GetRattlingCoilGcd must hold outside melee range so ranged fallback can cover movement (Jobs/Viper/ViperSpellHelper.cs)")
+}
+
+$rattlingCoilPolicyBody = Get-MethodBlock $viperHelperText "public static bool ShouldUseRattlingCoil()"
+$rattlingForecastIndex = $rattlingCoilPolicyBody.IndexOf("ShouldSpendRattlingCoilForSerpentsIreForecast()", [System.StringComparison]::Ordinal)
+$serpentsHoldIndex = $rattlingCoilPolicyBody.IndexOf("ShouldHoldNewResourceForSerpentsIre()", [System.StringComparison]::Ordinal)
+if ($rattlingForecastIndex -lt 0 -or $serpentsHoldIndex -lt 0 -or $rattlingForecastIndex -gt $serpentsHoldIndex) {
+    $failures.Add("Viper Rattling Coil forecast spend must be checked before the generic Serpents Ire resource hold (Jobs/Viper/ViperSpellHelper.cs)")
+}
+
+$reawakenSerpentsBody = Get-MethodBlock $viperHelperText "public static bool ShouldHoldReawakenForSerpentsIre()"
+if ($reawakenSerpentsBody -notmatch "ShouldHoldReawakenForSerpentsIreForecast\(\)") {
+    $failures.Add("Viper Reawaken Serpents Ire hold must include the high-end resource forecast (Jobs/Viper/ViperSpellHelper.cs)")
+}
+
+$newResourceHoldBody = Get-MethodBlock $viperHelperText "public static bool ShouldHoldNewResourceForSerpentsIre()"
+if ($newResourceHoldBody -notmatch "ShouldHoldDreadwinderForSerpentsIreForecast\(\)") {
+    $failures.Add("Viper generic Serpents Ire resource hold must include the high-end Dreadwinder forecast (Jobs/Viper/ViperSpellHelper.cs)")
 }
 
 $potionTriggerText = Read-File "Jobs/Viper/Triggers/TriggerAction_Potion.cs"

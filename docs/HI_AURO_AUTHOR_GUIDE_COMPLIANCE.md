@@ -31,6 +31,8 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 
 必须按官方运行时顺序设计：
 
+当前基线：HiAuRo Runtime v0.1.92。该版本使用 AE CalSlot 执行链；顶层合规检查不再按旧三阶段栈模型审查。
+
 ```text
 游戏每帧
 → RuntimeCore.OnTick
@@ -38,28 +40,25 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 → Coroutine / EventSystem / HotkeyPoller
 → ACRLifecycle.Update
 → 职业切换加载或卸载 ACR
-→ AIRunner.Update
-→ 刷新 Data.Objects / Data.Party
-→ TargetResolvers
-→ OnBattleUpdate
-→ 执行轴 / 事实轴 / 辅助轴
-→ Opener
-→ SpellQueue
-→ AILoop_Normal.GetNextSlot
-→ 遍历 SlotResolvers
-→ Check >= 0
-→ SlotMode 窗口匹配
-→ Build(slot)
-→ SlotExecutor.Execute(slot)
-→ BeforeSpell / UseAction / OnSpellCastSuccess / AfterSpell
+→ AIRunner.Refresh(state)
+→ 刷新 Data.Objects / TargetResolvers
+→ 战斗态刷新 Data.Party / OnBattleUpdate
+→ AIRunner.UpdateCountDown()
+→ AiLoop.Update(runner)
+→ AIRunner.CalSlotAsync
+→ BattleData.NextSlot / CurrSlot / CurrSequence
+→ SlotExecutor.HandleSlotSequence 或 ResolveSlots(mode)
 ```
 
 设计含义：
 
 - `SlotResolvers` 是正常循环，不是最高优先级。
-- 执行轴、事实轴、辅助轴、Opener、SpellQueue 都可能先于正常循环出手。
+- `BattleData.NextSlot`、`CurrSlot`、`CurrSequence` 和高优先级队列都可能先于正常循环出手。
+- 倒计时动作由 `CountDownHandler.Update(battleData)` 通过 `BattleData.AddSpell2NextSlot(spell)` 写入 `NextSlot`。
+- `OpenerMgr.UseOpener(battleData, rotation)` 把 `IOpener` 推入 `BattleData.CurrSequence`，职业侧只提供公开 `IOpener` 合同。
+- `SlotExecutor.ResolveSlots(mode)` 按 `SlotMode.Gcd` / `SlotMode.OffGcd` 分流，`BattleData.HighPrioritySlots_GCD` 和 `BattleData.HighPrioritySlots_OffGCD` 也按窗口拆队列。
 - Resolver 不能假设自己每帧通过 `Check()` 后一定会立即 `Build()`。
-- `Build()` 只在 `Check()` 通过且 SlotMode 窗口匹配时调用。
+- `Build()` 只在 `CalSlotAsync` 的战斗门控通过、SlotMode 窗口匹配且本帧轮到 `ResolveSlots(mode)` 时调用。
 - 技能成功后的状态可能有服务器延迟，不要用“刚打出技能就立刻拥有状态”的假设写关键逻辑。
 
 ## 3. 决策优先级
@@ -67,12 +66,10 @@ https://github.com/denghaoxuan991876906/HiAuRo/blob/master/doc/ACR_AUTHOR_GUIDE.
 必须遵守官方优先级：
 
 ```text
-1. 高优先级强制技能
-2. 事实轴决策
-3. 辅助轴强制技能
-4. Opener 起手序列
-5. SpellQueue 待处理队列
-6. AILoop 正常循环
+1. BattleData.NextSlot / 当前 CurrSlot
+2. BattleData.CurrSequence 起手或嵌套序列
+3. BattleData.HighPrioritySlots_GCD / HighPrioritySlots_OffGCD
+4. SlotResolvers 正常循环，按 GCD/oGCD mode 分流
 ```
 
 因此：

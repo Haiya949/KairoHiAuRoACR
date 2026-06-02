@@ -163,6 +163,7 @@ $requiredFiles = @(
     "Jobs/BlackMage/BlackMageTargetResolver.cs",
     "Jobs/BlackMage/QTKey.cs",
     "Jobs/BlackMage/Triggers/BlackMageHotkeyIds.cs",
+    "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs",
     "Jobs/BlackMage/Triggers/TriggerAction_Hotkey.cs",
     "Jobs/BlackMage/Triggers/TriggerAction_Potion.cs",
     "Jobs/BlackMage/Opener/BlackMageOpener.cs",
@@ -256,7 +257,9 @@ Assert-FileNotExists "Jobs/BlackMage/Opener/BlackMageOpenerController.cs" "BLM m
 Assert-Contains "Jobs/BlackMage/BlackMageRotationUi.cs" 'AddBuiltinQt\(BuiltinQt\.Burst,\s*true\)' "BLM UI must expose Burst"
 Assert-Contains "Jobs/BlackMage/BlackMageRotationUi.cs" 'AddBuiltinQt\(BuiltinQt\.Hold,\s*false\)' "BLM UI must expose Hold"
 Assert-Contains "Jobs/BlackMage/BlackMageRotationUi.cs" 'AddTab\("[^"]*\p{IsCJKUnifiedIdeographs}[^"]*"\)' "BLM UI tab must be Chinese"
-Assert-Contains "Jobs/BlackMage/BlackMageRotationUi.cs" 'AddQtHotkey\("[^"]*\p{IsCJKUnifiedIdeographs}[^"]*",\s*new\s+HotkeyResolver_Potion\(\)\)' "BLM potion must be a Chinese-labeled UI hotkey"
+Assert-Contains "Jobs/BlackMage/BlackMageRotationUi.cs" 'AddQtHotkey\("[^"]*\p{IsCJKUnifiedIdeographs}[^"]*",\s*new\s+BlackMagePotionHotkeyResolver\(\)\)' "BLM potion must be a Chinese-labeled UI hotkey on the new Runtime queue"
+Assert-Contains "Jobs/BlackMage/BlackMageRotationUi.cs" 'new\s+BlackMageSpellHotkeyResolver\(' "BLM normal UI hotkeys must use the BLM Runtime high-priority resolver"
+Assert-NotContains "Jobs/BlackMage/BlackMageRotationUi.cs" 'HotkeyResolver_Potion|HotkeyResolver_Sprint|HotkeyResolver_LB|HotkeyResolver_NormalSpell' "BLM UI hotkeys must not use old framework resolvers that enqueue SpellQueue"
 Assert-NotContains "Jobs/BlackMage/BlackMageRotationUi.cs" 'TargetSelectionOptions|_settings\.TargetSelection|目标选择|手动目标|最近敌人' "BLM UI must not expose target selection controls after Runtime owns target selection"
 Assert-NotContains "Jobs/BlackMage/BlackMageRotationUi.cs" 'UsePotion|QTKey\.Potion|QTKey\.UsePotion|AddQtToggle\([^\n]*Potion|AddQtToggle\([^\n]*UsePotion' "BLM potion must not be exposed as a persistent QT"
 Assert-NotContains "Jobs/BlackMage/BlackMageRotationUi.cs" 'KairoHiAuRoACR\.Jobs\.BlackMage\.Data|BlackMageActionId|BlackMageStatusId' "BLM UI must use HiAuRo.Helper IDs instead of local ID catalogs"
@@ -289,9 +292,15 @@ Assert-InOrder "Jobs/BlackMage/Triggers/TriggerAction_Hotkey.cs" @(
     "HotkeyHelper.ExecuteById(BlackMageHotkeyIds.Potion);",
     "return true;",
     "var spell = CreateSpell(Key);",
-    "SlotHelper.Enqueue(slot);"
-) "BLM generic hotkey trigger must handle Potion through HotkeyHelper before non-potion Slot enqueue"
-Assert-NotContains "Jobs/BlackMage/Triggers/TriggerAction_Hotkey.cs" 'QTKey\.UsePotion|UsePotion' "BLM generic hotkey trigger must not restore the old potion QT gate"
+    "SlotHelper.Execute(slot);"
+) "BLM generic hotkey trigger must handle Potion through HotkeyHelper before non-potion high-priority execution"
+Assert-NotContains "Jobs/BlackMage/Triggers/TriggerAction_Hotkey.cs" 'SlotHelper\.Enqueue|QTKey\.UsePotion|UsePotion' "BLM generic hotkey trigger must not restore the old SpellQueue or potion QT gate"
+Assert-Contains "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs" 'class\s+BlackMageSpellHotkeyResolver\s*:\s*IHotkeyResolver' "BLM must own a normal hotkey resolver for the new AE-style execution chain"
+Assert-Contains "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs" 'class\s+BlackMagePotionHotkeyResolver\s*:\s*IHotkeyResolver' "BLM must own a potion hotkey resolver for item use instead of old SpellQueue"
+Assert-Contains "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs" 'SlotHelper\.Execute\(slot\)' "BLM hotkey resolver must push manual skills into BattleData high-priority queues"
+Assert-Contains "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs" 'ItemHelper\.ForceUsePotion\(ItemHelper\.GetCurrJobPotionItemId\(\)\)' "BLM potion resolver must use the HiAuRo item helper rather than wrapping potion as an Action spell"
+Assert-Contains "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs" 'SpellHelper\.CanUseSpell\(_actionId\)' "BLM normal hotkey resolver must preserve readiness checks"
+Assert-NotContains "Jobs/BlackMage/Triggers/BlackMageHotkeyResolvers.cs" 'SpellQueue|SlotHelper\.Enqueue|ACRLifecycle\.Runner\.SpellQueue' "BLM hotkey resolvers must not enqueue the old SpellQueue"
 
 Assert-Contains "Jobs/BlackMage/BlackMageSettings.cs" 'FirstBurstAnchorMs\s*=\s*7_000' "BLM settings must keep the old high-end 3G burst anchor"
 Assert-Contains "Jobs/BlackMage/BlackMageSettings.cs" 'ThunderRefreshMs\s*=\s*3_000' "BLM settings must keep Thunder refresh timing"
@@ -1111,6 +1120,11 @@ Assert-NotContains $helperPath 'KairoHiAuRoACR\.Jobs\.BlackMage\.Data|BlackMageA
 Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" 'HiAuRo\.Helper' "BLM job-owned docs must record the Helper ID source"
 Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" '不迁移时间轴|不要迁移时间轴|时间轴变量' "BLM job-owned docs must record the timeline boundary"
 Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" '70/80/90/100|70.*80.*90.*100' "BLM job-owned docs must record the supported high-difficulty level profiles"
+Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" 'Refresh\s*->\s*UpdateCountDown\s*->\s*AiLoop\.Update|Refresh\s*→\s*UpdateCountDown\s*→\s*AiLoop\.Update' "BLM job-owned docs must record the updated ACRLifecycle runtime order"
+Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" 'BattleData\.CurrSequence' "BLM job-owned docs must record the new opener sequence destination"
+Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" 'AddSpell2NextSlot' "BLM job-owned docs must record the countdown NextSlot enqueue path"
+Assert-Contains "Jobs/BlackMage/docs/DEVELOPMENT.md" 'SlotHelper\.Execute\(\)|HighPrioritySlots_GCD|HighPrioritySlots_OffGCD' "BLM job-owned docs must record that manual hotkeys use the new high-priority queues"
+Assert-NotContains "Jobs/BlackMage/docs/DEVELOPMENT.md" 'PrioritySlotStack|OpenerMgr\.CurrentState|PeekCurrentSlot|AIRunner\.DecisionStage|AIRunner\.ExecutionStage|SlotExecutor\.StartSlot|ExecuteStep' "BLM job-owned docs must not describe deleted old runtime stages"
 
 if ($failures.Count -gt 0) {
     Write-Host "Black Mage port validation failed:"

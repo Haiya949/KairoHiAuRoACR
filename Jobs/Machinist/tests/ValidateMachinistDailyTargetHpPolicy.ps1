@@ -73,8 +73,6 @@ Assert-Contains "Jobs/Machinist/MachinistSettings.cs" "public const string Comba
 Assert-Contains "Jobs/Machinist/MachinistSettings.cs" "public const string CombatModeHighEnd" "MCH high-end mode must remain the explicit non-daily mode"
 
 foreach ($pattern in @(
-    "private const float WeakTargetBurstHpThreshold = 0\.12f",
-    "private const float DumpResourcesHpThreshold = 0\.03f",
     "private static IBattleChara\? GetCurrentTarget\(\)",
     "private static bool ShouldUseDailyTargetHpPolicy\(\)",
     "private static float GetCurrentTargetHpPercent\(\)",
@@ -86,7 +84,19 @@ foreach ($pattern in @(
     }
 }
 
+foreach ($pattern in @(
+    "public\s+float\s+DailyWeakTargetBurstHpThreshold\s*=\s*0\.12f;",
+    "public\s+float\s+DailyDumpResourcesHpThreshold\s*=\s*0\.03f;",
+    "public\s+bool\s+DailyMinionResourceGuardEnabled\s*=\s*true;",
+    "public\s+float\s+DailyQueenHpThreshold\s*=\s*0\.75f;"
+)) {
+    Assert-Contains "Jobs/Machinist/MachinistSettings.cs" $pattern "Daily target-HP thresholds must be persisted in MCH settings"
+}
+
+Assert-NotContains "Jobs/Machinist/MachinistSpellHelper.cs" "private const float (WeakTargetBurstHpThreshold|DumpResourcesHpThreshold)" "Daily target-HP thresholds must not remain hard-coded in SpellHelper"
+
 Assert-BodyContains $helper "private static bool ShouldUseDailyTargetHpPolicy\(\)" @(
+    "_settings\.DailyMinionResourceGuardEnabled",
     "!_settings\.IsHighEndMode"
 ) "Daily target-HP policy must be disabled in high-end mode"
 
@@ -110,13 +120,13 @@ Assert-BodyContains $helper "private static bool ShouldDumpResourcesByTargetHp\(
     "!ShouldUseDailyTargetHpPolicy\(\)",
     "var target = GetCurrentTarget\(\)",
     "target is null \|\| target\.MaxHp <= 0",
-    "\(float\)target\.CurrentHp / target\.MaxHp <= DumpResourcesHpThreshold"
+    "\(float\)target\.CurrentHp / target\.MaxHp <= _settings\.DailyDumpResourcesHpThreshold"
 ) "Daily mode should auto-dump resources only when a live target is nearly dead"
 
 Assert-BodyContains $helper "private static bool ShouldHoldBurstForWeakTarget\(\)" @(
     "ShouldUseDailyTargetHpPolicy\(\)",
     "target\.IsBoss\(\)",
-    "GetCurrentTargetHpPercent\(\) <= WeakTargetBurstHpThreshold"
+    "GetCurrentTargetHpPercent\(\) <= _settings\.DailyWeakTargetBurstHpThreshold"
 ) "Daily mode should avoid planned burst on weak non-boss targets"
 
 Assert-BodyContains $helper "private static bool ShouldUseDumpResources\(\)" @(

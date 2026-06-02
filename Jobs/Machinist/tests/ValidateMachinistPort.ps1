@@ -135,10 +135,12 @@ Assert-Contains "Jobs/Machinist/MachinistRotationEntry.cs" "Opener\s*=\s*new\s+M
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "class\s+MachinistOpener\s*:\s*IOpener" "MCH opener must implement HiAuRo IOpener"
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "AEAssist|Kairo\.Machinist|UseActionManager|UseAction\(" "MCH opener must use only HiAuRo-native Slot/Spell APIs"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "InitCountDown\(CountDownHandler\s+handler\)" "MCH opener must register countdown actions through HiAuRo CountDownHandler"
-Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "handler\.AddAction\(4_000,\s*ActionId\.Reassemble,\s*SpellTargetType\.Self\)" "MCH opener must use the approved 4000ms prepull Reassemble countdown action"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "handler\.AddAction\(4_000,\s*\(\)\s*=>" "MCH opener must register prepull Reassemble through CountDownHandler; Runtime CountDownHandler.Update writes it to BattleData.NextSlot through AddSpell2NextSlot"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "new\s+Spell\(ActionId\.Reassemble,\s*SpellTargetType\.Self\)" "MCH opener must create the approved 4000ms prepull Reassemble spell through CountDownHandler"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "Type\s*=\s*SpellType\.Ability" "MCH prepull Reassemble must be marked as an ability for Runtime event history"
 Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "handler\.AddAction\([^,]+,\s*ActionId\.Drill" "MCH opener must not cast Drill during countdown; the opener GCD resolver starts Drill after countdown/combat begins"
-Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "handler\.AddAction\(0," "MCH opener must not move pull GCDs into countdown actions; Runtime v0.1.83 lazily registers countdown actions and starts OpenerMgr when countdown finishes"
-Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "public\s+List<Action<Slot>>\s+Sequence\s*=>\s*_activeSequence\s*\?\?=\s*BuildSequence\(\)" "MCH Runtime IOpener must own one executable opener sequence snapshot while OpenerMgr is running"
+Assert-NotContains "Jobs/Machinist/Opener/MachinistOpener.cs" "handler\.AddAction\(0," "MCH opener must not move pull GCDs into countdown actions; Runtime CountDownHandler owns countdown NextSlot actions and OpenerMgr starts the opener sequence"
+Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "public\s+List<Action<Slot>>\s+Sequence\s*=>\s*_activeSequence\s*\?\?=\s*BuildSequence\(\)" "MCH Runtime IOpener must own one executable opener sequence snapshot while OpenerMgr pushes it into BattleData.CurrSequence"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "private static readonly \(Func<bool> IsAvailable, Action<Slot> Build\)\[\] StandardOpenerSteps" "MCH opener must keep executable opener steps in a native Sequence builder"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "private static List<Action<Slot>> BuildSequence\(\)" "MCH opener must build its Runtime Sequence before indexed execution starts"
 Assert-Contains "Jobs/Machinist/Opener/MachinistOpener.cs" "StartCheck\(\)" "MCH opener must be startable by Runtime when countdown ends or combat starts"
@@ -252,6 +254,9 @@ Assert-NotContains "Jobs/Machinist/MachinistRotationEventHandler.cs" "MachinistT
 Assert-NotContains "Jobs/Machinist/MachinistRotationEntry.cs" "BuildTargetResolvers" "Target selection must not be frozen at Rotation Build time"
 Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "CombatContext\.State\.InCombat" "Docs must state that normal ACR loop starts only after InCombat"
 Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "IOpener" "Docs must state that countdown pull actions belong to Opener"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "ACRLifecycle\.Update\(\): Refresh -> UpdateCountDown -> AiLoop\.Update\(runner\)" "Docs must describe the current CalSlot/AiLoop.Update runtime chain"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "BattleData\.AddSpell2NextSlot\(spell\).*BattleData\.NextSlot" "Docs must state countdown spells enter BattleData.NextSlot through AddSpell2NextSlot"
+Assert-Contains "Jobs/Machinist/docs/DEVELOPMENT.md" "OpenerMgr\.UseOpener\(battleData, rotation\).*BattleData\.CurrSequence" "Docs must state OpenerMgr pushes opener Sequence into BattleData.CurrSequence"
 Assert-Contains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" "production opener logic" "Docs must distinguish production countdown handling from read-only debug display"
 Assert-NotContains "Jobs/Machinist/docs/HI_AURO_AUTHOR_GUIDE_COMPLIANCE.md" 'ACR 面板可以只读显示|read-only display .*Countdown\.CountdownTimer|Countdown\.CountdownTimer.*CountDownHandler' "Docs must not permit ACR UI to read countdown IPC directly"
 Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
@@ -266,7 +271,7 @@ Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
 Assert-InOrder "Jobs/Machinist/MachinistSpellHelper.cs" @(
     "public static Spell? GetQueenOffGcd()",
     "if (IsForbidBurstActive())",
-    "var shouldSpendBatteryByBudget"
+    "var shouldSpendBatteryBySelectedStrategy"
 ) "Battery budget paths must respect ForbidBurst first"
 Assert-Contains "Jobs/Machinist/MachinistSpellHelper.cs" "LevelAtLeast\(80\)\s*\?\s*ActionId\.QueenOverdrive\s*:\s*ActionId\.RookOverdrive" "MCH robot overdrive must choose RookOverdrive below level 80"
 

@@ -1,3 +1,5 @@
+using KairoHiAuRoACR.Jobs.BlackMage.Triggers;
+
 namespace KairoHiAuRoACR.Jobs.BlackMage;
 
 public sealed class BlackMageRotationUi : IRotationUI
@@ -40,21 +42,21 @@ public sealed class BlackMageRotationUi : IRotationUI
         builder.AddIntInput("通晓倾泻层数", ref _settings.PolyglotDumpStacks, 1, 1);
 
         builder.AddGroup("快捷动作");
-        builder.AddQtHotkey("爆发药", new HotkeyResolver_Potion());
-        builder.AddQtHotkey("冲刺", new HotkeyResolver_Sprint());
-        builder.AddQtHotkey("极限技", new HotkeyResolver_LB());
-        builder.AddQtHotkey("即刻咏唱", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Swiftcast, "即刻咏唱", SpellTargetType.Self));
-        builder.AddQtHotkey("三连咏唱", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Triplecast, "三连咏唱", SpellTargetType.Self));
-        builder.AddQtHotkey("黑魔纹", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.LeyLines, "黑魔纹", SpellTargetType.Self));
-        builder.AddQtHotkey("回到魔纹", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.BetweenTheLines, "回到魔纹", SpellTargetType.Self));
-        builder.AddQtHotkey("魔纹重置", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Retrace, "魔纹重置", SpellTargetType.Self));
-        builder.AddQtHotkey("魔泉", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Manafont, "魔泉", SpellTargetType.Self));
-        builder.AddQtHotkey("星灵移位", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Transpose, "星灵移位", SpellTargetType.Self));
-        builder.AddQtHotkey("详述", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Amplifier, "详述", SpellTargetType.Self));
-        builder.AddQtHotkey("魔罩", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Manaward, "魔罩", SpellTargetType.Self));
-        builder.AddQtHotkey("以太步", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.AetherialManipulation, "以太步"));
-        builder.AddQtHotkey("昏乱", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Addle, "昏乱"));
-        builder.AddQtHotkey("沉稳咏唱", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.Surecast, "沉稳咏唱", SpellTargetType.Self));
-        builder.AddQtHotkey("醒梦", new HotkeyResolver_NormalSpell(BLMHelper.EN.Skills.LucidDreaming, "醒梦", SpellTargetType.Self));
+        builder.AddQtHotkey("爆发药", new BlackMagePotionHotkeyResolver());
+        builder.AddQtHotkey("冲刺", new BlackMageSpellHotkeyResolver("blm_hk_sprint", "冲刺", 3, SpellTargetType.Self, SpellCategory.Sprint));
+        builder.AddQtHotkey("极限技", new BlackMageSpellHotkeyResolver("blm_hk_limit_break", "极限技", SpellsDefine.极限技, SpellTargetType.Target, SpellCategory.LimitBreak));
+        builder.AddQtHotkey("即刻咏唱", new BlackMageSpellHotkeyResolver("blm_hk_swiftcast", "即刻咏唱", BLMHelper.EN.Skills.Swiftcast, SpellTargetType.Self));
+        builder.AddQtHotkey("三连咏唱", new BlackMageSpellHotkeyResolver("blm_hk_triplecast", "三连咏唱", BLMHelper.EN.Skills.Triplecast, SpellTargetType.Self));
+        builder.AddQtHotkey("黑魔纹", new BlackMageSpellHotkeyResolver("blm_hk_ley_lines", "黑魔纹", BLMHelper.EN.Skills.LeyLines, SpellTargetType.Self));
+        builder.AddQtHotkey("回到魔纹", new BlackMageSpellHotkeyResolver("blm_hk_between_the_lines", "回到魔纹", BLMHelper.EN.Skills.BetweenTheLines, SpellTargetType.Self));
+        builder.AddQtHotkey("魔纹重置", new BlackMageSpellHotkeyResolver("blm_hk_retrace", "魔纹重置", BLMHelper.EN.Skills.Retrace, SpellTargetType.Self));
+        builder.AddQtHotkey("魔泉", new BlackMageSpellHotkeyResolver("blm_hk_manafont", "魔泉", BLMHelper.EN.Skills.Manafont, SpellTargetType.Self));
+        builder.AddQtHotkey("星灵移位", new BlackMageSpellHotkeyResolver("blm_hk_transpose", "星灵移位", BLMHelper.EN.Skills.Transpose, SpellTargetType.Self));
+        builder.AddQtHotkey("详述", new BlackMageSpellHotkeyResolver("blm_hk_amplifier", "详述", BLMHelper.EN.Skills.Amplifier, SpellTargetType.Self));
+        builder.AddQtHotkey("魔罩", new BlackMageSpellHotkeyResolver("blm_hk_manaward", "魔罩", BLMHelper.EN.Skills.Manaward, SpellTargetType.Self));
+        builder.AddQtHotkey("以太步", new BlackMageSpellHotkeyResolver("blm_hk_aetherial_manipulation", "以太步", BLMHelper.EN.Skills.AetherialManipulation));
+        builder.AddQtHotkey("昏乱", new BlackMageSpellHotkeyResolver("blm_hk_addle", "昏乱", BLMHelper.EN.Skills.Addle));
+        builder.AddQtHotkey("沉稳咏唱", new BlackMageSpellHotkeyResolver("blm_hk_surecast", "沉稳咏唱", BLMHelper.EN.Skills.Surecast, SpellTargetType.Self));
+        builder.AddQtHotkey("醒梦", new BlackMageSpellHotkeyResolver("blm_hk_lucid_dreaming", "醒梦", BLMHelper.EN.Skills.LucidDreaming, SpellTargetType.Self));
     }
 }

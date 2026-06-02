@@ -34,7 +34,10 @@ public sealed class MachinistOpener : IOpener
 
     public void InitCountDown(CountDownHandler handler)
     {
-        handler.AddAction(4_000, ActionId.Reassemble, SpellTargetType.Self);
+        handler.AddAction(4_000, () => new Spell(ActionId.Reassemble, SpellTargetType.Self)
+        {
+            Type = SpellType.Ability,
+        });
     }
 
     private static List<Action<Slot>> BuildSequence()

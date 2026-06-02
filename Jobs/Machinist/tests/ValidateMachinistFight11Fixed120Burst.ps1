@@ -106,7 +106,7 @@ $queenBody = Get-Body $helper "public static Spell\? GetQueenOffGcd\(\)" "Queen/
 Assert-Order $queenBody @(
     "var shouldSpendBatteryInFixed120Burst = ShouldSpendBatteryInFixed120Burst();",
     "if (ShouldHoldBatteryForFixed120Burst())",
-    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryByBudget || CanUseBurstResource())"
+    "if (ShouldUseDumpResources() || IsForceBurstActive() || shouldSpendBatteryInFixed120Burst || shouldSpendBatteryBySelectedStrategy || CanUseBatteryByBurstResourcePermission())"
 ) "Queen/Rook must be held before the 120s package and released after Drill before Chain Saw"
 
 $wildfireDelayBody = Get-Body $helper "private static bool ShouldDelayWildfireUntilHyperchargeForBurstPackage\(\)" "Wildfire fixed 120s package guard"

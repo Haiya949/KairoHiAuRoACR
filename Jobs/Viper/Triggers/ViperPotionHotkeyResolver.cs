@@ -1,4 +1,3 @@
-using HiAuRo.Runtime;
 using OmenTools.Interop.Game.Lumina;
 
 namespace KairoHiAuRoACR.Jobs.Viper;
@@ -22,7 +21,7 @@ public sealed class ViperPotionHotkeyResolver : IHotkeyResolver
 
         var slot = new Slot();
         slot.Add(Spell.CreatePotion());
-        ACRLifecycle.Runner.SpellQueue.Enqueue(slot);
+        SlotHelper.Enqueue(slot);
         ViperSpellHelper.ConsumeTimelinePotionRequest();
     }
 }

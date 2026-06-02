@@ -25,6 +25,12 @@ public sealed class MachinistRotationUi : IRotationUI
 
         builder.AddGroup("运行设置");
         builder.AddDropdown("战斗模式", MachinistSettings.CombatModeOptions, ref _settings.CombatMode);
+        builder.AddDropdown("机器人策略", MachinistSettings.BatteryStrategyOptions, ref _settings.BatteryStrategy);
+        builder.AddIntInput("机器人阈值优先电量", ref _settings.BatteryThresholdStrategySpendThreshold, 5, 10);
+        builder.AddFloatInput("日随保留爆发血量阈值", ref _settings.DailyWeakTargetBurstHpThreshold);
+        builder.AddFloatInput("日随泄资源血量阈值", ref _settings.DailyDumpResourcesHpThreshold);
+        builder.AddCheckbox("日随小怪资源保护", ref _settings.DailyMinionResourceGuardEnabled);
+        builder.AddFloatInput("日随机器人血量阈值", ref _settings.DailyQueenHpThreshold);
 
         builder.AddGroup("快捷动作");
         builder.AddQtHotkey("爆发药", new HotkeyResolver_Potion());

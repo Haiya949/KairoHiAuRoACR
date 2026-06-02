@@ -560,6 +560,9 @@ public static class ViperSpellHelper
         if (ShouldHoldResourceForBaseCombo())
             return false;
 
+        if (ShouldSpendRattlingCoilForSerpentsIreForecast())
+            return true;
+
         if (ShouldHoldNewResourceForSerpentsIre())
             return false;
 
@@ -596,7 +599,8 @@ public static class ViperSpellHelper
 
     public static bool ShouldHoldReawakenForSerpentsIre()
     {
-        return ShouldHoldNewResourceForSerpentsIre() && !CanStartDoubleReawakenBeforeSerpentsIre();
+        return (ShouldHoldNewResourceForSerpentsIre() && !CanStartDoubleReawakenBeforeSerpentsIre())
+            || ShouldHoldReawakenForSerpentsIreForecast();
     }
 
     public static bool ShouldHoldReawakenForBaseCombo()
@@ -615,7 +619,8 @@ public static class ViperSpellHelper
 
     public static bool ShouldHoldNewResourceForSerpentsIre()
     {
-        return CanUseSerpentsIreBeforeGcdWindow();
+        return CanUseSerpentsIreBeforeGcdWindow()
+            || ShouldHoldDreadwinderForSerpentsIreForecast();
     }
 
     public static bool HasReawakenBuffCoverage()
@@ -909,12 +914,152 @@ public static class ViperSpellHelper
         return _currentBattleTimeMs;
     }
 
+    public static (uint? ActionId, string Reason) GetPredictedNextGcd()
+    {
+        if (GetReawakenGcd() is { } reawaken)
+            return (reawaken.Id, "Reawaken");
+
+        if (GetDreadwinderGcd() is { } dreadwinder)
+            return (dreadwinder.Id, "Dreadwinder");
+
+        if (GetRattlingCoilGcd() is { } rattlingCoil)
+            return (rattlingCoil.Id, "RattlingCoil");
+
+        if (GetAoeGcd() is { } aoe)
+            return (aoe.Id, "Aoe");
+
+        if (GetRangedFallbackGcd() is { } rangedFallback)
+            return (rangedFallback.Id, "RangedFallback");
+
+        if (GetBaseGcd() is { } baseGcd)
+            return (baseGcd.Id, "BaseCombo");
+
+        return (null, "NoGcd");
+    }
+
     private static bool ShouldSpendReawakenToPreventLoss()
     {
         return GetSerpentOffering() >= 90
             || HelperRuntime.HasStatus(StatusId.ReadyToReawaken)
             || HelperRuntime.HasStatus(StatusId.Reawakened)
             || ShouldDumpResources();
+    }
+
+    private static bool ShouldHoldReawakenForSerpentsIreForecast()
+    {
+        if (!CanUseSerpentsIreForecast())
+            return false;
+
+        if (GetSerpentOffering() < 50)
+            return false;
+
+        var forecastOffering = GetPredictedSerpentOfferingBeforeSerpentsIre(-50);
+        return forecastOffering < 50;
+    }
+
+    private static bool ShouldHoldDreadwinderForSerpentsIreForecast()
+    {
+        if (!CanUseSerpentsIreForecast())
+            return false;
+
+        if (GetDreadwinderCharges() < 1 || GetDreadwinderCooldownRemainingMs() <= GetSerpentsIreCooldownRemainingMs())
+            return false;
+
+        return GetSerpentsIreForecastOfferingGain(includeReadyDreadwinder: true)
+            > GetSerpentsIreForecastOfferingGain(includeReadyDreadwinder: false);
+    }
+
+    private static bool ShouldSpendRattlingCoilForSerpentsIreForecast()
+    {
+        if (!CanUseSerpentsIreForecast())
+            return false;
+
+        if (GetRattlingCoilStacks() <= 0 || !TargetSpell(ActionId.UncoiledFury).IsReadyWithCanCast())
+            return false;
+
+        var currentForecastOffering = GetPredictedSerpentOfferingBeforeSerpentsIre();
+        if (currentForecastOffering >= 50)
+            return false;
+
+        return currentForecastOffering + 10 >= 50;
+    }
+
+    private static int GetPredictedSerpentOfferingBeforeSerpentsIre(int immediateOfferingDelta = 0)
+    {
+        return Math.Clamp(GetSerpentOffering() + immediateOfferingDelta + GetSerpentsIreForecastOfferingGain(), 0, 100);
+    }
+
+    private static int GetSerpentsIreForecastOfferingGain(bool includeReadyDreadwinder = true)
+    {
+        if (!CanUseSerpentsIreForecast())
+            return 0;
+
+        var availableMs = GetSerpentsIreForecastWindowMs();
+        var baseThirdHits = CountBaseComboThirdHitsBeforeSerpentsIre(availableMs);
+        var dreadwinderHits = includeReadyDreadwinder ? CountReadyDreadwinderUsesBeforeSerpentsIre(availableMs) : 0;
+        return (baseThirdHits + dreadwinderHits) * 10;
+    }
+
+    private static bool CanUseSerpentsIreForecast()
+    {
+        return GetCombatProfile() == ViperCombatProfile.HighEnd
+            && !IsForceBurstActive()
+            && !IsInTwoMinuteBurstWindow()
+            && GetSerpentsIreCooldownRemainingMs() > 0
+            && GetSerpentsIreCooldownRemainingMs() <= _settings.SerpentsIreResourceForecastLookaheadMs
+            && CanUseResourceBase();
+    }
+
+    private static int GetSerpentsIreForecastWindowMs()
+    {
+        return Math.Max(0, GetSerpentsIreCooldownRemainingMs() - (int)Math.Max(0, GCDHelper.GetGCDCooldown()) - _settings.SerpentsIreResourceForecastSafetyMs);
+    }
+
+    private static int CountBaseComboThirdHitsBeforeSerpentsIre(int availableMs)
+    {
+        if (availableMs <= 0)
+            return 0;
+
+        var nextStep = GetNextBaseComboStep();
+        if (nextStep < 1 || nextStep > 3)
+            return 0;
+
+        var gcdDuration = Math.Max(1, (int)GCDHelper.GetGCDDuration());
+        var firstThirdHitOffset = (3 - nextStep) * gcdDuration;
+        if (firstThirdHitOffset > availableMs)
+            return 0;
+
+        return ((availableMs - firstThirdHitOffset) / (gcdDuration * 3)) + 1;
+    }
+
+    private static int CountReadyDreadwinderUsesBeforeSerpentsIre(int availableMs)
+    {
+        if (availableMs <= 0 || GetDreadwinderCharges() < 1)
+            return 0;
+
+        var gcdDuration = Math.Max(1, (int)GCDHelper.GetGCDDuration());
+        var dreadwinderPackageMs = gcdDuration * 3;
+        return dreadwinderPackageMs <= availableMs ? 1 : 0;
+    }
+
+    private static int GetNextBaseComboStep()
+    {
+        return GetLastComboStep() switch
+        {
+            1 => 2,
+            2 => 3,
+            _ => 1,
+        };
+    }
+
+    private static int GetSerpentsIreCooldownRemainingMs()
+    {
+        return (int)Math.Max(0, HelperRuntime.GetCooldownRemaining(ActionId.SerpentsIre));
+    }
+
+    private static int GetDreadwinderCooldownRemainingMs()
+    {
+        return (int)Math.Max(0, HelperRuntime.GetCooldownRemaining(ActionId.Vicewinder));
     }
 
     public static bool ShouldHoldResourceForBaseCombo()
